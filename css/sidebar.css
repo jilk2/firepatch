@@ -1,4 +1,4 @@
-.sidebar {
+.aside {
   border-right: 1px solid var(--line);
   padding: 14px 14px 18px;
   display: flex;
@@ -31,13 +31,13 @@ nav {
 }
 
 .nav-item:hover,
-.nav-item.active {
+.nav-item.current {
   background: #103142;
   border-color: #1c5368;
   color: #f2fcff;
 }
 
-.nav-item.active {
+.nav-item.current {
   background: var(--cyan-soft);
   border-color: #12627c;
   color: #f2fcff;
@@ -45,7 +45,7 @@ nav {
   position: relative;
 }
 
-.nav-item.active::before {
+.nav-item.current::before {
   content: "";
   width: 6px;
   height: 6px;
@@ -55,7 +55,7 @@ nav {
   left: 10px;
 }
 
-.nav-item.active .nav-icon {
+.nav-item.current .nav-icon {
   margin-left: 10px;
 }
 
