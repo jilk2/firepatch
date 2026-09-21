@@ -17,9 +17,9 @@
             <section class="card mission">
                 <h4>HUIDIGE MISSIE - RUNNING</h4>
                 <h2>Ecosysteemscan - Sector 03</h2>
-                <p>Missievoortgang <strong>66% Voltooid</strong></p>
+                <p>Missievoortgang <strong>66% Voltooid</strong></p> <!-- DEZE WERKT NOG NIET -->
                 <div class="progress cyan">
-                    <div></div>
+                    <div style="width: 66%;"></div>
                 </div>
                 <ul>
                     <li>Biomassascan <span>Gereed</span></li>

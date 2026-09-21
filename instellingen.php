@@ -30,17 +30,17 @@
           <h2>⚙ Drone Configuratie</h2>
           <div class="setting-row">
             <div class="setting-label"><span>Maximale vlieghoogte</span><span class="setting-value">120m</span></div>
-            <div class="range" style="--dot: 27%"></div>
+            <input type="range" class="range-input" min="0" max="100" value="27" aria-label="Maximale vlieghoogte">
           </div>
           <div class="setting-row">
             <div class="setting-label"><span>Minimale batterij voor terugkeer</span><span
                 class="setting-value">20%</span></div>
-            <div class="range" style="--dot: 7%"></div>
+            <input type="range" class="range-input" min="0" max="100" value="7" aria-label="Minimale batterij voor terugkeer">
           </div>
           <div class="setting-row">
             <div class="setting-label"><span>Maximale windsnelheid</span><span class="setting-value">45 km/h</span>
             </div>
-            <div class="range" style="--dot: 15%"></div>
+            <input type="range" class="range-input" min="0" max="100" value="15" aria-label="Maximale windsnelheid">
           </div>
           <div class="setting-row">
             <div class="setting-label"><span>Niet vliegen bij regen</span><span class="toggle on"></span></div>
