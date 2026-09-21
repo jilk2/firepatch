@@ -23,14 +23,7 @@
                     </div>
                 </div>
                 <div class="map">
-                    <iframe
-                        src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d25534.453872819813!2d6.010588891485108!3d52.04765963410813!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e1!3m2!1sen!2snl!4v1788955259685!5m2!1sen!2snl"
-                        width="100%" height="450" style="border:0;" allowfullscreen="" loading="lazy"
-                        referrerpolicy="strict-origin-when-cross-origin"></iframe>
-                    <div class="marker m1">Sector 01</div>
-                    <div class="marker m2">Sector 02</div>
-                    <div class="marker m3">Sector 03</div>
-                    <div class="marker m4">Sector 04</div>
+                    <img id="map" src="image/map.png" alt="map of the region">
                 </div>
             </section>
 
@@ -96,6 +89,7 @@
             </section>
         </aside>
     </div>
+    <script src="js/map.js"></script>
 </body>
 
 </html>
