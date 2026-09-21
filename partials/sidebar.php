@@ -8,7 +8,7 @@
 </head>
 
 <body>
-    <aside class="sidebar">
+    <aside>
         <nav>
             <?php $currentpage = basename($_SERVER['PHP_SELF']); ?>
             <a href="index.php" class="nav-item <?= $currentpage === 'index.php' ? ' current' : '' ?>"><span class="nav-icon">⌂</span>Overzicht</a>
@@ -16,7 +16,7 @@
             <a href="kaart.php" class="nav-item <?= $currentpage === 'kaart.php' ? ' current' : '' ?>"><span class="nav-icon">🗺</span>Kaart</a>
             <a href="logboek.php" class="nav-item <?= $currentpage === 'logboek.php' ? ' current' : '' ?>"><span class="nav-icon">🗋</span>Logboek</a>
             <a href="instellingen.php" class="nav-item <?= $currentpage === 'instellingen.php' ? ' current' : '' ?>"><span class="nav-icon">⚙</span>Instellingen</a>
-            <a href="verifynet.php" class="nav-item <?= $currentpage === 'verifynet.php' ? ' current' : '' ?>"><span class="nav-icon">⚙</span>VerifyNET</a>
+            <a href="verifynet.php" class="nav-item <?= $currentpage === 'verifynet.php' ? ' current' : '' ?>"><span class="nav-icon">◈</span>VerifyNET</a>
         </nav>
         <div class="fleet">
             <h3>FLEET MATRIX</h3>

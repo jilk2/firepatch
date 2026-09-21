@@ -8,11 +8,11 @@
 </head>
 
 <body>
-    <header class="topbar">
+    <header>
         <div class="brand">
-            <div class="shield">◈</div>
+            <span class="shield">◈</span>
             <div>
-                <h1>NATURE<span>GUARD</span></h1>
+                <h1>FIRE<span>PATCH</span></h1>
                 <p>AUTONOMOUS BIOSPHERE DEFENSE</p>
             </div>
         </div>
