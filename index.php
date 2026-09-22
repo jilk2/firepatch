@@ -1,9 +1,7 @@
 <!doctype html>
 <html lang="nl">
 
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<head>    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>NatureGuard Dashboard - Overzicht</title>
     <link rel="stylesheet" href="./css/main.css" />
     <script src="./js/main.js" defer></script>
@@ -30,12 +28,10 @@
             <section class="alert-card">
                 <div>
                     <h3>⚠ ACTIE GEVRAAGD</h3>
-                    <p>Droogte gedetecteerd in Sector 04.</p>
-                    <p>Aanbevolen: 3 deployment drones inzetten ter bewatering.</p>
+                    <p>Brand gedetecteerd in Sector <?php echo "4"?>.</p>
                 </div>
                 <div class="page-actions">
-                    <a href="#" class="btn">Aanpassen</a>
-                    <a href="#" class="btn primary">Goedkeuren</a>
+                    <a href="mission.php" class="btn primary">Bekijk</a>
                 </div>
             </section>
 
@@ -58,21 +54,7 @@
         </main>
 
         <aside class="rightbar">
-            <section class="card">
-                <div class="card-head">
-                    <h2>Drone Status</h2>
-                    <span class="drone-state">Actief</span>
-                </div>
-                <div class="stats">
-                    <p>Huidige Zone <strong>Sector 03</strong></p>
-                    <p>Accuniveau <strong>78%</strong></p>
-                    <div class="progress">
-                        <div style="width: 78%"></div>
-                    </div>
-                    <p>Verwachte Terugkomst <strong>16:42 uur</strong></p>
-                    <p>Sub-drones Actief <strong>3 eenheden</strong></p>
-                </div>
-            </section>
+
 
             <section class="card mission">
                 <h4>HUIDIGE MISSIE</h4>
@@ -86,6 +68,19 @@
                     <li>Wateranalyse <span>Gereed</span></li>
                     <li class="active">Inventarisatie <span>Actief</span></li>
                 </ul>
+            </section>
+            <section class="card">
+                <div class="card-head">
+                    <h2>Drone Status</h2>
+                    <span class="drone-state">Actief</span>
+                </div>
+                <div class="stats">
+                    <p>Accuniveau <strong>78%</strong></p>
+                    <div class="progress">
+                        <div style="width: 78%"></div>
+                    </div>
+                    <p>Verwachte Terugkomst <strong>16:42 uur</strong></p>
+                </div>
             </section>
         </aside>
     </div>

@@ -1,5 +1,5 @@
 aside {
-  border-right: 1px solid var(--line);
+  border-right: 1px solid var(--black);
   padding: 14px 14px 18px;
   display: flex;
   flex-direction: column;
@@ -32,15 +32,15 @@ nav {
 
 .nav-item:hover,
 .nav-item.current {
-  background: #103142;
-  border-color: #1c5368;
-  color: #f2fcff;
+  background: var(--gray);
+  border-color: var(--black);
+  color: var(--white);
 }
 
 .nav-item.current {
-  background: var(--cyan-soft);
-  border-color: #12627c;
-  color: #f2fcff;
+  background: var(--red);
+  border-color: var(--black);
+  color: var(--white);
   font-weight: 700;
   position: relative;
 }
@@ -50,7 +50,7 @@ nav {
   width: 6px;
   height: 6px;
   border-radius: 999px;
-  background: var(--cyan);
+  background: var(--white);
   position: absolute;
   left: 10px;
 }
@@ -62,9 +62,9 @@ nav {
 .fleet {
   margin-top: 24px;
   font-size: 13px;
-  color: var(--muted);
-  background: rgba(8, 18, 31, 0.55);
-  border: 1px solid #101e2f;
+  color: var(--white);
+  background: var(--gray);
+  border: 1px solid var(--black);
   border-radius: 12px;
   padding: 14px;
 }
@@ -73,7 +73,7 @@ nav {
   margin: 0 0 10px;
   font-size: 12px;
   letter-spacing: 2px;
-  color: #56708d;
+  color: var(--white);
 }
 
 .fleet p {
@@ -83,6 +83,6 @@ nav {
 }
 
 .fleet span {
-  color: var(--cyan);
+  color: var(--lightgreen);
   font-weight: 700;
 }

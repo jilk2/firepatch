@@ -15,7 +15,7 @@
             <a href="mission.php" class="nav-item <?= $currentpage === 'mission.php' ? ' current' : '' ?>"><span class="nav-icon">●</span>Missies</a>
             <a href="kaart.php" class="nav-item <?= $currentpage === 'kaart.php' ? ' current' : '' ?>"><span class="nav-icon">🗺</span>Kaart</a>
             <a href="logboek.php" class="nav-item <?= $currentpage === 'logboek.php' ? ' current' : '' ?>"><span class="nav-icon">🗋</span>Logboek</a>
-            <a href="instellingen.php" class="nav-item <?= $currentpage === 'instellingen.php' ? ' current' : '' ?>"><span class="nav-icon">⚙</span>Instellingen</a>
+    <!--            <a href="instellingen.php" class="nav-item --><?php //= $currentpage === 'instellingen.php' ? ' current' : '' ?><!--"><span class="nav-icon">⚙</span>Instellingen</a>-->
             <a href="verifynet.php" class="nav-item <?= $currentpage === 'verifynet.php' ? ' current' : '' ?>"><span class="nav-icon">⚙</span>VerifyNET</a>
         </nav>
         <div class="fleet">
