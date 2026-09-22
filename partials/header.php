@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="./css/header.css" />
+    <link rel="stylesheet" href="./css/header.css"/>
 </head>
 
 <body>
@@ -12,17 +12,17 @@
         <div class="brand">
             <span class="shield">◈</span>
             <div>
-                <h1>FIRE<span>PATCH</span></h1>
+                <h1><span>FIRE</span>PATCH</h1>
                 <p>AUTONOMOUS BIOSPHERE DEFENSE</p>
             </div>
         </div>
         <div class="topbar-right">
             <span class="online-dot"></span>
-            <span class="status">Veluwe-Net: ONLINE</span>
+            <span class="status">Connection: ONLINE</span>
             <div class="user">
                 <div>
                     <strong>Wout van Houten</strong>
-                    <p>Ranger - Veluwe District</p>
+                    <p>Boswachter</p>
                 </div>
                 <div class="avatar">WV</div>
             </div>

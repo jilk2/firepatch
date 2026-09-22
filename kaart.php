@@ -37,19 +37,21 @@
             </div>
           </div>
           <div class="map">
-            <iframe
-              src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d25534.453872819813!2d6.010588891485108!3d52.04765963410813!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e1!3m2!1sen!2snl!4v1788955259685!5m2!1sen!2snl"
-              width="100%" height="600" style="border:0;" allowfullscreen="" loading="lazy"
-              referrerpolicy="strict-origin-when-cross-origin"></iframe>
+              <div class="map">
+                  <img src="" alt="Kaart voor simulatie" id="map-image">
+              </div>
+
+
+<!--            <iframe-->
+<!--              src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d25534.453872819813!2d6.010588891485108!3d52.04765963410813!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e1!3m2!1sen!2snl!4v1788955259685!5m2!1sen!2snl"-->
+<!--              width="100%" height="600" style="border:0;" allowfullscreen="" loading="lazy"-->
+<!--              referrerpolicy="strict-origin-when-cross-origin"></iframe>-->
             <div class="marker m1 ok">S01 · Stabiel</div>
             <div class="marker m2">S02 · Analyse</div>
             <div class="marker m3 ok">S03 · Patrouille</div>
             <div class="marker m4 warn">S04 · Droogte</div>
             <div class="overlay-box">
-              <h4>SELECTIE S04</h4>
-              Bodemvochtigheid 12%<br />
-              Temperatuur 34°C<br />
-              Wind 16 km/u
+                <!-- filler -->
             </div>
           </div>
         </section>
