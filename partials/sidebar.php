@@ -19,9 +19,9 @@
             <a href="verifynet.php" class="nav-item <?= $currentpage === 'verifynet.php' ? ' current' : '' ?>"><span class="nav-icon">⚙</span>VerifyNET</a>
         </nav>
         <div class="fleet">
-            <h3>FLEET MATRIX</h3>
-            <p>Drone Signalen <span>12/12</span></p>
-            <p>Signaalsterkte <span>98%</span></p>
+            <h3>VerifyNET</h3>
+            <p> Status: <span>Online</span></p>
+            <p> Ongelezen: <span>5</span></p>
         </div>
     </aside>
 </body>

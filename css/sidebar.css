@@ -45,18 +45,10 @@ nav {
   position: relative;
 }
 
-.nav-item.current::before {
-  content: "";
-  width: 6px;
-  height: 6px;
-  border-radius: 999px;
-  background: var(--white);
-  position: absolute;
-  left: 10px;
-}
 
 .nav-item.current .nav-icon {
-  margin-left: 10px;
+  margin-left: 5px;
+  font-weight: bold;
 }
 
 .fleet {

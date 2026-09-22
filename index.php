@@ -82,6 +82,7 @@
                         <div style="width: 78%"></div>
                     </div>
                     <p>Verwachte Terugkomst <strong>16:42 uur</strong></p>
+                    <p>Signaalsterkte <strong>98%</strong></p>
                 </div>
             </section>
         </aside>
