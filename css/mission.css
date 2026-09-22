@@ -1,26 +1,25 @@
 .mission p {
   display: flex;
+  color: var(--white);
   justify-content: space-between;
 }
 
 .mission strong {
-  color: #f0fbff;
+  color: var(--white);
 }
 
 .progress {
   width: 100%;
-  max-width: 220px;
   height: 8px;
-  background: #1b3046;
+  background: var(--gray);
   border-radius: 999px;
   overflow: hidden;
   margin: 6px 0 12px;
 }
 
 .progress div {
-  width: 0;
   height: 100%;
-  background: #1bf09a;
+  background: var(--lightgreen);
 }
 
 .mission {
@@ -31,7 +30,7 @@
   margin: 0;
   font-size: 12px;
   letter-spacing: 1px;
-  color: var(--cyan);
+  color: var(--white);
 }
 
 .mission h2 {
@@ -40,7 +39,7 @@
 }
 
 .progress.cyan div {
-  background: var(--cyan);
+  background: var(--lightgreen);
 }
 
 .mission ul {
@@ -53,16 +52,16 @@
   display: flex;
   justify-content: space-between;
   padding: 9px 0;
-  border-top: 1px solid var(--line-soft);
-  color: #b3cbde;
+  border-top: 1px solid var(--gray);
+  color: var(--white);
 }
 
 .mission li span {
-  color: #1de292;
+  color: var(--green);
 }
 
 .mission li.active span {
-  color: var(--cyan);
+  color: var(--lightgreen);
 }
 
 .queue {

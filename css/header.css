@@ -1,5 +1,5 @@
 
-.topbar {
+header {
   height: 76px;
   padding: 0 22px;
   border-bottom: 1px solid var(--red);
@@ -82,5 +82,4 @@
   font-size: 12px;
   color: var(--white);
   background: var(--gray);
-}
 }
