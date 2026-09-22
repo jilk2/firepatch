@@ -1,3 +1,9 @@
+<?php
+require_once('./partials/db.php');
+
+//add to $db the values from input fields
+?>
+
 <!doctype html>
 <html lang="nl">
 
@@ -7,6 +13,7 @@
     <title>NatureGuard | Missies</title>
     <link rel="stylesheet" href="./css/main.css" />
     <link rel="stylesheet" href="./css/mission.css" />
+    <script src="./js/mission.js" defer></script>
 </head>
 
 <body>
@@ -29,15 +36,19 @@
             </section>
 
             <section class="card queue">
-                <div>
-                    <h4>GEPLANDE INTERVENTIE</h4>
-                    <h3>Droogte interventie - Sector 04</h3>
-                    <p>Wachten op goedkeuring of start-trigger. Gepland met 3 mini-E drones
-                        ter gerichte irrigatie van droogtestress-hotspots.</p>
+                <div class="content">
+                    <div>
+                        <h4>GEPLANDE INTERVENTIE</h4>
+                        <h3>Brand gedetecteerd - VerifyNET</h3>
+                        <p>Brand gedetecteerd door 4 mensen op 51°56'31.2"N - 4°31'10.1"E</p>
+                    </div>
+                    <div class="alert-actions">
+                        <a href="#" class="btn ghost">check verifyNET</a>
+                        <a href="#" class="btn primary">Stuur drone</a>
+                    </div>
                 </div>
-                <div class="alert-actions">
-                    <a href="#" class="btn ghost">Aanpassen</a>
-                    <a href="#" class="btn primary">Goedkeuren</a>
+                <div class="image-container">
+                    <img src="images/brandje.jpg" alt="verifynet img">
                 </div>
             </section>
         </main>
@@ -51,43 +62,50 @@
                 <div class="form-field">
                     <label for="sector-select">Selecteer Gebied / Sector</label>
                     <select id="sector-select" class="mission-select">
-                        <option>Sector 04 (Veluwe-Oost)</option>
-                        <option>Sector 03 (Veluwe-Midden)</option>
-                        <option>Sector 02 (Veluwe-Noord)</option>
+                        <option>Kralingse Bos</option>
                     </select>
                 </div>
 
                 <div class="form-field">
                     <label>Missie Doelen</label>
                     <ul class="checklist">
-                        <li><label><input type="checkbox" checked> Ecosysteem monitoren</label></li>
-                        <li><label><input type="checkbox" checked> Droogte detecteren</label></li>
-                        <li><label><input type="checkbox"> Dieren monitoren</label></li>
-                        <li><label><input type="checkbox"> Biodiversiteit meten</label></li>
+                        <li><label><input type="checkbox" checked> planten scannen </label></li>
+                        <li><label><input type="checkbox" checked> Grondvruchtbaarheid meten </label></li>
+                        <li><label><input type="checkbox"> Dieren monitoren </label></li>
+                        <li><label><input type="checkbox"> Lichtlevels controleren </label></li>
                     </ul>
                 </div>
 
                 <div class="form-field">
                     <label>Interventies Toestaan</label>
                     <ul class="checklist">
-                        <li><label><input type="checkbox" checked> Water geven (irrigatie-droplink)</label></li>
-                        <li><label><input type="checkbox" checked> Temperatuur begeleiden (neveling)</label></li>
-                        <li><label><input type="checkbox"> Planten handmatig verwijderen (exoten)</label></li>
+                        <li><label><input type="checkbox" checked> Water geven aan planten </label></li>
+                        <li><label><input type="checkbox" > Grond bemesten </label></li>
+                        <li><label><input type="checkbox" > Invasieve dierensoorten verwijderen </label></li>
+                        <li><label><input type="checkbox"> Onkruid verwijderen </label></li>
                     </ul>
                 </div>
 
                 <div class="form-field time-field">
                     <label>Actieve Operationele Tijden</label>
                     <div class="time-row">
-                        <span>06:00</span>
-                        <span>18:00</span>
+                        <span id="startLabel">08:00</span>
+                        <span id="endLabel">18:00</span>
                     </div>
-                    <input type="range" class="time-range" min="0" max="100" value="50" aria-label="Actieve operationele tijden">
+                    <div class="slider">
+                        <div class="slider-track"></div>
+                        <div class="slider-range" id="range"></div>
+
+                        <input id="start" type="range" min="0" max="1440" step="15" value="360">
+
+                        <input id="end" type="range" min="0" max="1440" step="15" value="1080">
+                    </div>
                 </div>
 
                 <ul class="checklist compact">
                     <li><label><input type="checkbox" checked> Aanpassen aan weer (bijv. regen/windvlagen)</label></li>
-                    <li><label><input type="checkbox" checked> Aanpassen aan dierenactiviteit (nacht/rusttijden)</label></li>
+                    <li><label><input type="checkbox" checked> Aanpassen aan dierenactiviteit (nacht/rusttijden)</label>
+                    </li>
                 </ul>
 
                 <button type="submit" class="mission-submit">MISSIE STARTEN</button>

@@ -66,6 +66,10 @@
 
 .queue {
   padding: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
 }
 
 .queue h4 {
@@ -96,12 +100,23 @@
   text-align: center;
 }
 
+.image-container {
+  height: 180px;
+  background-color: yellow;
+}
+
+.image-container img {
+  height: 100%;
+  width: auto;
+}
+
+
 .mission-rightbar {
   padding: 22px 22px 22px 0;
 }
 
 .mission-form {
-  background: var(--panel);
+  background: var(--black);
   border: 1px solid var(--line);
   border-radius: 12px;
   padding: 18px 18px 14px;
@@ -163,7 +178,7 @@
 }
 
 .checklist input {
-  accent-color: var(--cyan);
+  accent-color: var(--lightgreen);
   width: 16px;
   height: 16px;
   margin: 0;
@@ -177,14 +192,65 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  color: var(--muted);
+  color: var(--text);
   font-size: 12px;
-  margin-bottom: 10px;
 }
 
-.time-range {
+.slider {
+  position: relative;
+  height: 28px;
+}
+
+.slider-track,
+.slider-range {
+  position: absolute;
+  top: 9px;
+  height: 10px;
+  border-radius: 8px;
+}
+
+.slider-track {
+  left: 0;
+  right: 0;
+  background: #374151;
+  border: 1px solid #657080;
+}
+
+.slider-range {
+  background: var(--lightgreen);
+}
+
+.slider input {
+  position: absolute;
   width: 100%;
-  accent-color: var(--cyan);
+  height: 28px;
+  margin: 0;
+  appearance: none;
+  -webkit-appearance: none;
+  background: transparent;
+  pointer-events: none;
+}
+
+.slider input::-webkit-slider-thumb {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--lightgreen);
+  box-shadow: 0 0 5px var(--black);
+  cursor: grab;
+  pointer-events: auto;
+}
+
+.slider input::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--green);
+  cursor: grab;
+  pointer-events: auto;
 }
 
 .checklist.compact {
@@ -195,14 +261,21 @@
   width: 100%;
   border: 0;
   border-radius: 10px;
-  background: var(--cyan);
-  color: #001c29;
+  border-color: var(--gray);
+  background: var(--red);
+  color: var(--text);
   font-weight: 800;
   font-size: 16px;
   padding: 18px 14px;
   margin-top: 16px;
   cursor: pointer;
 }
+
+/* @media (max-width: 1300px) {
+  .queue {
+    flex-direction: column;
+  }
+} */
 
 @media (max-width: 1200px) {
   .mission-rightbar {
