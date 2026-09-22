@@ -8,7 +8,7 @@
 </head>
 
 <body>
-    <aside class="sidebar">
+    <aside>
         <nav>
             <?php $currentpage = basename($_SERVER['PHP_SELF']); ?>
             <a href="index.php" class="nav-item <?= $currentpage === 'index.php' ? ' current' : '' ?>"><span class="nav-icon">⌂</span>Overzicht</a>

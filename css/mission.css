@@ -1,0 +1,212 @@
+.mission p {
+  display: flex;
+  justify-content: space-between;
+}
+
+.mission strong {
+  color: #f0fbff;
+}
+
+.progress {
+  width: 100%;
+  max-width: 220px;
+  height: 8px;
+  background: #1b3046;
+  border-radius: 999px;
+  overflow: hidden;
+  margin: 6px 0 12px;
+}
+
+.progress div {
+  width: 0;
+  height: 100%;
+  background: #1bf09a;
+}
+
+.mission {
+  padding: 14px;
+}
+
+.mission h4 {
+  margin: 0;
+  font-size: 12px;
+  letter-spacing: 1px;
+  color: var(--cyan);
+}
+
+.mission h2 {
+  margin: 4px 0 10px;
+  font-size: 31px;
+}
+
+.progress.cyan div {
+  background: var(--cyan);
+}
+
+.mission ul {
+  list-style: none;
+  margin: 12px 0 0;
+  padding: 0;
+}
+
+.mission li {
+  display: flex;
+  justify-content: space-between;
+  padding: 9px 0;
+  border-top: 1px solid var(--line-soft);
+  color: #b3cbde;
+}
+
+.mission li span {
+  color: #1de292;
+}
+
+.mission li.active span {
+  color: var(--cyan);
+}
+
+.queue {
+  padding: 14px;
+}
+
+.queue h4 {
+  margin: 0;
+  font-size: 12px;
+  letter-spacing: 1px;
+  color: var(--warn);
+}
+
+.queue h3 {
+  margin: 6px 0 10px;
+  font-size: 24px;
+}
+
+.queue p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.alert-actions {
+  display: flex;
+  gap: 10px;
+  padding: 12px 0 0;
+}
+
+.alert-actions .btn {
+  flex: 1;
+  text-align: center;
+}
+
+.mission-rightbar {
+  padding: 22px 22px 22px 0;
+}
+
+.mission-form {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 18px 18px 14px;
+}
+
+.form-header {
+  margin-bottom: 18px;
+}
+
+.form-header h3 {
+  margin: 0;
+  font-size: 24px;
+  line-height: 1.2;
+}
+
+.form-field {
+  margin-bottom: 18px;
+}
+
+.form-field label {
+  display: block;
+  margin-bottom: 10px;
+  color: #dfefff;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.mission-select {
+  width: 100%;
+  border: 1px solid #2a3b52;
+  border-radius: 10px;
+  background: rgba(9, 18, 29, 0.9);
+  color: var(--text);
+  padding: 12px 14px;
+  font-size: 15px;
+}
+
+.checklist {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+}
+
+.checklist li {
+  display: flex;
+  align-items: center;
+}
+
+.checklist label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  color: #dfefff;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.checklist input {
+  accent-color: var(--cyan);
+  width: 16px;
+  height: 16px;
+  margin: 0;
+}
+
+.time-field {
+  margin-top: 8px;
+}
+
+.time-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: var(--muted);
+  font-size: 12px;
+  margin-bottom: 10px;
+}
+
+.time-range {
+  width: 100%;
+  accent-color: var(--cyan);
+}
+
+.checklist.compact {
+  margin-top: 14px;
+}
+
+.mission-submit {
+  width: 100%;
+  border: 0;
+  border-radius: 10px;
+  background: var(--cyan);
+  color: #001c29;
+  font-weight: 800;
+  font-size: 16px;
+  padding: 18px 14px;
+  margin-top: 16px;
+  cursor: pointer;
+}
+
+@media (max-width: 1200px) {
+  .mission-rightbar {
+    padding: 0 22px 22px;
+  }
+}

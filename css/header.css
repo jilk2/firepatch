@@ -83,13 +83,4 @@
   color: var(--white);
   background: var(--gray);
 }
-
-.layout {
-  display: grid;
-  grid-template-columns: 205px 1fr 300px;
-  min-height: calc(100vh - 76px);
-}
-
-.layout.short {
-  grid-template-columns: 205px 1fr;
 }

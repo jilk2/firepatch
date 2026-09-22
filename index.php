@@ -4,12 +4,14 @@
 <head>    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>NatureGuard Dashboard - Overzicht</title>
     <link rel="stylesheet" href="./css/main.css" />
+    <link rel="stylesheet" href="./css/kaart.css" />
+    <link rel="stylesheet" href="./css/mission.css" />
     <script src="./js/main.js" defer></script>
 </head>
 
 <body>
     <?php include("./partials/header.php"); ?>
-    <div class="layout">
+    <div class="layout dashboard-layout">
         <?php include("./partials/sidebar.php"); ?>
         <main class="page">
             <section class="card">

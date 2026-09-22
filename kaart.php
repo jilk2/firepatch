@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>NatureGuard Dashboard - Kaart</title>
   <link rel="stylesheet" href="./css/main.css" />
+  <link rel="stylesheet" href="./css/kaart.css" />
   <script src="./js/main.js" defer></script>
 </head>
 
@@ -58,33 +59,6 @@
       </div>
     </main>
 
-    <aside class="rightbar kaart-rightbar">
-<!--      <section class="card">-->
-<!--        <div class="card-head">-->
-<!--          <h2>Sectorstatus</h2>-->
-<!--        </div>-->
-<!--        <ul class="sector-list">-->
-<!--          <li><span>Sector 01</span><span class="status-pill done">Stabiel</span></li>-->
-<!--          <li><span>Sector 02</span><span class="status-pill active">Monitoring</span></li>-->
-<!--          <li><span>Sector 03</span><span class="status-pill active">Actief</span></li>-->
-<!--          <li><span>Sector 04</span><span class="status-pill pending">Kritiek</span></li>-->
-<!--        </ul>-->
-<!--      </section>-->
-
-      <section class="card mission">
-        <h4>MAP-LAAG DETAILS</h4>
-        <h2>Sensor Matrix</h2>
-        <p>Beschikbaarheid <strong>98%</strong></p>
-        <div class="progress">
-          <div style="width: 98%"></div>
-        </div>
-        <ul>
-          <li>Actieve nodes <span>124</span></li>
-          <li>Offline nodes <span>3</span></li>
-          <li class="active">Waarschuwingen <span>2</span></li>
-        </ul>
-      </section>
-    </aside>
   </div>
 </body>
 

@@ -8,9 +8,9 @@
 </head>
 
 <body>
-    <header class="topbar">
+    <header>
         <div class="brand">
-            <div class="shield">◈</div>
+            <span class="shield">◈</span>
             <div>
                 <h1><span>FIRE</span>PATCH</h1>
                 <p>AUTONOMOUS BIOSPHERE DEFENSE</p>
