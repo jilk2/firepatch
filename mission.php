@@ -1,7 +1,24 @@
 <?php
-require_once('./partials/db.php');
+require_once('./DB/DBConnect.php');
+date_default_timezone_set('Europe/Amsterdam');
 
 //add to $db the values from input fields
+if(isset($_POST['submit'])) {
+    $sector = $_POST['sector'] ?? '';
+    $goals = json_encode($_POST['goals'] ?? []);
+    $interventions = json_encode($_POST['interventions'] ?? []);
+    $startMinutes = (int) ($_POST['start_time'] ?? 0);
+    $endMinutes = (int) ($_POST['end_time'] ?? 0);
+    $startTime = date('Y-m-d') . ' ' . sprintf('%02d:%02d:00', intdiv($startMinutes, 60), $startMinutes % 60);
+    $endTime = date('Y-m-d') . ' ' . sprintf('%02d:%02d:00', intdiv($endMinutes, 60), $endMinutes % 60);
+    //Bijv:     2026-9-23          %d-> int, 02-> 2cijfers met 0 vooraf  360/60 = 6(uur)    360%60 = 0(minuten)     geeft 2026-09-23 06:00:00
+
+    $query = "INSERT INTO missions (area, purpose, interventions, `start-time`, `end-time`) VALUES (?, ?, ?, ?, ?)";
+    $result = mysqli_prepare($db, $query);
+    $result->bind_param('sssss', $sector, $goals, $interventions, $startTime, $endTime);
+    $result->execute();
+    $result->close();
+}
 ?>
 
 <!doctype html>
@@ -54,35 +71,35 @@ require_once('./partials/db.php');
         </main>
 
         <aside class="rightbar mission-rightbar">
-            <form class="mission-form">
+            <form class="mission-form" method="POST">
                 <div class="form-header">
                     <h3>NIEUWE MISSIE INITIALISEREN</h3>
                 </div>
 
                 <div class="form-field">
                     <label for="sector-select">Selecteer Gebied / Sector</label>
-                    <select id="sector-select" class="mission-select">
-                        <option>Kralingse Bos</option>
+                    <select id="sector-select" name="sector" class="mission-select">
+                        <option value="Kralingse Bos">Kralingse Bos</option>
                     </select>
                 </div>
 
                 <div class="form-field">
                     <label>Missie Doelen</label>
                     <ul class="checklist">
-                        <li><label><input type="checkbox" checked> planten scannen </label></li>
-                        <li><label><input type="checkbox" checked> Grondvruchtbaarheid meten </label></li>
-                        <li><label><input type="checkbox"> Dieren monitoren </label></li>
-                        <li><label><input type="checkbox"> Lichtlevels controleren </label></li>
+                        <li><label><input type="checkbox" name="goals[]" value="Planten scannen" checked> Planten scannen </label></li>
+                        <li><label><input type="checkbox" name="goals[]" value="Grondvruchtbaarheid meten" checked> Grondvruchtbaarheid meten </label></li>
+                        <li><label><input type="checkbox" name="goals[]" value="Dieren monitoren"> Dieren monitoren </label></li>
+                        <li><label><input type="checkbox" name="goals[]" value="Lichtlevels controleren"> Lichtlevels controleren </label></li>
                     </ul>
                 </div>
 
                 <div class="form-field">
                     <label>Interventies Toestaan</label>
                     <ul class="checklist">
-                        <li><label><input type="checkbox" checked> Water geven aan planten </label></li>
-                        <li><label><input type="checkbox" > Grond bemesten </label></li>
-                        <li><label><input type="checkbox" > Invasieve dierensoorten verwijderen </label></li>
-                        <li><label><input type="checkbox"> Onkruid verwijderen </label></li>
+                        <li><label><input type="checkbox" name="interventions[]" value="Water geven aan planten" checked> Water geven aan planten </label></li>
+                        <li><label><input type="checkbox" name="interventions[]" value="Grond bemesten"> Grond bemesten </label></li>
+                        <li><label><input type="checkbox" name="interventions[]" value="Invasieve dierensoorten verwijderen"> Invasieve dierensoorten verwijderen </label></li>
+                        <li><label><input type="checkbox" name="interventions[]" value="Onkruid verwijderen"> Onkruid verwijderen </label></li>
                     </ul>
                 </div>
 
@@ -96,19 +113,19 @@ require_once('./partials/db.php');
                         <div class="slider-track"></div>
                         <div class="slider-range" id="range"></div>
 
-                        <input id="start" type="range" min="0" max="1440" step="15" value="360">
+                        <input id="start" name="start_time" type="range" min="0" max="1440" step="15" value="360">
 
-                        <input id="end" type="range" min="0" max="1440" step="15" value="1080">
+                        <input id="end" name="end_time" type="range" min="0" max="1440" step="15" value="1080">
                     </div>
                 </div>
 
-                <ul class="checklist compact">
-                    <li><label><input type="checkbox" checked> Aanpassen aan weer (bijv. regen/windvlagen)</label></li>
-                    <li><label><input type="checkbox" checked> Aanpassen aan dierenactiviteit (nacht/rusttijden)</label>
+                <!-- <ul class="checklist compact">
+                    <li><label><input type="checkbox" name="adapt_to_weather" value="1" checked> Aanpassen aan weer (bijv. regen/windvlagen)</label></li>
+                    <li><label><input type="checkbox" name="adapt_to_animal_activity" value="1" checked> Aanpassen aan dierenactiviteit (nacht/rusttijden)</label>
                     </li>
-                </ul>
+                </ul> -->
 
-                <button type="submit" class="mission-submit">MISSIE STARTEN</button>
+                <button type="submit" name="submit" class="mission-submit">MISSIE STARTEN</button>
             </form>
         </aside>
     </div>
