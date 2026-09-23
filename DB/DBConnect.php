@@ -3,7 +3,7 @@
 $servername = "127.0.0.1";
 $username = "root";
 $password = "";
-$dbname = "FirePatch";
+$dbname = "tle-1";
 
 // Create connection
 $db = mysqli_connect($servername, $username, $password, $dbname);
