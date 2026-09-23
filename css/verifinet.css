@@ -1,0 +1,33 @@
+/* Specifieke styling voor de VerifyNET pagina */
+.verifinet-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #1B1B1E; /* De zwarte kleur uit je thema */
+    border: 1px solid #6D676E;
+    border-radius: 8px;
+    overflow: hidden;
+    color: #ebf1ef;
+    margin-top: 15px;
+}
+
+.verifinet-table th {
+    background-color: #111;
+    color: #00d5ff; /* Cyan accent */
+    text-align: left;
+    padding: 12px 16px;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-bottom: 1px solid #6D676E;
+}
+
+.verifinet-table td {
+    padding: 12px 16px;
+    border-bottom: 1px solid #2a2a2a;
+    font-size: 14px;
+    color: #ebf1ef;
+}
+
+.verifinet-table tr:nth-child(even) {
+    background-color: rgba(255, 255, 255, 0.02);
+}
