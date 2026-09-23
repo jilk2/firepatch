@@ -1,11 +1,11 @@
 /* =====================================================
    FIREPATCH - LOGBOEK
-   Alleen styling voor de logboek content
+   Alleen styling voor de logboekpagina
 ===================================================== */
 
 
 /* =====================================================
-   LOGBOEK PAGINA
+   PAGINA
 ===================================================== */
 
 .page {
@@ -14,7 +14,7 @@
 
     padding: 22px;
 
-    /* background: var(--bg); */
+    background: var(--bg);
 }
 
 
@@ -49,7 +49,7 @@
 
 
 /* =====================================================
-   FILTERS
+   FILTER CONTAINER
 ===================================================== */
 
 .log-filters {
@@ -97,26 +97,35 @@
 .log-filters .filter-keywords li a {
     display: block;
 
-    padding: 7px 13px;
+    padding: 7px 14px;
 
-    color: var(--muted);
+    color: var(--white);
+
+    background: #29292c;
+
+    border: 1px solid #55555a;
+    border-radius: 999px;
 
     text-decoration: none;
 
     font-size: 12px;
-    font-weight: 500;
+    font-weight: 600;
 
-    border: 1px solid var(--line);
-    border-radius: 999px;
+    white-space: nowrap;
 
-    transition: 0.2s;
+    transition:
+        background-color 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease;
 }
 
 
 /* Hover */
 
 .log-filters .filter-keywords li a:hover {
-    color: var(--text);
+    color: var(--white);
+
+    background: #3a3a3e;
 
     border-color: var(--red);
 }
@@ -147,21 +156,40 @@
 .log-filters .filter-group input {
     padding: 8px 11px;
 
-    background: var(--panel);
+    background: #29292c;
 
-    color: var(--text);
+    color: var(--white);
 
-    border: 1px solid var(--line);
+    border: 1px solid #55555a;
     border-radius: 8px;
 
     font-family: inherit;
     font-size: 12px;
 
     outline: none;
+
+    cursor: pointer;
+}
+
+.log-filters .filter-group input:hover {
+    border-color: #77777d;
 }
 
 .log-filters .filter-group input:focus {
     border-color: var(--red);
+}
+
+
+/* Kalender icoon */
+
+.log-filters
+.filter-group
+input[type="date"]::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+
+    filter: invert(1);
+
+    opacity: 0.8;
 }
 
 
@@ -177,9 +205,9 @@
 
     table-layout: fixed;
 
-    background: var(--panel);
+    background: #1b1b1d;
 
-    border: 1px solid var(--line);
+    border: 1px solid #454549;
     border-radius: 12px;
 
     overflow: hidden;
@@ -193,7 +221,7 @@
 ===================================================== */
 
 .log-table thead {
-    background: var(--dark);
+    background: #1b1b1d;
 }
 
 .log-table th {
@@ -203,17 +231,28 @@
 
     color: var(--white);
 
+    background: #1b1b1d;
+
     font-size: 11px;
     font-weight: 700;
 
     text-transform: uppercase;
     letter-spacing: 0.5px;
 
-    border-bottom: 1px solid var(--line);
+    border-bottom: 1px solid #454549;
 }
 
 
-/* Kolom breedtes */
+/* Verticale lijnen header */
+
+.log-table th:not(:last-child) {
+    border-right: 1px solid #343438;
+}
+
+
+/* =====================================================
+   KOLOM BREEDTES
+===================================================== */
 
 .log-table th:nth-child(1) {
     width: 18%;
@@ -241,27 +280,54 @@
 ===================================================== */
 
 .log-table tbody tr {
-    background: var(--panel);
+    background: #1b1b1d;
+
+    transition: background-color 0.15s ease;
 }
+
+
+/* Afwisselende achtergrond */
 
 .log-table tbody tr:nth-child(even) {
-    background: var(--panel-soft);
+    background: #202023;
 }
 
+
+/* Hover */
+
 .log-table tbody tr:hover {
-    background: rgba(255, 255, 255, 0.04);
+    background: #29292d;
 }
+
+
+/* =====================================================
+   TABEL CELLEN
+===================================================== */
 
 .log-table td {
     height: 44px;
 
     padding: 0 18px;
 
-    color: var(--text);
-
-    border-bottom: 1px solid var(--line-soft);
+    color: var(--white);
 
     vertical-align: middle;
+
+    border-bottom: 1px solid #343438;
+}
+
+
+/* Verticale lijnen tussen kolommen */
+
+.log-table tbody td:not(:last-child) {
+    border-right: 1px solid #343438;
+}
+
+
+/* Laatste rij */
+
+.log-table tbody tr:last-child td {
+    border-bottom: none;
 }
 
 
@@ -283,7 +349,7 @@
 ===================================================== */
 
 .log-table tbody td:nth-child(2) {
-    color: var(--muted);
+    color: #c4c4c7;
 
     font-weight: 500;
 }
@@ -293,8 +359,12 @@
    ACTIVITEIT
 ===================================================== */
 
+.log-table tbody td:nth-child(3) {
+    color: var(--white);
+}
+
 .log-table tbody td:nth-child(3) strong {
-    color: var(--text);
+    color: var(--white);
 
     font-weight: 600;
 }
@@ -305,7 +375,7 @@
 ===================================================== */
 
 .log-table tbody td:nth-child(4) {
-    color: var(--muted);
+    color: #c4c4c7;
 }
 
 
@@ -313,9 +383,14 @@
    STATUS
 ===================================================== */
 
+.log-table tbody td:nth-child(5) {
+    white-space: nowrap;
+}
+
 .status-pill {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
 
     padding: 4px 9px;
 
@@ -323,6 +398,8 @@
 
     font-size: 10px;
     font-weight: 700;
+
+    line-height: 1;
 }
 
 
@@ -331,9 +408,9 @@
 .status-pill.done {
     color: var(--lightgreen);
 
-    border: 1px solid var(--lightgreen);
+    background: rgba(25, 230, 140, 0.08);
 
-    background: rgba(0, 255, 140, 0.08);
+    border: 1px solid var(--lightgreen);
 }
 
 
@@ -342,9 +419,9 @@
 .status-pill.pending {
     color: var(--red);
 
-    border: 1px solid var(--red);
+    background: rgba(176, 0, 32, 0.10);
 
-    background: rgba(176, 0, 32, 0.08);
+    border: 1px solid var(--red);
 }
 
 
@@ -353,14 +430,14 @@
 .status-pill.active {
     color: var(--warn);
 
-    border: 1px solid var(--warn);
+    background: rgba(255, 170, 0, 0.10);
 
-    background: rgba(255, 170, 0, 0.08);
+    border: 1px solid var(--warn);
 }
 
 
 /* =====================================================
-   FOOTER
+   TABEL FOOTER
 ===================================================== */
 
 .log-table tfoot td {
@@ -368,10 +445,13 @@
 
     padding: 0 18px;
 
-    background: var(--dark);
+    background: #1b1b1d;
 
-    border: 0;
+    border-top: 1px solid #454549;
 }
+
+
+/* Footer inhoud */
 
 .log-footer-content {
     display: flex;
@@ -381,12 +461,16 @@
     width: 100%;
 }
 
+
+/* Aantal logs */
+
 .log-footer-content p {
     margin: 0;
 
     color: var(--white);
 
     font-size: 11px;
+    font-weight: 500;
 }
 
 
@@ -404,26 +488,37 @@
 .pagination button {
     padding: 6px 10px;
 
-    background: transparent;
+    background: #29292c;
 
-    color: var(--muted);
+    color: #c4c4c7;
 
-    border: 1px solid var(--line);
+    border: 1px solid #454549;
     border-radius: 6px;
 
     font-family: inherit;
     font-size: 11px;
 
     cursor: pointer;
+
+    transition:
+        background-color 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease;
 }
+
+
+/* Hover */
 
 .pagination button:hover:not(:disabled) {
     color: var(--white);
 
-    border-color: var(--red);
-
     background: var(--red);
+
+    border-color: var(--red);
 }
+
+
+/* Disabled */
 
 .pagination button:disabled {
     opacity: 0.35;
@@ -431,11 +526,16 @@
     cursor: not-allowed;
 }
 
+
+/* Pagina nummer */
+
 .pagination span {
     color: var(--white);
 
     font-size: 11px;
     font-weight: 600;
+
+    white-space: nowrap;
 }
 
 
@@ -443,22 +543,68 @@
    RESPONSIVE
 ===================================================== */
 
-@media (max-width: 900px) {
+@media (max-width: 1000px) {
 
     .page {
         padding: 16px;
     }
+
+
+    /* Filters onder elkaar */
 
     .log-filters {
         flex-direction: column;
         align-items: flex-start;
     }
 
+
     .log-filters .filter-keywords {
         flex-wrap: wrap;
     }
 
+
+    .log-filters .filter-group {
+        width: 100%;
+    }
+
+
+    /* Tabel horizontaal scrollbaar */
+
     .log-table {
         min-width: 800px;
     }
+
+}
+
+
+/* =====================================================
+   KLEIN SCHERM
+===================================================== */
+
+@media (max-width: 600px) {
+
+    .page-title {
+        font-size: 20px;
+    }
+
+    .log-filters {
+        padding: 10px;
+    }
+
+    .log-filters .filter-keywords li a {
+        padding: 6px 10px;
+
+        font-size: 11px;
+    }
+
+    .log-footer-content {
+        flex-direction: column;
+
+        align-items: flex-start;
+
+        gap: 10px;
+
+        padding: 10px 0;
+    }
+
 }
