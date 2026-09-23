@@ -1,3 +1,17 @@
+<?php
+//session_start();
+//if(!isset($_SESSION['username'])){
+//    header('Location: login.php');
+//    exit;
+//}
+
+
+
+
+?>
+
+
+
 <!doctype html>
 <html lang="nl">
 
@@ -24,6 +38,7 @@
                 </div>
                 <div class="map">
                     <img id="map" src="image/map.png" alt="map of the region">
+                    <img id="vlam" src="image/vlammetjes-6-st.jpg" alt="flames">
                 </div>
             </section>
 

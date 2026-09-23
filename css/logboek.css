@@ -46,11 +46,11 @@
   background: var(--panel);
   border-radius: 999px;
   padding: 4px 10px;
-  font-size: 12px;
+  font-size: 0.75rem;
 }
 
 .log-filters .filter-keywords li a {
-  color: var(--muted);
+  color: var(--darktext);
   text-decoration: none;
 }
 
@@ -75,11 +75,11 @@
   background: var(--panel);
   border-radius: 8px;
   padding: 6px 10px;
-  color: var(--muted);
+  color: var(--darktext);
 }
 
 .log-table {
-  font-size: 12px;
+  font-size: 0.75rem;
 }
 
 .log-table th {
@@ -88,7 +88,7 @@
   padding: 8px 12px;
   color: #7ca2be;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 0.0625rem;
   font-weight: 600;
 }
 
@@ -113,7 +113,7 @@
 }
 
 .log-table tfoot td:first-child {
-  color: var(--muted);
+  color: var(--darktext);
 }
 
 .log-table tfoot td:first-child span {
@@ -121,7 +121,7 @@
 }
 
 .log-table .pagination a {
-  color: var(--muted);
+  color: var(--darktext);
   text-decoration: none;
   border: 1px solid var(--line);
   border-radius: 6px;
