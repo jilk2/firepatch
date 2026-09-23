@@ -1,12 +1,19 @@
 <?php
-//session_start();
-//if(!isset($_SESSION['username'])){
-//    header('Location: login.php');
-//    exit;
-//}
+
+require_once __DIR__ . '/config/database.php';
 
 
+// Logboek gegevens ophalen
 
+$query = "SELECT * FROM logboek ORDER BY created_at DESC LIMIT 5";
+
+$result = mysqli_query($db, $query);
+
+$logs = [];
+
+while ($row = mysqli_fetch_assoc($result)) {
+    $logs[] = $row;
+}
 
 ?>
 
@@ -53,20 +60,59 @@
             </section>
 
             <section class="card">
+
                 <div class="card-head">
+
                     <h2>Systeem Logboek (Live)</h2>
-                    <span class="text-muted">Frequentie: Realtime</span>
+
+                    <span class="text-muted">
+                        Frequentie: Realtime
+                    </span>
+
                 </div>
+
+
                 <ul class="log-list">
-                    <li><span>14:26</span>Water succesvol toegediend op droge coördinaten in Sector 04.<em>VOLTOOID</em>
-                    </li>
-                    <li><span>14:20</span>3 Bewaterings mini-drones succesvol ingezet vanaf ranger
-                        post.<em>VOLTOOID</em></li>
-                    <li><span>14:15</span>Automatisch verzoek mini-drones inzetten gegenereerd.<em class="pending">IN
-                            AFWACHTING</em></li>
-                    <li><span>14:14</span>Kritieke lage bodemvochtigheid (12%) gedetecteerd door sensor
-                        matrix.<em>VOLTOOID</em></li>
+
+                    <?php foreach ($logs as $log): ?>
+
+                        <li>
+
+                            <span>
+                                <?= date(
+                                    'H:i',
+                                    strtotime($log['created_at'])
+                                ) ?>
+                            </span>
+
+                            <?= htmlspecialchars($log['activity']) ?>
+
+                            <?php if ($log['status'] === 'done'): ?>
+
+                                <em>
+                                    VOLTOOID
+                                </em>
+
+                            <?php elseif ($log['status'] === 'pending'): ?>
+
+                                <em class="pending">
+                                    IN AFWACHTING
+                                </em>
+
+                            <?php elseif ($log['status'] === 'active'): ?>
+
+                                <em>
+                                    MONITORING
+                                </em>
+
+                            <?php endif; ?>
+
+                        </li>
+
+                    <?php endforeach; ?>
+
                 </ul>
+
             </section>
         </main>
 
