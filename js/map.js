@@ -12,6 +12,7 @@ mapImage.addEventListener("click", (event) => {
   const x = (event.clientX - rect.left) / rect.width;
   const y = (event.clientY - rect.top) / rect.height;
 
+
   console.log("-------------------------------------");
   console.log(`x: ${x}, y: ${y}`);
   coordinates = {
@@ -30,13 +31,10 @@ ws.addEventListener("message", (event) => {
   console.log(`Server: ${event.data}`);
 });
 
-// Handle errors
 ws.addEventListener("error", (error) => {
   console.error("WebSocket error:", error);
 });
 
-// Handle connection close
 ws.addEventListener("close", () => {
   console.log("Disconnected from the server");
-  process.exit(0);
 });

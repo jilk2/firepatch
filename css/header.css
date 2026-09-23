@@ -27,8 +27,8 @@ header {
 
 .brand h1 {
   margin: 0;
-  font-size: 29px;
-  letter-spacing: 0.5px;
+  font-size: 1.8125rem;
+  letter-spacing: 0.03125rem;
 }
 
 .brand h1 span {
@@ -38,15 +38,15 @@ header {
 .brand p {
   margin: -2px 0 0;
   color: var(--lightgreen);
-  font-size: 11px;
-  letter-spacing: 2px;
+  font-size: 0.6875rem;
+  letter-spacing: 0.125rem;
 }
 
 .topbar-right {
   display: flex;
   align-items: center;
   gap: 14px;
-  color: var(--muted);
+  color: var(--darktext);
 }
 
 .online-dot {
@@ -68,7 +68,7 @@ header {
 .user p,
 .status {
   margin: 0;
-  font-size: 12px;
+  font-size: 0.75rem;
   color: var(--white);
 }
 
@@ -79,7 +79,7 @@ header {
   border: 2px solid var(--red);
   display: grid;
   place-items: center;
-  font-size: 12px;
+  font-size: 0.75rem;
   color: var(--white);
   background: var(--gray);
 }

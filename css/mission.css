@@ -28,14 +28,14 @@
 
 .mission h4 {
   margin: 0;
-  font-size: 12px;
-  letter-spacing: 1px;
+  font-size: 0.75rem;
+  letter-spacing: 0.0625rem;
   color: var(--white);
 }
 
 .mission h2 {
   margin: 4px 0 10px;
-  font-size: 31px;
+  font-size: 1.9375rem;
 }
 
 .progress.cyan div {
@@ -74,19 +74,19 @@
 
 .queue h4 {
   margin: 0;
-  font-size: 12px;
-  letter-spacing: 1px;
+  font-size: 0.75rem;
+  letter-spacing: 0.0625rem;
   color: var(--warn);
 }
 
 .queue h3 {
   margin: 6px 0 10px;
-  font-size: 24px;
+  font-size: 1.5rem;
 }
 
 .queue p {
   margin: 0;
-  color: var(--muted);
+  color: var(--darktext);
 }
 
 .alert-actions {
@@ -128,7 +128,7 @@
 
 .form-header h3 {
   margin: 0;
-  font-size: 24px;
+  font-size: 1.5rem;
   line-height: 1.2;
 }
 
@@ -140,7 +140,7 @@
   display: block;
   margin-bottom: 10px;
   color: #dfefff;
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 600;
 }
 
@@ -151,7 +151,7 @@
   background: rgba(9, 18, 29, 0.9);
   color: var(--text);
   padding: 12px 14px;
-  font-size: 15px;
+  font-size: 0.9375rem;
 }
 
 .checklist {
@@ -173,7 +173,7 @@
   gap: 10px;
   margin: 0;
   color: #dfefff;
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 500;
 }
 
@@ -192,8 +192,9 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  color: var(--text);
-  font-size: 12px;
+  color: var(--darktext);
+  font-size: 0.75rem;
+  margin-bottom: 10px;
 }
 
 .slider {
@@ -265,7 +266,7 @@
   background: var(--red);
   color: var(--text);
   font-weight: 800;
-  font-size: 16px;
+  font-size: 1rem;
   padding: 18px 14px;
   margin-top: 16px;
   cursor: pointer;

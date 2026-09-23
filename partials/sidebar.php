@@ -18,11 +18,13 @@
     <!--            <a href="instellingen.php" class="nav-item --><?php //= $currentpage === 'instellingen.php' ? ' current' : '' ?><!--"><span class="nav-icon">⚙</span>Instellingen</a>-->
             <a href="verifynet.php" class="nav-item <?= $currentpage === 'verifynet.php' ? ' current' : '' ?>"><span class="nav-icon">⚙</span>VerifyNET</a>
         </nav>
-        <div class="fleet">
-            <h3>FLEET MATRIX</h3>
-            <p>Drone Signalen <span>12/12</span></p>
-            <p>Signaalsterkte <span>98%</span></p>
-        </div>
+        <a href="verifynet.php" style="text-decoration: none; color: inherit; display: block;">
+            <div class="fleet">
+                <h3>VerifyNET</h3>
+                <p> Status: <span>Online</span></p>
+                <p> Ongelezen: <span>5</span></p>
+            </div>
+        </a>
     </aside>
 </body>
 
