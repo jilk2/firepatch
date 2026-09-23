@@ -1,113 +1,355 @@
+<?php
+
+require_once __DIR__ . '/config/database.php';
+
+
+// Logboek gegevens ophalen
+
+$query = "SELECT * FROM logboek ORDER BY created_at DESC";
+
+$result = mysqli_query($db, $query);
+
+$logs = [];
+
+while ($row = mysqli_fetch_assoc($result)) {
+    $logs[] = $row;
+}
+
+?>
+
 <!doctype html>
+
 <html lang="nl">
 
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NatureGuard Dashboard - Logboek</title>
-  <link rel="stylesheet" href="./css/main.css" />
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>NatureGuard Dashboard - Logboek</title>
+
+    <link
+        rel="stylesheet"
+        href="css/main.css"
+    >
+
 </head>
 
+
 <body>
-  <?php include("./partials/header.php"); ?>
-  <div class="layout">
-    <?php include("./partials/sidebar.php"); ?>
+
+
+<?php include __DIR__ . '/partials/header.php'; ?>
+
+
+<div class="layout">
+
+
+    <?php include __DIR__ . '/partials/sidebar.php'; ?>
+
+
     <main class="page">
-      <div class="page-top">
-        <div>
-          <h1 class="page-title">Systeem Logboek</h1>
-          <p class="page-subtitle">Bekijk real-time biosfeer gebeurtenissen en geautomatiseerde interventies.</p>
-        </div>
-        <div class="page-actions">
-          <a href="#" class="btn secondary">Exporteren</a>
-          <a href="#" class="btn primary">Live Pauzeren</a>
-        </div>
-      </div>
 
-      <div class="card log-filters">
-        <ul class="filter-keywords">
-          <?php
-          $activeFilter = $_GET['f'] ?? 'all';
-          ?>
-          <li <?php if ($activeFilter === 'all')
-            echo 'class="active"'; ?>><a href="?f=all">Alles</a></li>
-          <li <?php if ($activeFilter === 'scans')
-            echo 'class="active"'; ?>><a href="?f=scans">Scans</a></li>
-          <li <?php if ($activeFilter === 'interventies')
-            echo 'class="active"'; ?>><a
-              href="?f=interventies">Interventies</a></li>
-          <li <?php if ($activeFilter === 'drones')
-            echo 'class="active"'; ?>><a href="?f=drones">Drones</a></li>
-          <li <?php if ($activeFilter === 'problemen')
-            echo 'class="active"'; ?>><a href="?f=problemen">Problemen</a></li>
-        </ul>
-        <div class="filter-group">
-          <label hidden for="filter-search">search keyword</label>
-          <input type="text" id="filter-search" name="filter-search" placeholder="Zoek op trefwoord..." />
 
-          <label hidden for="filter-date">Datum</label>
-          <input type="date" id="filter-date" name="filter-date" />
+        <!-- HEADER -->
+
+        <div class="page-top">
+
+            <div>
+
+                <h1 class="page-title">
+                    Systeem Logboek
+                </h1>
+
+                <p class="page-subtitle">
+                    Bekijk biosfeer gebeurtenissen en interventies.
+                </p>
+
+            </div>
         </div>
-      </div>
 
-      <table class="card log-table">
-        <thead>
-          <tr>
-            <th>Tijd</th>
-            <th>Activiteit</th>
-            <th>Locatie</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>14:26 · Vandaag</td>
-            <td><strong>Bewateringsactie afgerond</strong></td>
-            <td>Sector 04</td>
-            <td><span class="status-pill done">Voltooid</span></td>
-          </tr>
-          <tr>
-            <td>14:20 · Vandaag</td>
-            <td><strong>Deployment gestart</strong></td>
-            <td>Sector 04</td>
-            <td><span class="status-pill done">Voltooid</span></td>
-          </tr>
-          <tr>
-            <td>14:15 · Vandaag</td>
-            <td><strong>Interventieverzoek gegenereerd</strong></td>
-            <td>Sector 04</td>
-            <td><span class="status-pill pending">Wacht</span></td>
-          </tr>
-          <tr>
-            <td>14:14 · Vandaag</td>
-            <td><strong>Sensorpiek gedetecteerd</strong></td>
-            <td>Sector 04</td>
-            <td><span class="status-pill done">Gelogd</span></td>
-          </tr>
-          <tr>
-            <td>13:52 · Vandaag</td>
-            <td><strong>Patrouillepad aangepast</strong></td>
-            <td>Sector 04</td>
-            <td><span class="status-pill active">Monitoring</span></td>
-          </tr>
-        </tbody>
-        <tfoot>
-          <tr>
-            <td colspan="4">
-              <div class="log-footer-content">
-                <p>Getoond: 5/89 logregels</p>
-                <div class="pagination">
-                  <a class="log-link" href="#" class="page-link">Vorige</a>
-                  <span>Pagina 1 van 9</span>
-                  <a class="log-link" href="#" class="page-link">Volgende</a>
-                </div>
-              </div>
-            </td>
-          </tr>
-        </tfoot>
-      </table>
+
+        <!-- FILTERS -->
+
+        <div class="card log-filters">
+
+
+            <ul class="filter-keywords">
+
+                <li class="active">
+
+                    <a
+                        href="#"
+                        class="log-filter"
+                        data-filter="all"
+                    >
+                        Alles
+                    </a>
+
+                </li>
+
+
+                <li>
+
+                    <a
+                        href="#"
+                        class="log-filter"
+                        data-filter="scan"
+                    >
+                        Scans
+                    </a>
+
+                </li>
+
+
+                <li>
+
+                    <a
+                        href="#"
+                        class="log-filter"
+                        data-filter="interventie"
+                    >
+                        Interventies
+                    </a>
+
+                </li>
+
+
+                <li>
+
+                    <a
+                        href="#"
+                        class="log-filter"
+                        data-filter="drone"
+                    >
+                        Drones
+                    </a>
+
+                </li>
+
+
+                <li>
+
+                    <a
+                        href="#"
+                        class="log-filter"
+                        data-filter="probleem"
+                    >
+                        Problemen
+                    </a>
+
+                </li>
+
+            </ul>
+
+
+            <div class="filter-group">
+
+                <!-- <input
+                    type="text"
+                    id="filter-search"
+                    placeholder="Zoek op trefwoord..." -->
+                <!-- > -->
+
+                <input
+                    type="date"
+                    id="filter-date"
+                >
+
+            </div>
+
+
+        </div>
+
+
+        <!-- LOGBOEK -->
+
+        <table class="card log-table">
+
+
+            <thead>
+
+                <tr>
+
+                    <th>Tijd</th>
+
+                    <th>Type</th>
+
+                    <th>Activiteit</th>
+
+                    <th>Locatie</th>
+
+                    <th>Status</th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody id="logbook-body">
+
+                <?php foreach ($logs as $log): ?>
+
+                    <tr
+                        data-type="<?= htmlspecialchars($log['type']) ?>"
+                        data-date="<?= date('Y-m-d', strtotime($log['created_at'])) ?>"
+                    >
+
+                        <td>
+
+                            <?= date(
+                                'H:i',
+                                strtotime($log['created_at'])
+                            ) ?>
+
+                            ·
+
+                            <?= date(
+                                'd-m-Y',
+                                strtotime($log['created_at'])
+                            ) ?>
+
+                        </td>
+
+
+                        <td>
+
+                            <?php
+
+                            if ($log['type'] === 'scan') {
+                                echo "Scan";
+                            }
+
+                            if ($log['type'] === 'interventie') {
+                                echo "Interventie";
+                            }
+
+                            if ($log['type'] === 'drone') {
+                                echo "Drone";
+                            }
+
+                            if ($log['type'] === 'probleem') {
+                                echo "Probleem";
+                            }
+
+                            ?>
+
+                        </td>
+
+
+                        <td>
+
+                            <strong>
+
+                                <?= htmlspecialchars(
+                                    $log['activity']
+                                ) ?>
+
+                            </strong>
+
+                        </td>
+
+
+                        <td>
+
+                            <?= htmlspecialchars(
+                                $log['location']
+                            ) ?>
+
+                        </td>
+
+
+                        <td>
+
+                            <span
+                                class="status-pill <?= htmlspecialchars($log['status']) ?>"
+                            >
+
+                                <?php
+
+                                if ($log['status'] === 'done') {
+                                    echo "Voltooid";
+                                }
+
+                                if ($log['status'] === 'pending') {
+                                    echo "Wacht";
+                                }
+
+                                if ($log['status'] === 'active') {
+                                    echo "Monitoring";
+                                }
+
+                                ?>
+
+                            </span>
+
+                        </td>
+
+                    </tr>
+
+                <?php endforeach; ?>
+
+            </tbody>
+
+
+            <tfoot>
+
+                <tr>
+
+                    <td colspan="5">
+
+                        <div class="log-footer-content">
+
+                            <p id="logbook-count">
+                                Getoond: <?= count($logs) ?> logregels
+                            </p>
+
+                            <div class="pagination">
+
+                                <button
+                                    id="previous-page"
+                                    class="log-link"
+                                >
+                                    Vorige
+                                </button>
+
+                                <span id="page-info">
+                                    Pagina 1
+                                </span>
+
+                                <button
+                                    id="next-page"
+                                    class="log-link"
+                                >
+                                    Volgende
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                    </td>
+
+                </tr>
+
+            </tfoot>
+
+
+        </table>
+
+
     </main>
-  </div>
+
+</div>
+
+
+<script src="js/logboek.js"></script>
+
+
 </body>
 
 </html>
