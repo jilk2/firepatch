@@ -1,6 +1,9 @@
+<<<<<<< HEAD
 // const mapImage = document.getElementById("map");
 // const ws = new WebSocket("ws://localhost:8080");
 // let coordinates = { X: 0, Y: 0 };
+=======
+>>>>>>> main
 
 // ws.addEventListener("open", () => {
 //   console.log("Connected to the WebSocket server");
@@ -12,6 +15,7 @@
 //   const x = (event.clientX - rect.left) / rect.width;
 //   const y = (event.clientY - rect.top) / rect.height;
 
+<<<<<<< HEAD
 //   console.log("-------------------------------------");
 //   console.log(`x: ${x}, y: ${y}`);
 //   coordinates = {
@@ -25,6 +29,8 @@
 //     console.error("WebSocket is not connected");
 //   }
 // });
+=======
+>>>>>>> main
 
 // ws.addEventListener("message", (event) => {
 //   console.log(`Server: ${event.data}`);
