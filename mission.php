@@ -3,7 +3,7 @@ require_once('./DB/DBConnect.php');
 date_default_timezone_set('Europe/Amsterdam');
 
 //add to $db the values from input fields
-if(isset($_POST['submit'])) {
+if (isset($_POST['submit'])) {
     $sector = $_POST['sector'] ?? '';
     $goals = json_encode($_POST['goals'] ?? []);
     $interventions = json_encode($_POST['interventions'] ?? []);
@@ -17,8 +17,19 @@ if(isset($_POST['submit'])) {
     $result = mysqli_prepare($db, $query);
     $result->bind_param('sssss', $sector, $goals, $interventions, $startTime, $endTime);
     $result->execute();
-    $result->close();
 }
+
+$query = "SELECT * FROM missions ORDER BY `start-time` DESC";
+$result = mysqli_prepare($db, $query);
+$result->execute();
+$result = $result->get_result();
+$missions = [];
+while ($row = $result->fetch_assoc()) {
+    $row['purpose'] = json_decode($row['purpose']);
+    $row['interventions'] = json_decode($row['interventions']);
+    $missions[] = $row;
+}
+// print_r($missions); 
 ?>
 
 <!doctype html>
@@ -86,20 +97,29 @@ if(isset($_POST['submit'])) {
                 <div class="form-field">
                     <label>Missie Doelen</label>
                     <ul class="checklist">
-                        <li><label><input type="checkbox" name="goals[]" value="Planten scannen" checked> Planten scannen </label></li>
-                        <li><label><input type="checkbox" name="goals[]" value="Grondvruchtbaarheid meten" checked> Grondvruchtbaarheid meten </label></li>
-                        <li><label><input type="checkbox" name="goals[]" value="Dieren monitoren"> Dieren monitoren </label></li>
-                        <li><label><input type="checkbox" name="goals[]" value="Lichtlevels controleren"> Lichtlevels controleren </label></li>
+                        <li><label><input type="checkbox" name="goals[]" value="Planten scannen" checked> Planten
+                                scannen </label></li>
+                        <li><label><input type="checkbox" name="goals[]" value="Grondvruchtbaarheid meten" checked>
+                                Grondvruchtbaarheid meten </label></li>
+                        <li><label><input type="checkbox" name="goals[]" value="Dieren monitoren"> Dieren monitoren
+                            </label></li>
+                        <li><label><input type="checkbox" name="goals[]" value="Lichtlevels controleren"> Lichtlevels
+                                controleren </label></li>
                     </ul>
                 </div>
 
                 <div class="form-field">
                     <label>Interventies Toestaan</label>
                     <ul class="checklist">
-                        <li><label><input type="checkbox" name="interventions[]" value="Water geven aan planten" checked> Water geven aan planten </label></li>
-                        <li><label><input type="checkbox" name="interventions[]" value="Grond bemesten"> Grond bemesten </label></li>
-                        <li><label><input type="checkbox" name="interventions[]" value="Invasieve dierensoorten verwijderen"> Invasieve dierensoorten verwijderen </label></li>
-                        <li><label><input type="checkbox" name="interventions[]" value="Onkruid verwijderen"> Onkruid verwijderen </label></li>
+                        <li><label><input type="checkbox" name="interventions[]" value="Water geven aan planten"
+                                    checked> Water geven aan planten </label></li>
+                        <li><label><input type="checkbox" name="interventions[]" value="Grond bemesten"> Grond bemesten
+                            </label></li>
+                        <li><label><input type="checkbox" name="interventions[]"
+                                    value="Invasieve dierensoorten verwijderen"> Invasieve dierensoorten verwijderen
+                            </label></li>
+                        <li><label><input type="checkbox" name="interventions[]" value="Onkruid verwijderen"> Onkruid
+                                verwijderen </label></li>
                     </ul>
                 </div>
 
