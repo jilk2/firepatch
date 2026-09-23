@@ -34,7 +34,7 @@ while ($row = mysqli_fetch_assoc($result)) {
 
     <link
         rel="stylesheet"
-        href="css/main.css"
+        href="./css/logboek.css"
     >
 
 </head>
