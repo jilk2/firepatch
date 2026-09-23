@@ -1,3 +1,16 @@
+<?php
+require_once "DB/DBConnect.php";
+
+$sql = "SELECT * FROM claims";
+
+$result = mysqli_query($db, $sql);
+
+while ($row = mysqli_fetch_assoc($result)) {
+    $claims[] = $row;
+}
+
+mysqli_close($db);
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -18,6 +31,36 @@
         <aside class="rightbar">
         </aside>
     </div>
+
+
+    <main>
+        <section>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Tijd</th>
+                        <th>Activiteit</th>
+                        <th>Locatie</th>
+                        <th>Afbeelding</th>
+                    </tr>
+                </thead>
+                <tfoot></tfoot>
+                <tbody>
+                    <?php
+                    foreach ($claims as $claim):
+                        ?>
+                        <tr>
+                            <td><?= $claim[''];?></td>
+                            <td><?= $claim[''];?></td>
+                            <td><?= $claim[''];?></td>
+                        </tr>
+                        <?php
+                    endforeach;
+                    ?>
+                </tbody>
+            </table>
+        </section>
+    </main>
 </body>
 
 </html>
