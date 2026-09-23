@@ -42,7 +42,7 @@ body {
   grid-template-columns: 205px 1fr 300px;
 }
 .mission-layout {
-  grid-template-columns: 205px 1fr 350px;
+  grid-template-columns: 205px 1fr 450px;
 }
 
 .layout.short {
@@ -116,6 +116,10 @@ body {
 .card-head h2 {
   font-size: 1.5rem;
   margin: 0;
+}
+
+.stats {
+  padding: 14px;
 }
 
 .rightbar {

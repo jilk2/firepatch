@@ -31,3 +31,93 @@
 .verifinet-table tr:nth-child(even) {
     background-color: rgba(255, 255, 255, 0.02);
 }
+
+/* Stijlen voor VerifyNET Badges en Details */
+.badge {
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+.badge-true {
+    background-color: rgba(34, 246, 147, 0.15);
+    color: var(--lightgreen);
+    border: 1px solid var(--lightgreen);
+}
+
+.badge-false {
+    background-color: rgba(150, 3, 26, 0.2);
+    color: #ff4444;
+    border: 1px solid var(--red);
+}
+
+.badge-pending {
+    background-color: rgba(255, 159, 10, 0.15);
+    color: var(--orange);
+    border: 1px solid var(--orange);
+}
+
+
+/* Maak tabelrijen klikbaar en geef ze een hover-effect */
+.verifinet-table tbody tr {
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.verifinet-table tbody tr:hover {
+    background-color: rgba(0, 213, 255, 0.08); /* Subtiele cyan gloed bij hover */
+}
+
+
+/* Stijling voor het Community Note / Comment formulier */
+#comment-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+#comment-form textarea, 
+#comment-form input[type="text"] {
+    width: 100%;
+    background-color: #111b2a;
+    border: 1px solid #2a3b52;
+    color: #e8f5ff;
+    padding: 12px 14px;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 14px;
+    box-sizing: border-box;
+    resize: vertical;
+}
+
+#comment-form textarea:focus, 
+#comment-form input[type="text"]:focus {
+    outline: none;
+    border-color: var(--cyan, #00d5ff);
+    box-shadow: 0 0 0 2px rgba(0, 213, 255, 0.2);
+}
+
+/* Strakke styling voor alle invoervelden */
+input.input, 
+textarea.input,
+.input {
+    width: 100% !important;
+    background-color: #111b2a !important;
+    border: 1px solid #2a3b52 !important;
+    color: #e8f5ff !important;
+    padding: 12px 14px !important;
+    border-radius: 8px !important;
+    font-family: inherit !important;
+    font-size: 14px !important;
+    box-sizing: border-box !important;
+}
+
+input.input:focus, 
+textarea.input:focus,
+.input:focus {
+    outline: none !important;
+    border-color: var(--cyan, #00d5ff) !important;
+    box-shadow: 0 0 0 2px rgba(0, 213, 255, 0.2) !important;
+}
