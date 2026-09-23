@@ -1,0 +1,112 @@
+.kaart-main {
+  grid-column: 2;
+}
+
+.map-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 14px;
+  align-items: start;
+}
+
+.map-card {
+  width: 100%;
+}
+
+.map-badges {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--white);
+}
+
+.badge {
+  border: 1px solid var(--red);
+  color: #da0524;
+  border-radius: 6px;
+  padding: 3px 8px;
+  font-size: 12px;
+}
+
+.map {
+  position: relative;
+  display: flex;
+  align-content: center;
+  justify-content: center;
+  padding: 5px;
+}
+
+#map {
+  width: 100%;
+  height: 100%;
+  border-radius: 5px;
+}
+
+/* .marker {
+  position: absolute;
+  z-index: 1;
+  background: rgba(8, 18, 31, 0.9);
+  border: 1px solid var(--cyan);
+  color: #fff;
+  padding: 5px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+}
+
+.marker.warn {
+  border-color: var(--warn);
+}
+
+.marker.ok {
+  border-color: #1de292;
+}
+
+.m1 {
+  top: 300px;
+  left: 432px;
+}
+
+.m2 {
+  top: 94px;
+  right: 650px;
+}
+
+.m3 {
+  bottom: 200px;
+  left: 700px;
+}
+
+.m4 {
+  top: 140px;
+  right: 280px;
+  border-color: #ff9f0a;
+} */
+
+/* .overlay-box {
+  position: absolute;
+  right: 14px;
+  bottom: 14px;
+  z-index: 2;
+  background: rgba(8, 16, 29, 0.88);
+  border: 1px solid #214b64;
+  border-radius: 10px;
+  padding: 10px;
+  min-width: 175px;
+  color: #c0d9eb;
+  font-size: 13px;
+}
+
+.overlay-box h4 {
+  margin: 0 0 4px;
+  color: var(--cyan);
+  font-size: 12px;
+  letter-spacing: 1px;
+} */
+
+@media (max-width: 1200px) {
+  .kaart-rightbar {
+    padding: 0 22px 22px;
+  }
+}
+

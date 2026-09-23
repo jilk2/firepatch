@@ -1,0 +1,135 @@
+.timeline {
+  margin: 0;
+  padding: 14px;
+  list-style: none;
+}
+
+.timeline li {
+  display: grid;
+  grid-template-columns: 140px 1fr auto;
+  gap: 14px;
+  padding: 12px 0;
+  border-top: 1px solid var(--line-soft);
+}
+
+.timeline li:first-child {
+  border-top: 0;
+}
+
+.timeline time {
+  color: var(--cyan);
+  font-weight: 700;
+}
+
+.timeline strong {
+  display: block;
+  margin-bottom: 4px;
+}
+
+.log-filters {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+  padding: 0 14px;
+}
+
+.log-filters .filter-keywords {
+  display: flex;
+  gap: 6px;
+  list-style: none;
+  padding: 0;
+}
+
+.log-filters .filter-keywords li {
+  border: 1px solid var(--line);
+  background: var(--panel);
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 12px;
+}
+
+.log-filters .filter-keywords li a {
+  color: var(--muted);
+  text-decoration: none;
+}
+
+.log-filters .filter-keywords li.active {
+  border-color: var(--cyan);
+  background: var(--panel-soft);
+}
+
+.log-filters .filter-keywords li.active a {
+  color: var(--cyan);
+  font-weight: 700;
+}
+
+.log-filters .filter-group {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.log-filters .filter-group input {
+  border: 1px solid var(--line);
+  background: var(--panel);
+  border-radius: 8px;
+  padding: 6px 10px;
+  color: var(--muted);
+}
+
+.log-table {
+  font-size: 12px;
+}
+
+.log-table th {
+  background-color: var(--panel);
+  text-align: left;
+  padding: 8px 12px;
+  color: #7ca2be;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 600;
+}
+
+.log-table tr:nth-child(odd) {
+  background-color: var(--bg-soft);
+}
+
+.log-table td {
+  padding: 8px 12px;
+  border-top: 1px solid var(--line-soft);
+}
+
+.log-table td:first-child {
+  color: var(--cyan);
+  font-weight: 700;
+}
+
+.log-table .log-footer-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.log-table tfoot td:first-child {
+  color: var(--muted);
+}
+
+.log-table tfoot td:first-child span {
+  color: var(--text);
+}
+
+.log-table .pagination a {
+  color: var(--muted);
+  text-decoration: none;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 4px 8px;
+}
+
+.log-table .pagination a:hover {
+  color: var(--text);
+  border-color: var(--text);
+  font-weight: 700;
+}
