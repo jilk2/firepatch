@@ -12,11 +12,10 @@ $data = json_decode(file_get_contents("php://input"));
 if(isset($data->title) && isset($data->author_email)) {
     $status = "pending"; 
     
-    // Vang de nieuwe velden netjes op (maak ze leeg als ze niet zijn ingevuld)
     $description = isset($data->description) ? $data->description : '';
     $source = isset($data->source) ? $data->source : '';
     
-    // Voeg 5 waardes in in plaats van 3
+    
     $stmt = $pdo->prepare("INSERT INTO claims (Title, description, source, Status, author_email) VALUES (?, ?, ?, ?, ?)");
     
     if($stmt->execute([$data->title, $description, $source, $status, $data->author_email])) {
