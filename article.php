@@ -133,12 +133,12 @@ mysqli_close($db);
         const currentUser = localStorage.getItem('verifinet_user');
 
         if (!currentUser) {
-            alert("Toegang geweigerd: Je moet ingelogd zijn als node om te stemmen.");
+            alert("Toegang geweigerd: Je moet ingelogd zijn  om te stemmen.");
             return;
         }
 
         try {
-            const response = await fetch('/php/save_comment.php', {
+            const response = await fetch('save_comment.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
