@@ -50,7 +50,7 @@
 }
 
 .log-filters .filter-keywords li a {
-  color: var(--muted);
+  color: var(--darktext);
   text-decoration: none;
 }
 
@@ -75,7 +75,7 @@
   background: var(--panel);
   border-radius: 8px;
   padding: 6px 10px;
-  color: var(--muted);
+  color: var(--darktext);
 }
 
 .log-table {
@@ -113,7 +113,7 @@
 }
 
 .log-table tfoot td:first-child {
-  color: var(--muted);
+  color: var(--darktext);
 }
 
 .log-table tfoot td:first-child span {
@@ -121,7 +121,7 @@
 }
 
 .log-table .pagination a {
-  color: var(--muted);
+  color: var(--darktext);
   text-decoration: none;
   border: 1px solid var(--line);
   border-radius: 6px;

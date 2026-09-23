@@ -82,7 +82,7 @@
 
 .queue p {
   margin: 0;
-  color: var(--muted);
+  color: var(--darktext);
 }
 
 .alert-actions {
@@ -177,7 +177,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  color: var(--muted);
+  color: var(--darktext);
   font-size: 0.75rem;
   margin-bottom: 10px;
 }

@@ -9,7 +9,7 @@
   --cyan: #00d5ff;
   --lightgreen: #22f693;
   --text: #d9ecff;
-  --muted: #1B1B1E;
+  --darktext: #1B1B1E;
   --orange: #ff9f0a;
 }
 
@@ -23,6 +23,14 @@ body {
   color: var(--white);
   font: 500 0.9375rem/1.4 "Segoe UI", Inter, sans-serif;
   min-height: 100vh;
+}
+
+#vlam {
+  position: absolute;
+  width: 150px;
+  height: auto;
+  z-index: 999;
+  pointer-events: none;
 }
 
 .layout {
@@ -195,7 +203,7 @@ body {
 
 .stats {
   padding: 12px 14px;
-  color: var(--muted);
+  color: var(--darktext);
 }
 
 .stats p {
@@ -209,7 +217,7 @@ body {
 }
 
 .text-muted {
-  color: var(--muted); 
+  color: var(--darktext);
 }
 
 @media (max-width: 1200px) {

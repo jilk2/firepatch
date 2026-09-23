@@ -15,11 +15,11 @@
 }
 
 .page-title {
-  color: var(--muted);
+  color: var(--darktext);
 }
 
 .page-subtitle {
-  color: var(--muted);
+  color: var(--darktext);
 }
 
 .page-actions{
