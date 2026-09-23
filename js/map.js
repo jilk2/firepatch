@@ -3,6 +3,9 @@
 // const ws = new WebSocket("ws://localhost:8080");
 // let coordinates = { X: 0, Y: 0 };
 =======
+const mapImage = document.getElementById("map");
+const ws = new WebSocket("ws://localhost:8080");
+let coordinates = { coordinates: { x: 0, y: 0 } };
 >>>>>>> main
 
 // ws.addEventListener("open", () => {
@@ -30,6 +33,22 @@
 //   }
 // });
 =======
+  console.log("-------------------------------------");
+  console.log(`x: ${x}, y: ${y}`);
+  coordinates = {
+    coordinates: {
+      x: x,
+      y: y,
+    },
+  };
+
+  console.log(JSON.stringify(coordinates))
+  if (ws.readyState === WebSocket.OPEN) {
+    ws.send(JSON.stringify(coordinates));
+  } else {
+    console.error("WebSocket is not connected");
+  }
+});
 >>>>>>> main
 
 // ws.addEventListener("message", (event) => {
