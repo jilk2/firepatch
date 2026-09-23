@@ -46,7 +46,7 @@
   background: var(--panel);
   border-radius: 999px;
   padding: 4px 10px;
-  font-size: 12px;
+  font-size: 0.75rem;
 }
 
 .log-filters .filter-keywords li a {
@@ -79,7 +79,7 @@
 }
 
 .log-table {
-  font-size: 12px;
+  font-size: 0.75rem;
 }
 
 .log-table th {
@@ -88,7 +88,7 @@
   padding: 8px 12px;
   color: #7ca2be;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 0.0625rem;
   font-weight: 600;
 }
 
