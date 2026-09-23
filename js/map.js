@@ -35,8 +35,16 @@
 //   console.error("WebSocket error:", error);
 // });
 
+<<<<<<< HEAD
 // // Handle connection close
 // ws.addEventListener("close", () => {
 //   console.log("Disconnected from the server");
 //   process.exit(0);
 // });
+=======
+// Handle connection close
+ws.addEventListener("close", () => {
+  console.log("Disconnected from the server");
+  process.exit(0);
+});
+>>>>>>> main
