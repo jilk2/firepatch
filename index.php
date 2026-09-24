@@ -83,7 +83,7 @@
                 <ul>
                     <li>Biomassascan <span>Gereed</span></li>
                     <li>Wateranalyse <span>Gereed</span></li>
-                    <li class="active">Inventarisatie <span>Actief</span></li>
+                    <li>Inventarisatie <span class="actief">Actief</span></li>
                 </ul>
             </section>
             <section class="card">

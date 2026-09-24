@@ -19,7 +19,7 @@ if (isset($_POST['submit'])) {
     $result->execute();
 }
 
-$query = "SELECT * FROM missions ORDER BY `start-time` DESC";
+$query = "SELECT * FROM missions ORDER BY `start-time` ASC";
 $result = mysqli_prepare($db, $query);
 $result->execute();
 $result = $result->get_result();
@@ -29,7 +29,8 @@ while ($row = $result->fetch_assoc()) {
     $row['interventions'] = json_decode($row['interventions']);
     $missions[] = $row;
 }
-// print_r($missions); 
+$nextMission = $missions[0] ?? null;
+$queuedMissions = array_slice($missions, 1);
 ?>
 
 <!doctype html>
@@ -49,35 +50,63 @@ while ($row = $result->fetch_assoc()) {
     <div class="layout mission-layout">
         <?php include("./partials/sidebar.php"); ?>
         <main class="page">
-            <section class="card mission">
-                <h4>HUIDIGE MISSIE - RUNNING</h4>
-                <h2>Ecosysteemscan - Sector 03</h2>
-                <p>Missievoortgang <strong>66% Voltooid</strong></p> <!-- DEZE WERKT NOG NIET -->
-                <div class="progress cyan">
-                    <div style="width: 66%;"></div>
-                </div>
-                <ul>
-                    <li>Biomassascan <span>Gereed</span></li>
-                    <li>Wateranalyse <span>Gereed</span></li>
-                    <li class="active">Inventarisatie <span>Actief</span></li>
-                </ul>
-            </section>
+            <?php if ($nextMission): ?>
+                <section class="card mission">
+                    <h4>EERSTVOLGENDE MISSIE</h4>
+                    <h2><?= htmlspecialchars($nextMission['area'], ENT_QUOTES, 'UTF-8') ?></h2>
+                    <p><?= htmlspecialchars(date('d-m-Y', strtotime($nextMission['start-time'])), ENT_QUOTES, 'UTF-8') ?> 
+                        <span><?= htmlspecialchars(date('H:i', strtotime($nextMission['start-time'])) . ' - ' . date('H:i', strtotime($nextMission['end-time'])), ENT_QUOTES, 'UTF-8') ?></span></p>
+                    <div class="progress cyan">
+                        <div style="width: 40%;"></div>
+                    </div>
+                    <p class="mission-progress">Missievoortgang <strong>40%</strong></p>
 
-            <section class="card queue">
-                <div class="content">
-                    <div>
-                        <h4>GEPLANDE INTERVENTIE</h4>
-                        <h3>Brand gedetecteerd - VerifyNET</h3>
-                        <p>Brand gedetecteerd door 4 mensen op 51°56'31.2"N - 4°31'10.1"E</p>
-                    </div>
-                    <div class="alert-actions">
-                        <a href="#" class="btn ghost">check verifyNET</a>
-                        <a href="#" class="btn primary">Stuur drone</a>
-                    </div>
+                    <h3>Missiedoelen</h3>
+                    <ul>
+                        <?php foreach ($nextMission['purpose'] ?? [] as $goal): 
+                            $state = htmlspecialchars($nextMission['state'], ENT_QUOTES, 'UTF-8'); ?>
+                            <li><?= htmlspecialchars($goal, ENT_QUOTES, 'UTF-8') ?><span class="<?= strtolower($state) ?>"><?= $state ?></span></li>
+                        <?php endforeach; ?>
+                    </ul>
+
+                    <?php if (!empty($nextMission['interventions'])): ?>
+                        <h3>Toegestane interventies</h3>
+                        <ul>
+                            <?php foreach ($nextMission['interventions'] as $intervention): ?>
+                                <li><?= htmlspecialchars($intervention, ENT_QUOTES, 'UTF-8') ?><span>Toegestaan</span></li>
+                            <?php endforeach; ?>
+                        </ul>
+                    <?php endif; ?>
+                </section>
+            <?php else: ?>
+                <section class="card mission empty-state">
+                    <h4>MISSIES</h4>
+                    <h2>Geen missies gepland</h2>
+                    <p>Maak rechts een nieuwe missie aan om de planning te starten.</p>
+                </section>
+            <?php endif; ?>
+
+            <section class="mission-queue">
+                <div class="queue-heading">
+                    <h3>MISSIES IN DE QUEUE</h3>
+                    <span><?= count($queuedMissions) ?></span>
                 </div>
-                <div class="image-container">
-                    <img src="images/brandje.jpg" alt="verifynet img">
-                </div>
+
+                <?php if ($queuedMissions): ?>
+                    <div class="queue-list">
+                        <?php foreach ($queuedMissions as $queuedMission): ?>
+                            <article class="card queue-item">
+                                <div>
+                                    <h4><?= htmlspecialchars($queuedMission['area'], ENT_QUOTES, 'UTF-8') ?></h4>
+                                    <p><?= htmlspecialchars(date('d-m-Y H:i', strtotime($queuedMission['start-time'])), ENT_QUOTES, 'UTF-8') ?> - <?= htmlspecialchars(date('H:i', strtotime($queuedMission['end-time'])), ENT_QUOTES, 'UTF-8') ?></p>
+                                </div>
+                                <span class="queue-status">In queue</span>
+                            </article>
+                        <?php endforeach; ?>
+                    </div>
+                <?php else: ?>
+                    <p class="queue-empty">Er staan geen andere missies in de queue.</p>
+                <?php endif; ?>
             </section>
         </main>
 
