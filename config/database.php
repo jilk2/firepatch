@@ -1,12 +1,13 @@
 <?php
 
-$db = mysqli_connect(
-    "localhost",
-    "root",
-    "",
-    "tle-1"
-);
+declare(strict_types=1);
 
-if (!$db) {
-    die("Database verbinding mislukt: " . mysqli_connect_error());
+require_once __DIR__ . '/../DB/DBConnect.php';
+
+try {
+    $db = firepatchMysqli();
+} catch (Throwable $exception) {
+    error_log('Firepatch databasefout: ' . $exception->getMessage());
+    http_response_code(503);
+    exit('De database is tijdelijk niet beschikbaar. Controleer de centrale databaseconfiguratie.');
 }

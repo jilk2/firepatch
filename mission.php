@@ -1,6 +1,6 @@
 <?php
 
-require_once('./DB/DBConnect.php');
+require_once __DIR__ . '/config/database.php';
 
 date_default_timezone_set('Europe/Amsterdam');
 $today = date('Y-m-d');
@@ -21,7 +21,7 @@ if (isset($_POST['submit'])) {
     }
     if (empty($sector)) {
         $errors[] = 'Selecteer een gebied / sector.';
-    }     
+    }
 
     // Tijden
     $startMinutes = (int) ($_POST['start_time'] ?? 0);
@@ -47,13 +47,27 @@ if (isset($_POST['submit'])) {
         // }
     }
 
+    // DIT STOND OP DE MAIN??? IK HAD MERGE CONFLICT DUS HEB DIT UIT GECOMMEND
+
+    // $startMinutes = max(0, min(1440, $startMinutes));
+    // $endMinutes = max(0, min(1440, $endMinutes));
+
+    // if ($sector === '' || $goalsArray === [] || $endMinutes <= $startMinutes) {
+    //     http_response_code(422);
+    //     exit('Kies een sector, minimaal een missiedoel en een eindtijd na de starttijd.');
+    // }
+    // $dayStart = new DateTimeImmutable($today . ' 00:00:00');
+    // $startTime = $dayStart->modify('+' . $startMinutes . ' minutes')->format('Y-m-d H:i:s');
+    // $endTime = $dayStart->modify('+' . $endMinutes . ' minutes')->format('Y-m-d H:i:s');
+
+
     $states = [];
     foreach ($goalsArray as $goal) {
         $states[] = 'Gepland';
     }
-    $goals = json_encode($goalsArray);
-    $interventions = json_encode($interventionsArray);
-    $states = json_encode($states);
+    $goals = json_encode($goalsArray, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
+    $interventions = json_encode($interventionsArray, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
+    $states = json_encode($states, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
 
     if (empty($errors)) {
         if ($editMissionId) {
@@ -127,7 +141,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'delete' && isset($_GET['id'])
         // Convert start and end times to minutes for the slider
         $startDateTime = new DateTime($missionData["start-time"]);
         $endDateTime = new DateTime($missionData["end-time"]);
-        $_POST["start_time"] = ($startDateTime->format("H") * 60) + (int)$startDateTime->format("i");
+        $_POST["start_time"] = ($startDateTime->format("H") * 60) + (int) $startDateTime->format("i");
         $_POST["end_time"] = $endDateTime->format('H:i') === '00:00'
             ? 1440
             : ($endDateTime->format("H") * 60) + (int) $endDateTime->format("i");
@@ -175,7 +189,7 @@ require_once('./partials/currentmission.php');
                         <p>Brand gedetecteerd door 4 mensen in Sector 04</p>
                     </div>
                     <div class="alert-actions">
-                        <a href="#" class="btn ghost">check verifyNET</a>
+                        <a href="verifynet.php" class="btn ghost">check verifyNET</a>
                         <a href="#" class="btn primary">Stuur drone</a>
                     </div>
                 </div>
@@ -204,8 +218,10 @@ require_once('./partials/currentmission.php');
                     <h3>Missiedoelen</h3>
                     <ul>
                         <?php for ($i = 0; $i < count($nextMission['purpose'] ?? []); $i++): ?>
+                            <?php $goalState = $state[$i] ?? 'Gepland'; ?>
                             <li><?= htmlspecialchars($nextMission['purpose'][$i], ENT_QUOTES, 'UTF-8') ?><span
-                                    class="<?= strtolower($state[$i]) ?>"><?= $state[$i] ?></span></li>
+                                    class="<?= strtolower($goalState) ?>"><?= htmlspecialchars($goalState, ENT_QUOTES, 'UTF-8') ?></span>
+                            </li>
                         <?php endfor; ?>
                     </ul>
 
@@ -285,10 +301,12 @@ require_once('./partials/currentmission.php');
 
                 <div class="form-field">
                     <label for="sector-select">Selecteer Gebied / Sector</label>
-                    <select id="sector-select" name="sector" class="mission-select" > <!-- onfocus="this.size=10;" onblur="this.size=1;" onchange="this.size=1; this.blur();" -->
+                    <select id="sector-select" name="sector" class="mission-select">
+                        <!-- onfocus="this.size=10;" onblur="this.size=1;" onchange="this.size=1; this.blur();" -->
                         <?php for ($i = 1; $i <= 36; $i++): ?>
                             <?php $sectorOption = "Section $i"; ?>
-                            <option value="<?= $sectorOption ?>" <?= $formSector === $sectorOption ? 'selected' : '' ?>><?= $sectorOption ?></option>
+                            <option value="<?= $sectorOption ?>" <?= $formSector === $sectorOption ? 'selected' : '' ?>>
+                                <?= $sectorOption ?></option>
                         <?php endfor; ?>
                     </select>
                 </div>
@@ -298,26 +316,36 @@ require_once('./partials/currentmission.php');
                     <ul class="checklist">
                         <li><label><input type="checkbox" name="goals[]" value="Planten scannen" <?= in_array('Planten scannen', $formGoals, true) ? 'checked' : '' ?>> Planten
                                 scannen </label></li>
-                        <li><label><input type="checkbox" name="goals[]" value="Grondvruchtbaarheid meten" <?= in_array('Grondvruchtbaarheid meten', $formGoals, true) ? 'checked' : '' ?>>
+                        <li><label><input type="checkbox" name="goals[]" value="Grondvruchtbaarheid meten"
+                                    <?= in_array('Grondvruchtbaarheid meten', $formGoals, true) ? 'checked' : '' ?>>
                                 Grondvruchtbaarheid meten </label></li>
-                            <li><label><input type="checkbox" name="goals[]" value="Dieren monitoren" <?= in_array('Dieren monitoren', $formGoals, true) ? 'checked' : '' ?>> Dieren monitoren
+                        <li><label><input type="checkbox" name="goals[]" value="Dieren monitoren" <?= in_array('Dieren monitoren', $formGoals, true) ? 'checked' : '' ?>> Dieren monitoren
                             </label></li>
-                            <li><label><input type="checkbox" name="goals[]" value="Lichtlevels controleren" <?= in_array('Lichtlevels controleren', $formGoals, true) ? 'checked' : '' ?>> Lichtlevels
+                        <li><label><input type="checkbox" name="goals[]" value="Lichtlevels controleren"
+                                    <?= in_array('Lichtlevels controleren', $formGoals, true) ? 'checked' : '' ?>>
+                                Lichtlevels
                                 controleren </label></li>
+                        <!-- <span>+add new goal</span> -->
+                        <!-- <li><label><input type="checkbox" name="goals[]" value="Brand blussen" <?= in_array('Brand blussen', $formGoals, true) ? 'checked' : '' ?>> Brand blussen
+                            </label></li> -->
                     </ul>
                 </div>
 
                 <div class="form-field">
                     <label>Interventies Toestaan</label>
                     <ul class="checklist">
-                        <li><label><input type="checkbox" name="interventions[]" value="Water geven aan planten" <?= in_array('Water geven aan planten', $formInterventions, true) ? 'checked' : '' ?>> 
-                        Water geven aan planten </label></li>
-                        <li><label><input type="checkbox" name="interventions[]" value="Grond bemesten" <?= in_array('Grond bemesten', $formInterventions, true) ? 'checked' : '' ?>> 
-                        Grond bemesten </label></li>
-                        <li><label><input type="checkbox" name="interventions[]" value="Invasieve dierensoorten verwijderen" <?= in_array('Invasieve dierensoorten verwijderen', $formInterventions, true) ? 'checked' : '' ?>> 
-                        Invasieve dierensoorten verwijderen </label></li>
-                        <li><label><input type="checkbox" name="interventions[]" value="Onkruid verwijderen" <?= in_array('Onkruid verwijderen', $formInterventions, true) ? 'checked' : '' ?>> 
-                        Onkruid verwijderen </label></li>
+                        <li><label><input type="checkbox" name="interventions[]" value="Water geven aan planten"
+                                    <?= in_array('Water geven aan planten', $formInterventions, true) ? 'checked' : '' ?>>
+                                Water geven aan planten </label></li>
+                        <li><label><input type="checkbox" name="interventions[]" value="Grond bemesten"
+                                    <?= in_array('Grond bemesten', $formInterventions, true) ? 'checked' : '' ?>>
+                                Grond bemesten </label></li>
+                        <li><label><input type="checkbox" name="interventions[]"
+                                    value="Invasieve dierensoorten verwijderen" <?= in_array('Invasieve dierensoorten verwijderen', $formInterventions, true) ? 'checked' : '' ?>>
+                                Invasieve dierensoorten verwijderen </label></li>
+                        <li><label><input type="checkbox" name="interventions[]" value="Onkruid verwijderen"
+                                    <?= in_array('Onkruid verwijderen', $formInterventions, true) ? 'checked' : '' ?>>
+                                Onkruid verwijderen </label></li>
                     </ul>
                 </div>
 
@@ -331,9 +359,11 @@ require_once('./partials/currentmission.php');
                         <div class="slider-track"></div>
                         <div class="slider-range" id="range"></div>
 
-                        <input id="start" name="start_time" type="range" min="0" max="1440" step="15" value="<?= $formStartTime ?>">
+                        <input id="start" name="start_time" type="range" min="0" max="1440" step="15"
+                            value="<?= $formStartTime ?>">
 
-                        <input id="end" name="end_time" type="range" min="0" max="1440" step="15" value="<?= $formEndTime ?>">
+                        <input id="end" name="end_time" type="range" min="0" max="1440" step="15"
+                            value="<?= $formEndTime ?>">
                     </div>
                 </div>
 
@@ -343,7 +373,8 @@ require_once('./partials/currentmission.php');
                     </li>
                 </ul> -->
 
-                <button type="submit" name="submit" class="mission-submit"><?= $formEditId ? 'MISSIE AANPASSEN' : 'MISSIE STARTEN' ?></button>
+                <button type="submit" name="submit"
+                    class="mission-submit"><?= $formEditId ? 'MISSIE AANPASSEN' : 'MISSIE STARTEN' ?></button>
             </form>
 
         </aside>

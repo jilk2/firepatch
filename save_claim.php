@@ -1,68 +1,71 @@
 <?php
-// header("Access-Control-Allow-Origin: *");
-// header("Access-Control-Allow-Methods: POST, OPTIONS");
-// header("Access-Control-Allow-Headers: Content-Type");
-// header("Content-Type: application/json; charset=UTF-8");
 
-// if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') { http_response_code(200); exit(); }
+declare(strict_types=1);
 
-// require 'database.php';
-// $data = json_decode(file_get_contents("php://input"));
-
-// if(isset($data->title) && isset($data->author_email)) {
-//     $status = "pending"; 
-    
-//     $description = isset($data->description) ? $data->description : '';
-//     $source = isset($data->source) ? $data->source : '';
-    
-    
-//     $stmt = $pdo->prepare("INSERT INTO claims (Title, description, source, Status, author_email) VALUES (?, ?, ?, ?, ?)");
-    
-//     if($stmt->execute([$data->title, $description, $source, $status, $data->author_email])) {
-//         echo json_encode(["success" => true, "message" => "Claim succesvol ingediend.", "id" => $pdo->lastInsertId()]);
-//     } else {
-//         http_response_code(500);
-//         echo json_encode(["success" => false, "message" => "Fout bij opslaan claim in database."]);
-//     }
-// } else {
-//     http_response_code(400);
-//     echo json_encode(["success" => false, "message" => "Fout: Titel en auteur ontbreken."]);
-// }
-
-session_start();
-date_default_timezone_set("Europe/Amsterdam");
-
-if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    echo "Selected sector: " . $_POST["sector"];
-}
+date_default_timezone_set('Europe/Amsterdam');
 ?>
-<!DOCTYPE html>
-<html lang="en">
-
+<!doctype html>
+<html lang="nl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Firepatch - Nieuwe claim</title>
+    <link rel="stylesheet" href="./css/main.css">
+    <link rel="stylesheet" href="./css/saveclaimes.css">
 </head>
-
 <body>
-    <form action="upload.php" method="post" enctype="multipart/form-data">
-        <label for="time">Time:</label>
-        <input type="text" id="" name="text" value="<?= date("H:i"); ?>" disabled>
-        
-        Activity: <input type="text" name="name"><br>
+<?php include __DIR__ . '/partials/header.php'; ?>
+<div class="layout short">
+    <?php include __DIR__ . '/partials/sidebar.php'; ?>
 
-        <label for="sector">Choose a sector:</label>
-        <select name="sector" id="sector">
-            <?php for ($i = 1; $i <= 32; $i++): ?>
-                <option value="<?= $i ?>">Sector <?= $i ?></option>
-            <?php endfor; ?>
-        </select>
+    <main class="page claim-create-page">
+        <section class="card claim-create-card">
+            <div class="card-head">
+                <h2>Nieuwe VerifyNET-claim</h2>
+                <a href="verifynet.php" class="btn ghost">Annuleren</a>
+            </div>
 
-        Select image to upload: <input type="file" name="fileToUpload" id="fileToUpload">
-        <input type="submit" name="submit">
-    </form>
+            <form action="upload.php" method="post" enctype="multipart/form-data" id="claim-upload-form">
+                <input type="hidden" name="author_email" id="author-email">
+
+                <label for="title">Claim / activiteit</label>
+                <input class="input" type="text" id="title" name="title" maxlength="255" required>
+
+                <label for="description">Beschrijving</label>
+                <textarea class="input" id="description" name="description" rows="5"></textarea>
+
+                <label for="source">Bron of locatie</label>
+                <input class="input" type="text" id="source" name="source" maxlength="2048"
+                       placeholder="Bijvoorbeeld Sector 4 of een https://-link">
+
+                <label for="sector">Sector</label>
+                <select class="input" name="sector" id="sector">
+                    <option value="">Geen sector gekozen</option>
+                    <?php for ($sector = 1; $sector <= 36; $sector++): ?>
+                        <option value="<?= $sector ?>">Sector <?= $sector ?></option>
+                    <?php endfor; ?>
+                </select>
+
+                <label for="evidence">Bewijsafbeelding <small>(optioneel, JPG/PNG/WebP, maximaal 5 MB)</small></label>
+                <input class="input file-input" type="file" name="evidence" id="evidence"
+                       accept="image/jpeg,image/png,image/webp">
+
+                <button type="submit" class="btn primary submit-claim">Claim indienen</button>
+            </form>
+        </section>
+    </main>
+</div>
+
+<script>
+    const currentUser = localStorage.getItem('verifinet_user');
+    const authorInput = document.getElementById('author-email');
+
+    if (!currentUser) {
+        alert('Je moet ingelogd zijn om een claim in te dienen.');
+        window.location.replace('login.php');
+    } else {
+        authorInput.value = currentUser;
+    }
+</script>
 </body>
-
 </html>

@@ -4,13 +4,11 @@
 //    header('Location: login.php');
 //    exit;
 //}
-require_once('./DB/DBConnect.php');
+require_once __DIR__ . '/config/database.php';
 date_default_timezone_set('Europe/Amsterdam');
 $today = date('Y-m-d');
 
-require_once('./partials/currentmission.php');
-
-require_once('./DB/DBConnect.php');
+require_once __DIR__ . '/partials/currentmission.php';
 
 
 // Logboek gegevens ophalen
@@ -37,7 +35,6 @@ while ($row = mysqli_fetch_assoc($result)) {
     <link rel="stylesheet" href="./css/main.css" />
     <link rel="stylesheet" href="./css/kaart.css" />
     <link rel="stylesheet" href="./css/mission.css" />
-    <script src="./js/main.js" defer></script>
 </head>
 
 <body>
@@ -54,8 +51,7 @@ while ($row = mysqli_fetch_assoc($result)) {
                     </div>
                 </div>
                 <div class="map">
-                    <img id="map" src="image/map.png" alt="map of the region">
-                    <img id="vlam" src="image/vlammetjes-6-st.jpg" alt="flames">
+                    <img id="map" src="images/map.png" alt="map of the region">
                 </div>
             </section>
 
@@ -142,9 +138,10 @@ while ($row = mysqli_fetch_assoc($result)) {
                 <ul>
                     <?php for ($i = 0; $i < count($nextMission['purpose'] ?? []); $i++): ?>
                         <li>
+                            <?php $goalState = $state[$i] ?? 'Gepland'; ?>
                             <?= htmlspecialchars($nextMission['purpose'][$i], ENT_QUOTES, 'UTF-8') ?><span
-                                class="<?= strtolower($state[$i]) ?>">
-                                <?= $state[$i] ?>
+                                class="<?= strtolower($goalState) ?>">
+                                <?= htmlspecialchars($goalState, ENT_QUOTES, 'UTF-8') ?>
                             </span>
                         </li>
                     <?php endfor; ?>
@@ -157,7 +154,7 @@ while ($row = mysqli_fetch_assoc($result)) {
                     <p>Maak rechts een nieuwe missie aan om de planning te starten.</p>
                 </section>
             <?php endif; ?>
-            
+
             <section class="card">
                 <div class="card-head">
                     <h2>Drone Status</h2>
@@ -174,7 +171,6 @@ while ($row = mysqli_fetch_assoc($result)) {
             </section>
         </aside>
     </div>
-    <script src="js/map.js"></script>
 </body>
 
 </html>

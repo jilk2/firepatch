@@ -19,7 +19,6 @@
     <title>Firepatch - Kaart</title>
     <link rel="stylesheet" href="./css/main.css"/>
     <link rel="stylesheet" href="./css/kaart.css"/>
-    <script src="./js/main.js" defer></script>
     <script src="./js/kaart.js" defer></script>
 </head>
 
@@ -49,7 +48,7 @@
                 </div>
                 <div>
                     <div class="map">
-                        <img src="./image/map.png" alt="Kaart voor simulatie" id="map">
+                        <img src="./images/map.png" alt="Kaart voor simulatie" id="map">
 
                         <div class="sector-grid" id="sector-grid" aria-label="Kaartsectoren"></div>
 
