@@ -51,7 +51,7 @@ while ($row = mysqli_fetch_assoc($result)) {
                     </div>
                 </div>
                 <div class="map">
-                    <img id="map" src="image/map.png" alt="map of the region">
+                    <img id="map" src="images/map.png" alt="map of the region">
                 </div>
             </section>
 
