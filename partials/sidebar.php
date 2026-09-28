@@ -22,10 +22,11 @@
             <div class="fleet">
                 <h3>VerifyNET</h3>
                 <p> Status: <span>Online</span></p>
-                <p> Ongelezen: <span>5</span></p>
+                <p> Ongelezen: <span id="unread"></span></p>
             </div>
         </a>
     </aside>
+    <script src="./js/connection.js"></script>
 </body>
 
 </html>
