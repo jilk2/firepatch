@@ -121,3 +121,23 @@ textarea.input:focus,
     border-color: var(--cyan, #00d5ff) !important;
     box-shadow: 0 0 0 2px rgba(0, 213, 255, 0.2) !important;
 }
+
+/* Styling voor het gekleurde streepje (status) aan de linkerkant van de rij */
+.verifinet-table tbody tr {
+    /* Gebruikt de variabele die we in PHP hebben gezet. Val terug op oranje als er geen is. */
+    border-left: 4px solid var(--row-color, #ff9f0a); 
+}
+
+/* --- STATUS STREEPJE VIA CSS --- */
+
+/* 1. Geef de allereerste <td> (de tijd kolom) de linker rand via de CSS-variabele */
+.verifinet-table tbody tr td:first-child {
+    border-left: 4px solid var(--row-color, #ff9f0a); 
+}
+
+/* 2. Zorg dat de tekst van de tijd weer normaal lichtblauw/wit is */
+.verifinet-table td.tijd-col {
+    color: #e8f5ff;
+    font-family: 'Courier New', Courier, monospace;
+    font-weight: bold;
+}
