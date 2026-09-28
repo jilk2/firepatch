@@ -1,21 +1,16 @@
 <?php
-// Database gegevens
-$host = '127.0.0.1';
-$db   = 'tle-1'; // Aangepast naar jouw database op de screenshot
-$user = 'root';
-$pass = ''; 
-$charset = 'utf8mb4';
 
-$dsn = "mysql:host=$host;dbname=$db;charset=$charset";
-$options = [
-    PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
-    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-    PDO::ATTR_EMULATE_PREPARES   => false,
-];
+declare(strict_types=1);
+
+require_once __DIR__ . '/DB/DBConnect.php';
 
 try {
-    $pdo = new PDO($dsn, $user, $pass, $options);
-} catch (\PDOException $e) {
-    die(json_encode(["error" => "Database verbinding mislukt: " . $e->getMessage()]));
+    $pdo = firepatchPdo();
+} catch (Throwable $exception) {
+    error_log('Firepatch databasefout: ' . $exception->getMessage());
+    http_response_code(503);
+    die(json_encode([
+        'success' => false,
+        'error' => 'De database is tijdelijk niet beschikbaar.',
+    ]));
 }
-?>

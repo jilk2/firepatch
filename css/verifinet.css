@@ -1,7 +1,7 @@
 .verifinet-table {
     width: 100%;
     border-collapse: collapse;
-    background-color: #1B1B1E; 
+    background-color: #1B1B1E;
     border: 1px solid #6D676E;
     border-radius: 8px;
     overflow: hidden;
@@ -11,7 +11,7 @@
 
 .verifinet-table th {
     background-color: #111;
-    color: #00d5ff; 
+    color: #00d5ff;
     text-align: left;
     padding: 12px 16px;
     font-size: 13px;
@@ -66,7 +66,7 @@
 }
 
 .verifinet-table tbody tr:hover {
-    background-color: rgba(0, 213, 255, 0.08); 
+    background-color: rgba(0, 213, 255, 0.08);
 }
 
 
@@ -77,7 +77,7 @@
     gap: 12px;
 }
 
-#comment-form textarea, 
+#comment-form textarea,
 #comment-form input[type="text"] {
     width: 100%;
     background-color: #111b2a;
@@ -91,7 +91,7 @@
     resize: vertical;
 }
 
-#comment-form textarea:focus, 
+#comment-form textarea:focus,
 #comment-form input[type="text"]:focus {
     outline: none;
     border-color: var(--cyan, #00d5ff);
@@ -99,7 +99,7 @@
 }
 
 
-input.input, 
+input.input,
 textarea.input,
 .input {
     width: 100% !important;
@@ -113,7 +113,7 @@ textarea.input,
     box-sizing: border-box !important;
 }
 
-input.input:focus, 
+input.input:focus,
 textarea.input:focus,
 .input:focus {
     outline: none !important;
@@ -123,12 +123,12 @@ textarea.input:focus,
 
 .verifinet-table tbody tr {
 
-    border-left: 4px solid var(--row-color, #ff9f0a); 
+    border-left: 4px solid var(--row-color, #ff9f0a);
 }
 
 
 .verifinet-table tbody tr td:first-child {
-    border-left: 4px solid var(--row-color, #ff9f0a); 
+    border-left: 4px solid var(--row-color, #ff9f0a);
 }
 
 
