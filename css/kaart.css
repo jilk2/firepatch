@@ -79,22 +79,87 @@
 #map {
   width: 100%;
   height: 100%;
+  display: block;
   border-radius: 5px;
+}
+
+.sector-grid {
+  position: absolute;
+  inset: 5px;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  grid-template-rows: repeat(6, 1fr);
+}
+
+.sector {
+  min-width: 0;
+  min-height: 0;
+  padding: 0;
+  border: 1px solid var(--black);
+  background: transparent;
+  cursor: pointer;
+}
+
+.sector:hover,
+.sector:focus-visible {
+  outline: 2px solid var(--white);
+  outline-offset: -3px;
+  background: rgb(from var(--white) r g b / 0.18);
 }
 
 .overlay-box {
   position: absolute;
   bottom: 2%;
   right: 2%;
+  z-index: 2;
+  pointer-events: none;
   height: 15%;
   width: 15%;
+  min-width: 150px;
+  padding: 10px;
   border: 2px solid var(--black);
   display: flex;
+  flex-direction: column;
+  gap: 4px;
   align-items: center;
   justify-content: center;
   border-radius: 25px;
   background-color: rgb(from var(--gray) r g b / 0.64);
+  color: var(--white);
+  text-align: center;
+}
+
+.overlay-box p,
+.overlay-box strong {
+  margin: 0;
+}
+
+.sector-state {
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.healthy {
+  color: var(--lightgreen);
+}
+
+.moderate {
+  color: var(--orange);
+}
+
+.dangerous {
+  color: #ff5268;
+}
+
+@media (max-width: 700px) {
+  .overlay-box {
+    min-width: 120px;
+    width: 30%;
+    height: 20%;
+    font-size: 0.8rem;
   }
+}
 
 /* .marker {
   position: absolute;

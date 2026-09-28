@@ -20,6 +20,7 @@
     <link rel="stylesheet" href="./css/main.css"/>
     <link rel="stylesheet" href="./css/kaart.css"/>
     <script src="./js/main.js" defer></script>
+    <script src="./js/kaart.js" defer></script>
 </head>
 
 <body>
@@ -50,8 +51,10 @@
                     <div class="map">
                         <img src="./image/map.png" alt="Kaart voor simulatie" id="map">
 
-                        <div class="overlay-box">
-                            <p>filler</p>
+                        <div class="sector-grid" id="sector-grid" aria-label="Kaartsectoren"></div>
+
+                        <div class="overlay-box" id="sector-overlay" aria-live="polite">
+                            <p>Beweeg over een sector</p>
                         </div>
                     </div>
                 </div>

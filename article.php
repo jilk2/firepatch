@@ -45,6 +45,7 @@ mysqli_close($db);
         <main class="page">
             <div class="page-actions">
                 <a href="verifynet.php" class="btn ghost">&larr; Terug naar Overzicht</a>
+                <a href="verifynet.php" class="btn primary">&larr; Terug naar Overzicht</a>
             </div>
 
             <div class="card claim-detail-card">
