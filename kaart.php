@@ -50,6 +50,7 @@
                 <div>
                     <div class="map">
                         <img src="./image/map.png" alt="Kaart voor simulatie" id="map">
+                        <img src="./images/map.png" alt="Kaart voor simulatie" id="map">
 
                         <div class="sector-grid" id="sector-grid" aria-label="Kaartsectoren"></div>
 

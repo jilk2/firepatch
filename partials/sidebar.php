@@ -21,7 +21,6 @@
             <div class="fleet">
                 <h3>VerifyNET</h3>
                 <p> Status: <span>Online</span></p>
-                <p> Ongelezen: <span id="unread"></span></p>
             </div>
         </a>
     </aside>
