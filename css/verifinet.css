@@ -128,9 +128,16 @@ textarea.input:focus,
     border-left: 4px solid var(--row-color, #ff9f0a); 
 }
 
-/* Zet de kleur van de tijd terug naar de normale, rustige dashboard-kleur */
+/* --- STATUS STREEPJE VIA CSS --- */
+
+/* 1. Geef de allereerste <td> (de tijd kolom) de linker rand via de CSS-variabele */
+.verifinet-table tbody tr td:first-child {
+    border-left: 4px solid var(--row-color, #ff9f0a); 
+}
+
+/* 2. Zorg dat de tekst van de tijd weer normaal lichtblauw/wit is */
 .verifinet-table td.tijd-col {
-    color: #e8f5ff; /* Dezelfde kleur als de rest van je input-velden/tekst */
-    font-family: 'Courier New', Courier, monospace; /* Optioneel: Geeft een technische/klok look */
+    color: #e8f5ff;
+    font-family: 'Courier New', Courier, monospace;
     font-weight: bold;
 }
