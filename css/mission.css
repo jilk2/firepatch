@@ -23,7 +23,29 @@
 }
 
 .mission {
+  position: relative;
   padding: 14px;
+}
+
+.mission .buttons.current-mission {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  display: flex;
+  gap: 8px;
+}
+
+.mission .buttons a {
+  text-decoration: none;
+  color: var(--white);
+  background: var(--gray);
+  padding: 6px 12px;
+  border-radius: 6px;
+}
+
+.mission .buttons a:hover {
+  transform: scale(1.05);
+  background: #454146;
 }
 
 .mission h4 {
@@ -85,7 +107,7 @@
 
 .queue-item:hover {
   background: #2c2c31;
-  transform: scale(1.01);
+  /* transform: scale(1.01); */
 }
 
 .item-header {
@@ -140,7 +162,7 @@
   gap: 14px;
 }
 
-.notificationv h4 {
+.notification h4 {
   margin: 0;
   font-size: 0.75rem;
   letter-spacing: 0.0625rem;
@@ -198,6 +220,23 @@
   margin: 0;
   font-size: 1.5rem;
   line-height: 1.2;
+}
+
+.form-errors {
+  margin: 0 0 18px;
+  padding: 10px 12px;
+  border: 1px solid var(--red);
+  border-radius: 8px;
+  color: var(--white);
+  background: rgba(180, 35, 35, 0.2);
+}
+
+.form-errors p {
+  margin: 0;
+}
+
+.form-errors p + p {
+  margin-top: 6px;
 }
 
 .form-field {
