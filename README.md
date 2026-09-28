@@ -19,6 +19,12 @@ databasebeheerpagina's.
    eigen lokale wachtwoord in.
 7. Open `index.php` via de lokale PHP-webserver.
 
+Voor bewijsafbeeldingen moet de map `uploads` schrijfbaar zijn voor de lokale
+PHP-webserver. Op Linux/macOS kan dit vanuit de projectmap met
+`chmod 775 uploads`. Op Windows moet het account waaronder Apache/PHP draait
+schrijfrechten hebben op de map `uploads`; plaats het project niet in een
+beveiligde systeemmap zoals `C:\\Program Files`.
+
 ## Database-afspraken
 
 `DB/DBConnect.php` is de enige source of truth voor databaseconfiguratie en

@@ -69,7 +69,12 @@ if (is_array($upload) && ($upload['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR
     }
 
     if (!is_writable($uploadDirectory)) {
-        failUpload('De map uploads is niet schrijfbaar op de NAS.');
+        @chmod($uploadDirectory, 0775);
+        clearstatcache(true, $uploadDirectory);
+    }
+
+    if (!is_writable($uploadDirectory)) {
+        failUpload('De map uploads is niet schrijfbaar door de lokale PHP-webserver. Controleer de maprechten van uploads.');
     }
 
     $filename = bin2hex(random_bytes(16)) . '.' . $allowedTypes[$mimeType];
