@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__ . '/config/database.php';
+require_once('./DB/DBConnect.php');
 
 
 // Logboek gegevens ophalen
@@ -30,11 +30,16 @@ while ($row = mysqli_fetch_assoc($result)) {
         content="width=device-width, initial-scale=1.0"
     >
 
-    <title>NatureGuard Dashboard - Logboek</title>
+    <title>Firepatch - Logboek</title>
 
     <link
         rel="stylesheet"
-        href="css/main.css"
+        href="./css/logboek.css"
+    >
+    
+    <link
+        rel="stylesheet"
+        href="./css/main.css"
     >
 
 </head>
@@ -218,25 +223,7 @@ while ($row = mysqli_fetch_assoc($result)) {
 
                         <td>
 
-                            <?php
-
-                            if ($log['type'] === 'scan') {
-                                echo "Scan";
-                            }
-
-                            if ($log['type'] === 'interventie') {
-                                echo "Interventie";
-                            }
-
-                            if ($log['type'] === 'drone') {
-                                echo "Drone";
-                            }
-
-                            if ($log['type'] === 'probleem') {
-                                echo "Probleem";
-                            }
-
-                            ?>
+                            <?= htmlspecialchars($log['type']) ?>
 
                         </td>
 

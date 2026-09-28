@@ -15,17 +15,17 @@
             <a href="mission.php" class="nav-item <?= $currentpage === 'mission.php' ? ' current' : '' ?>"><span class="nav-icon">●</span>Missies</a>
             <a href="kaart.php" class="nav-item <?= $currentpage === 'kaart.php' ? ' current' : '' ?>"><span class="nav-icon">🗺</span>Kaart</a>
             <a href="logboek.php" class="nav-item <?= $currentpage === 'logboek.php' ? ' current' : '' ?>"><span class="nav-icon">🗋</span>Logboek</a>
-    <!--            <a href="instellingen.php" class="nav-item --><?php //= $currentpage === 'instellingen.php' ? ' current' : '' ?><!--"><span class="nav-icon">⚙</span>Instellingen</a>-->
             <a href="verifynet.php" class="nav-item <?= $currentpage === 'verifynet.php' ? ' current' : '' ?>"><span class="nav-icon">⚙</span>VerifyNET</a>
         </nav>
         <a href="verifynet.php" style="text-decoration: none; color: inherit; display: block;">
             <div class="fleet">
                 <h3>VerifyNET</h3>
                 <p> Status: <span>Online</span></p>
-                <p> Ongelezen: <span>5</span></p>
+                <p> Ongelezen: <span id="unread"></span></p>
             </div>
         </a>
     </aside>
+    <script src="./js/connection.js"></script>
 </body>
 
 </html>
