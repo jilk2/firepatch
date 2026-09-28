@@ -1,6 +1,6 @@
 <?php
 require_once "DB/DBConnect.php";
-
+/** @var mysqli $db */
 $sql = "SELECT * FROM claims ORDER BY id DESC";
 $result = mysqli_query($db, $sql);
 
