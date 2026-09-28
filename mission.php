@@ -9,9 +9,9 @@ $today = date('Y-m-d');
 if (isset($_POST['submit'])) {
     $sector = $_POST['sector'] ?? '';
 
-    $goalsArray = $_POST['interventions'] ?? [];
+    $goalsArray = $_POST['goals'] ?? [];
 
-    $interventionsArray = $_POST['goals'] ?? [];
+    $interventionsArray = $_POST['interventions'] ?? [];
 
 
 
@@ -37,12 +37,13 @@ if (isset($_POST['submit'])) {
 
 
     $result->bind_param(
-        'sssss',
+        'ssssss',
         $sector,
         $goals,
         $interventions,
         $startTime,
-        $endTime
+        $endTime,
+        $states
     );
 
 

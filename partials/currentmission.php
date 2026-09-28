@@ -15,33 +15,35 @@ while ($row = $result->fetch_assoc()) {
 $nextMission = $missions[0] ?? null;
 $queuedMissions = array_slice($missions, 1);
 
-// count goals and calculate progress
-$purposeCount = count($nextMission['purpose'] ?? []);
-$start = strtotime($nextMission['start-time']);
-$end = strtotime($nextMission['end-time']);
-$now = time();
+if ($nextMission) {
+    // count goals and calculate progress
+    $purposeCount = count($nextMission['purpose'] ?? []);
+    $start = strtotime($nextMission['start-time']);
+    $end = strtotime($nextMission['end-time']);
+    $now = time();
 
-$duration = max(1, $end - $start);
-$elapsed = max(0, min($now - $start, $duration));
+    $duration = max(1, $end - $start);
+    $elapsed = max(0, min($now - $start, $duration));
 
-$timeProgress = ($elapsed / $duration) * 100;
-$completedCount = min(
-    $purposeCount,
-    (int) floor(($timeProgress / 100) * $purposeCount)
-);
+    $timeProgress = ($elapsed / $duration) * 100;
+    $completedCount = min(
+        $purposeCount,
+        (int) floor(($timeProgress / 100) * $purposeCount)
+    );
 
-// $missionProgress = $purposeCount > 0
+    // $missionProgress = $purposeCount > 0
 //     ? ($completedCount / $purposeCount) * 100
 //     : 0;
 
-$state = [];
+    $state = [];
 
-foreach ($nextMission['purpose'] as $index => $purpose) {
-    if ($index < $completedCount) {
-        $state[] = 'Klaar';
-    } elseif ($index === $completedCount && $now >= $start && $now < $end) {
-        $state[] = 'Actief';
-    } else {
-        $state[] = 'Gepland';
+    foreach ($nextMission['purpose'] as $index => $purpose) {
+        if ($index < $completedCount) {
+            $state[] = 'Klaar';
+        } elseif ($index === $completedCount && $now >= $start && $now < $end) {
+            $state[] = 'Actief';
+        } else {
+            $state[] = 'Gepland';
+        }
     }
 }
