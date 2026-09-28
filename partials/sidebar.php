@@ -39,7 +39,7 @@
         const currentPage = window.location.pathname.split("/").pop();
 
         
-        const allowedPages = ["verifynet.php", "article.php", "login.php", "register.php"];
+        const allowedPages = ["verifynet.php", "article.php", "login.php", "register.php", "save_claim.php", "profile.php"];
 
         const sidebar = document.getElementById('firepatch-sidebar');
         const layoutContainer = document.querySelector('.layout');
