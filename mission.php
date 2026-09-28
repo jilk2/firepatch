@@ -131,6 +131,24 @@ require_once('./partials/currentmission.php');
     <div class="layout mission-layout">
         <?php include("./partials/sidebar.php"); ?>
         <main class="page">
+            <section class="card notification">
+                <div class="content">
+                    <div>
+                        <h4>GEPLANDE INTERVENTIE</h4>
+                        <h3>Brand gedetecteerd - VerifyNET</h3>
+                        <p>Brand gedetecteerd door 4 mensen in Sector 04</p>
+                    </div>
+                    <div class="alert-actions">
+                        <a href="#" class="btn ghost">check verifyNET</a>
+                        <a href="#" class="btn primary">Stuur drone</a>
+                    </div>
+                </div>
+                <div class="image-container">
+                    <img src="images/brandje.jpg" alt="verifynet img">
+                </div>
+            </section>
+
+            <!-- CURRENT MISSION -->
             <?php if ($nextMission): ?>
                 <section class="card mission">
                     <h4>HUIDIGE MISSIE</h4>
@@ -167,25 +185,8 @@ require_once('./partials/currentmission.php');
                     <p>Maak rechts een nieuwe missie aan om de planning te starten.</p>
                 </section>
             <?php endif; ?>
-
-            <section class="card queue">
-                <div class="content">
-                    <div>
-                        <h4>GEPLANDE INTERVENTIE</h4>
-                        <h3>Brand gedetecteerd - VerifyNET</h3>
-                        <p>Brand gedetecteerd door 4 mensen op 51°56'31.2"N - 4°31'10.1"E</p>
-                    </div>
-                    <div class="alert-actions">
-                        <a href="#" class="btn ghost">check verifyNET</a>
-                        <a href="#" class="btn primary">Stuur drone</a>
-                    </div>
-                </div>
-                <div class="image-container">
-                    <img src="images/brandje.jpg" alt="verifynet img">
-                </div>
-            </section>
-
-            <!-- <section class="mission-queue">
+            <!-- QUEUED MISSIONS -->
+            <section class="card mission queue">
                 <div class="queue-heading">
                     <h3>MISSIES IN DE QUEUE</h3>
                     <span><?= count($queuedMissions) ?></span>
@@ -195,18 +196,35 @@ require_once('./partials/currentmission.php');
                     <div class="queue-list">
                         <?php foreach ($queuedMissions as $queuedMission): ?>
                             <article class="card queue-item">
-                                <div>
+                                <div class="item-header">
                                     <h4><?= htmlspecialchars($queuedMission['area'], ENT_QUOTES, 'UTF-8') ?></h4>
-                                    <p><?= htmlspecialchars(date('d-m-Y H:i', strtotime($queuedMission['start-time'])), ENT_QUOTES, 'UTF-8') ?> - <?= htmlspecialchars(date('H:i', strtotime($queuedMission['end-time'])), ENT_QUOTES, 'UTF-8') ?></p>
+                                    <div>
+                                        <p><?= htmlspecialchars(date('d-m-Y', strtotime($queuedMission['start-time'])), ENT_QUOTES, 'UTF-8') ?>
+                                        </p>
+                                        <p>
+                                            <?= htmlspecialchars(date('H:i', strtotime($queuedMission['start-time'])), ENT_QUOTES, 'UTF-8') ?>
+                                            -
+                                            <?= htmlspecialchars(date('H:i', strtotime($queuedMission['end-time'])), ENT_QUOTES, 'UTF-8') ?>
+                                        </p>
+                                    </div>
                                 </div>
-                                <span class="queue-status">In queue</span>
+                                <ul>
+                                    <?php foreach ($queuedMission['purpose'] as $goal): ?>
+                                        <li>- <?= htmlspecialchars($goal, ENT_QUOTES, 'UTF-8') ?></li>
+                                    <?php endforeach; ?>
+                                </ul>
+                                <div class="buttons">
+                                    <a href="#" class="queue-button">Activeer nu</a>
+                                    <a href="#" class="queue-button">Aanpassen</a>
+                                    <a href="#" class="queue-button">Verwijder</a>
+                                </div>
                             </article>
                         <?php endforeach; ?>
                     </div>
                 <?php else: ?>
                     <p class="queue-empty">Er staan geen andere missies in de queue.</p>
                 <?php endif; ?>
-            </section> -->
+            </section>
         </main>
 
         <aside class="rightbar mission-rightbar">
@@ -218,7 +236,9 @@ require_once('./partials/currentmission.php');
                 <div class="form-field">
                     <label for="sector-select">Selecteer Gebied / Sector</label>
                     <select id="sector-select" name="sector" class="mission-select">
-                        <option value="Kralingse Bos">Kralingse Bos</option>
+                        <?php for ($i = 1; $i <= 25; $i++): ?>
+                            <option value="Section <?= $i ?>">Section <?= $i ?></option>
+                        <?php endfor; ?>
                     </select>
                 </div>
 
@@ -275,6 +295,7 @@ require_once('./partials/currentmission.php');
 
                 <button type="submit" name="submit" class="mission-submit">MISSIE STARTEN</button>
             </form>
+
         </aside>
     </div>
 </body>
