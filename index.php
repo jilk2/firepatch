@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__ . '/config/database.php';
+require_once('./DB/DBConnect.php');
 
 
 // Logboek gegevens ophalen
@@ -23,7 +23,7 @@ while ($row = mysqli_fetch_assoc($result)) {
 <html lang="nl">
 
 <head>    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>NatureGuard Dashboard - Overzicht</title>
+    <title>Firepatch Nature's guardians</title>
     <link rel="stylesheet" href="./css/main.css" />
     <link rel="stylesheet" href="./css/kaart.css" />
     <link rel="stylesheet" href="./css/mission.css" />
