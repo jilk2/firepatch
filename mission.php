@@ -1,5 +1,5 @@
 <?php
-
+/** @var mysqli $db */
 require_once('./DB/DBConnect.php');
 
 date_default_timezone_set('Europe/Amsterdam');
