@@ -92,11 +92,11 @@ body {
   overflow: hidden;
 }
 
-/*.btn.ghost {*/
-/*  border-color: #2e4b67;*/
-/*  color: #d8f1ff;*/
-/*  background: rgba(14, 28, 43, 0.7);*/
-/*}*/
+.btn.ghost {
+  border-color: #2e4b67;
+  color: #d8f1ff;
+  background: rgba(14, 28, 43, 0.7);
+}
 
 .card {
   background: var(--black);

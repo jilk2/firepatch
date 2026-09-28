@@ -22,7 +22,6 @@
             <div class="user">
                 <div>
                     <strong id="header-user-email">Gast</strong>
-                    <!-- HIER ZAT DE FOUT: id toegevoegd zodat JS de tekst kan wijzigen -->
                     <p id="header-user-role">Niet ingelogd</p>
                 </div>
                 <div class="avatar" id="header-avatar">?</div>
