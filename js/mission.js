@@ -10,7 +10,7 @@ function formatTime(minutes) {
          String(mins).padStart(2, "0");
 }
 
-function update(changed) {
+function syncTimeRange(changed) {
   // console.log(changed)
   let startValue = Number(startTime.value);
   let endValue = Number(endTime.value);
@@ -36,7 +36,9 @@ function update(changed) {
     formatTime(endValue);
 }
 
-startTime.addEventListener("input", () => update(startTime));
-endTime.addEventListener("input", () => update(endTime));
+startTime.addEventListener("input", () => syncTimeRange(startTime));
+endTime.addEventListener("input", () => syncTimeRange(endTime));
 
-update(); //zodat hij balk laat zien zonder te tijden veranderd te hebben
+syncTimeRange(); //zodat hij balk laat zien zonder te tijden veranderd te hebben
+
+

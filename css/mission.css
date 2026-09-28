@@ -51,6 +51,7 @@
 .mission li {
   display: flex;
   justify-content: space-between;
+  gap: 5px;
   padding: 9px 0;
   border-top: 1px solid var(--gray);
   color: var(--white);
@@ -60,8 +61,12 @@
   color: var(--green);
 }
 
-.mission li.active span {
+.mission li span.actief {
   color: var(--lightgreen);
+}
+
+.mission li span.gepland {
+  color: var(--orange);
 }
 
 .queue {
@@ -102,7 +107,7 @@
 
 .image-container {
   height: 180px;
-  background-color: yellow;
+  /* background-color: yellow; */
 }
 
 .image-container img {

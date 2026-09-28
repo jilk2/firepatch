@@ -3,22 +3,16 @@
 require_once('./DB/DBConnect.php');
 
 date_default_timezone_set('Europe/Amsterdam');
+$today = date('Y-m-d');
 
-
+//add to $db the values from input fields
 if (isset($_POST['submit'])) {
-
     $sector = $_POST['sector'] ?? '';
 
-    $goalsArray = $_POST['interventions'] ?? [];
+    $goalsArray = $_POST['goals'] ?? [];
 
-    $interventionsArray = $_POST['goals'] ?? [];
+    $interventionsArray = $_POST['interventions'] ?? [];
 
-
-    // Voor missions tabel opslaan als JSON
-
-    $goals = json_encode($goalsArray);
-
-    $interventions = json_encode($interventionsArray);
 
 
     // Tijden
@@ -26,59 +20,35 @@ if (isset($_POST['submit'])) {
     $startMinutes = (int) ($_POST['start_time'] ?? 0);
 
     $endMinutes = (int) ($_POST['end_time'] ?? 0);
+    $startTime = $today . ' ' . sprintf('%02d:%02d:00', intdiv($startMinutes, 60), $startMinutes % 60);
+    $endTime = $today . ' ' . sprintf('%02d:%02d:00', intdiv($endMinutes, 60), $endMinutes % 60);
+    //Bijv:     2026-9-23          %d-> int, 02-> 2cijfers met 0 vooraf  360/60 = 6(uur)    360%60 = 0(minuten)     geeft 2026-09-23 06:00:00
+    $states = [];
+    foreach ($goalsArray as $goal) {
+        $states[] = 'Gepland';
+    }
+    $goals = json_encode($goalsArray);
+    $interventions = json_encode($interventionsArray);
+    $states = json_encode($states);
 
 
-    $startTime =
-        date('Y-m-d') . ' ' .
-        sprintf(
-            '%02d:%02d:00',
-            intdiv($startMinutes, 60),
-            $startMinutes % 60
-        );
-
-
-    $endTime =
-        date('Y-m-d') . ' ' .
-        sprintf(
-            '%02d:%02d:00',
-            intdiv($endMinutes, 60),
-            $endMinutes % 60
-        );
-
-
-    /* =====================================================
-       MISSIE OPSLAAN
-    ===================================================== */
-
-    $query = "
-        INSERT INTO missions
-        (
-            area,
-            purpose,
-            interventions,
-            `start-time`,
-            `end-time`
-        )
-        VALUES (?, ?, ?, ?, ?)
-    ";
-
-
+    $query = "INSERT INTO missions (area, purpose, interventions, `start-time`, `end-time`, state) VALUES (?, ?, ?, ?, ?, ?)";
     $result = mysqli_prepare($db, $query);
 
 
     $result->bind_param(
-        'sssss',
+        'ssssss',
         $sector,
         $goals,
         $interventions,
         $startTime,
-        $endTime
+        $endTime,
+        $states
     );
 
 
     $result->execute();
 
-    $result->close();
 
 
 
@@ -140,6 +110,8 @@ if (isset($_POST['submit'])) {
 
 }
 
+require_once('./partials/currentmission.php');
+
 ?>
 
 <!doctype html>
@@ -159,19 +131,42 @@ if (isset($_POST['submit'])) {
     <div class="layout mission-layout">
         <?php include("./partials/sidebar.php"); ?>
         <main class="page">
-            <section class="card mission">
-                <h4>HUIDIGE MISSIE - RUNNING</h4>
-                <h2>Ecosysteemscan - Sector 03</h2>
-                <p>Missievoortgang <strong>66% Voltooid</strong></p> <!-- DEZE WERKT NOG NIET -->
-                <div class="progress cyan">
-                    <div style="width: 66%;"></div>
-                </div>
-                <ul>
-                    <li>Biomassascan <span>Gereed</span></li>
-                    <li>Wateranalyse <span>Gereed</span></li>
-                    <li class="active">Inventarisatie <span>Actief</span></li>
-                </ul>
-            </section>
+            <?php if ($nextMission): ?>
+                <section class="card mission">
+                    <h4>HUIDIGE MISSIE</h4>
+                    <h2><?= htmlspecialchars($nextMission['area'], ENT_QUOTES, 'UTF-8') ?></h2>
+                    <p><?= htmlspecialchars(date('d-m-Y', strtotime($nextMission['start-time'])), ENT_QUOTES, 'UTF-8') ?>
+                        <span><?= htmlspecialchars(date('H:i', strtotime($nextMission['start-time'])) . ' - ' . date('H:i', strtotime($nextMission['end-time'])), ENT_QUOTES, 'UTF-8') ?></span>
+                    </p>
+                    <div class="progress cyan">
+                        <div style="width: <?= $timeProgress ?>%;"></div>
+                    </div>
+                    <p class="mission-progress">Missievoortgang <strong><?= floor($timeProgress) ?>%</strong></p>
+
+                    <h3>Missiedoelen</h3>
+                    <ul>
+                        <?php for ($i = 0; $i < count($nextMission['purpose'] ?? []); $i++): ?>
+                            <li><?= htmlspecialchars($nextMission['purpose'][$i], ENT_QUOTES, 'UTF-8') ?><span
+                                    class="<?= strtolower($state[$i]) ?>"><?= $state[$i] ?></span></li>
+                        <?php endfor; ?>
+                    </ul>
+
+                    <?php if (!empty($nextMission['interventions'])): ?>
+                        <h3>Toegestane interventies</h3>
+                        <ul>
+                            <?php foreach ($nextMission['interventions'] as $intervention): ?>
+                                <li><?= htmlspecialchars($intervention, ENT_QUOTES, 'UTF-8') ?><span>Toegestaan</span></li>
+                            <?php endforeach; ?>
+                        </ul>
+                    <?php endif; ?>
+                </section>
+            <?php else: ?>
+                <section class="card mission empty-state">
+                    <h4>MISSIES</h4>
+                    <h2>Geen missies gepland</h2>
+                    <p>Maak rechts een nieuwe missie aan om de planning te starten.</p>
+                </section>
+            <?php endif; ?>
 
             <section class="card queue">
                 <div class="content">
@@ -189,6 +184,29 @@ if (isset($_POST['submit'])) {
                     <img src="images/brandje.jpg" alt="verifynet img">
                 </div>
             </section>
+
+            <!-- <section class="mission-queue">
+                <div class="queue-heading">
+                    <h3>MISSIES IN DE QUEUE</h3>
+                    <span><?= count($queuedMissions) ?></span>
+                </div>
+
+                <?php if ($queuedMissions): ?>
+                    <div class="queue-list">
+                        <?php foreach ($queuedMissions as $queuedMission): ?>
+                            <article class="card queue-item">
+                                <div>
+                                    <h4><?= htmlspecialchars($queuedMission['area'], ENT_QUOTES, 'UTF-8') ?></h4>
+                                    <p><?= htmlspecialchars(date('d-m-Y H:i', strtotime($queuedMission['start-time'])), ENT_QUOTES, 'UTF-8') ?> - <?= htmlspecialchars(date('H:i', strtotime($queuedMission['end-time'])), ENT_QUOTES, 'UTF-8') ?></p>
+                                </div>
+                                <span class="queue-status">In queue</span>
+                            </article>
+                        <?php endforeach; ?>
+                    </div>
+                <?php else: ?>
+                    <p class="queue-empty">Er staan geen andere missies in de queue.</p>
+                <?php endif; ?>
+            </section> -->
         </main>
 
         <aside class="rightbar mission-rightbar">
@@ -207,20 +225,29 @@ if (isset($_POST['submit'])) {
                 <div class="form-field">
                     <label>Missie Doelen</label>
                     <ul class="checklist">
-                        <li><label><input type="checkbox" name="goals[]" value="Planten scannen" checked> Planten scannen </label></li>
-                        <li><label><input type="checkbox" name="goals[]" value="Grondvruchtbaarheid meten" checked> Grondvruchtbaarheid meten </label></li>
-                        <li><label><input type="checkbox" name="goals[]" value="Dieren monitoren"> Dieren monitoren </label></li>
-                        <li><label><input type="checkbox" name="goals[]" value="Lichtlevels controleren"> Lichtlevels controleren </label></li>
+                        <li><label><input type="checkbox" name="goals[]" value="Planten scannen" checked> Planten
+                                scannen </label></li>
+                        <li><label><input type="checkbox" name="goals[]" value="Grondvruchtbaarheid meten" checked>
+                                Grondvruchtbaarheid meten </label></li>
+                        <li><label><input type="checkbox" name="goals[]" value="Dieren monitoren"> Dieren monitoren
+                            </label></li>
+                        <li><label><input type="checkbox" name="goals[]" value="Lichtlevels controleren"> Lichtlevels
+                                controleren </label></li>
                     </ul>
                 </div>
 
                 <div class="form-field">
                     <label>Interventies Toestaan</label>
                     <ul class="checklist">
-                        <li><label><input type="checkbox" name="interventions[]" value="Water geven aan planten" checked> Water geven aan planten </label></li>
-                        <li><label><input type="checkbox" name="interventions[]" value="Grond bemesten"> Grond bemesten </label></li>
-                        <li><label><input type="checkbox" name="interventions[]" value="Invasieve dierensoorten verwijderen"> Invasieve dierensoorten verwijderen </label></li>
-                        <li><label><input type="checkbox" name="interventions[]" value="Onkruid verwijderen"> Onkruid verwijderen </label></li>
+                        <li><label><input type="checkbox" name="interventions[]" value="Water geven aan planten"
+                                    checked> Water geven aan planten </label></li>
+                        <li><label><input type="checkbox" name="interventions[]" value="Grond bemesten"> Grond bemesten
+                            </label></li>
+                        <li><label><input type="checkbox" name="interventions[]"
+                                    value="Invasieve dierensoorten verwijderen"> Invasieve dierensoorten verwijderen
+                            </label></li>
+                        <li><label><input type="checkbox" name="interventions[]" value="Onkruid verwijderen"> Onkruid
+                                verwijderen </label></li>
                     </ul>
                 </div>
 
