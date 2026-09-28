@@ -10,7 +10,7 @@ $today = date('Y-m-d');
 
 require_once('./partials/currentmission.php');
 
-require_once __DIR__ . '/config/database.php';
+require_once('./DB/DBConnect.php');
 
 
 // Logboek gegevens ophalen
@@ -32,9 +32,8 @@ while ($row = mysqli_fetch_assoc($result)) {
 <!doctype html>
 <html lang="nl">
 
-<head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>NatureGuard Dashboard - Overzicht</title>
+<head>    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Firepatch Nature's guardians</title>
     <link rel="stylesheet" href="./css/main.css" />
     <link rel="stylesheet" href="./css/kaart.css" />
     <link rel="stylesheet" href="./css/mission.css" />
@@ -129,29 +128,36 @@ while ($row = mysqli_fetch_assoc($result)) {
 
         <aside class="rightbar">
 
-
+            <?php if($nextMission): ?>
             <section class="card mission">
                 <h4>HUIDIGE MISSIE</h4>
                 <h2><?= htmlspecialchars($nextMission['area'], ENT_QUOTES, 'UTF-8') ?></h2>
                 <!-- <p><?= htmlspecialchars(date('d-m-Y', strtotime($nextMission['start-time'])), ENT_QUOTES, 'UTF-8') ?>
                     <span><?= htmlspecialchars(date('H:i', strtotime($nextMission['start-time'])) . ' - ' . date('H:i', strtotime($nextMission['end-time'])), ENT_QUOTES, 'UTF-8') ?></span>
                 </p> -->
-                <p class="mission-progress">Missievoortgang <strong><?= $missionProgress ?>%</strong></p>
+                <p class="mission-progress">Missievoortgang <strong><?= floor($timeProgress) ?>%</strong></p>
                 <div class="progress cyan">
-                    <div style="width: <?= $missionProgress ?>%;"></div>
+                    <div style="width: <?= $timeProgress ?>%;"></div>
                 </div>
                 <ul>
-                    <?php for ($i = 0; $i < count($nextMission['purpose'] ?? []); $i++):
-                        $state = $nextMission['state'][$i]; ?>
+                    <?php for ($i = 0; $i < count($nextMission['purpose'] ?? []); $i++): ?>
                         <li>
                             <?= htmlspecialchars($nextMission['purpose'][$i], ENT_QUOTES, 'UTF-8') ?><span
-                                class="<?= strtolower($state) ?>">
-                                <?= $state ?>
+                                class="<?= strtolower($state[$i]) ?>">
+                                <?= $state[$i] ?>
                             </span>
                         </li>
                     <?php endfor; ?>
                 </ul>
             </section>
+            <?php else: ?>
+                <section class="card mission empty-state">
+                    <h4>MISSIES</h4>
+                    <h2>Geen missies gepland</h2>
+                    <p>Maak rechts een nieuwe missie aan om de planning te starten.</p>
+                </section>
+            <?php endif; ?>
+            
             <section class="card">
                 <div class="card-head">
                     <h2>Drone Status</h2>

@@ -1,34 +1,116 @@
 <?php
+
 require_once('./DB/DBConnect.php');
+
 date_default_timezone_set('Europe/Amsterdam');
 $today = date('Y-m-d');
 
 //add to $db the values from input fields
 if (isset($_POST['submit'])) {
     $sector = $_POST['sector'] ?? '';
-    $goals = $_POST['goals'] ?? '';
-    $interventions = $_POST['interventions'] ?? [];
+
+    $goalsArray = $_POST['interventions'] ?? [];
+
+    $interventionsArray = $_POST['goals'] ?? [];
+
+
+
+    // Tijden
+
     $startMinutes = (int) ($_POST['start_time'] ?? 0);
+
     $endMinutes = (int) ($_POST['end_time'] ?? 0);
     $startTime = $today . ' ' . sprintf('%02d:%02d:00', intdiv($startMinutes, 60), $startMinutes % 60);
     $endTime = $today . ' ' . sprintf('%02d:%02d:00', intdiv($endMinutes, 60), $endMinutes % 60);
     //Bijv:     2026-9-23          %d-> int, 02-> 2cijfers met 0 vooraf  360/60 = 6(uur)    360%60 = 0(minuten)     geeft 2026-09-23 06:00:00
     $states = [];
-    foreach ($goals as $goal) {
+    foreach ($goalsArray as $goal) {
         $states[] = 'Gepland';
     }
-    $goals = json_encode($goals);
-    $interventions = json_encode($interventions);
+    $goals = json_encode($goalsArray);
+    $interventions = json_encode($interventionsArray);
     $states = json_encode($states);
 
 
     $query = "INSERT INTO missions (area, purpose, interventions, `start-time`, `end-time`, state) VALUES (?, ?, ?, ?, ?, ?)";
     $result = mysqli_prepare($db, $query);
-    $result->bind_param('ssssss', $sector, $goals, $interventions, $startTime, $endTime, $states);
+
+
+    $result->bind_param(
+        'sssss',
+        $sector,
+        $goals,
+        $interventions,
+        $startTime,
+        $endTime
+    );
+
+
     $result->execute();
+
+
+
+
+    /* =====================================================
+       LOGBOEK TOEVOEGEN
+    ===================================================== */
+
+
+    // Interventies worden het type
+
+    $logType =
+        implode(", ", $interventionsArray);
+
+
+    // Doelen worden de activiteit
+
+    $logActivity =
+        implode(", ", $goalsArray);
+
+
+    // Sector wordt locatie
+
+    $logLocation = $sector;
+
+
+    // Missie is bezig
+
+    $logStatus = "active";
+
+
+    $logQuery = "
+        INSERT INTO logboek
+        (
+            type,
+            activity,
+            location,
+            status
+        )
+        VALUES (?, ?, ?, ?)
+    ";
+
+
+    $logResult =
+        mysqli_prepare($db, $logQuery);
+
+
+    $logResult->bind_param(
+        'ssss',
+        $logType,
+        $logActivity,
+        $logLocation,
+        $logStatus
+    );
+
+
+    $logResult->execute();
+
+    $logResult->close();
+
 }
 
 require_once('./partials/currentmission.php');
+
 ?>
 
 <!doctype html>
@@ -37,7 +119,7 @@ require_once('./partials/currentmission.php');
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>NatureGuard | Missies</title>
+    <title>Firepatch - Missies</title>
     <link rel="stylesheet" href="./css/main.css" />
     <link rel="stylesheet" href="./css/mission.css" />
     <script src="./js/mission.js" defer></script>
