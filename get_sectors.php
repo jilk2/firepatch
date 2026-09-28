@@ -5,7 +5,7 @@ require 'database.php';
 
 try {
     $stmt = $pdo->query(
-        'SELECT sector_number, state FROM map_sectors ORDER BY sector_number'
+        'SELECT sector_number, x_value, y_value, state FROM map_sectors ORDER BY sector_number'
     );
 
     echo json_encode([
