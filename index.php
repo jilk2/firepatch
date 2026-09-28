@@ -4,8 +4,11 @@
 //    header('Location: login.php');
 //    exit;
 //}
+require_once('./DB/DBConnect.php');
+date_default_timezone_set('Europe/Amsterdam');
+$today = date('Y-m-d');
 
-
+require_once('./partials/currentmission.php');
 
 
 ?>
@@ -15,7 +18,8 @@
 <!doctype html>
 <html lang="nl">
 
-<head>    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>NatureGuard Dashboard - Overzicht</title>
     <link rel="stylesheet" href="./css/main.css" />
     <link rel="stylesheet" href="./css/kaart.css" />
@@ -45,7 +49,7 @@
             <section class="alert-card">
                 <div>
                     <h3>⚠ ACTIE GEVRAAGD</h3>
-                    <p>Brand gedetecteerd in Sector <?php echo "4"?>.</p>
+                    <p>Brand gedetecteerd in Sector <?php echo "4" ?>.</p>
                 </div>
                 <div class="page-actions">
                     <a href="mission.php" class="btn primary">Bekijk</a>
@@ -75,15 +79,24 @@
 
             <section class="card mission">
                 <h4>HUIDIGE MISSIE</h4>
-                <h2>Ecosysteemscan</h2>
-                <p>Missievoortgang <strong>66% Voltooid</strong></p>
+                <h2><?= htmlspecialchars($nextMission['area'], ENT_QUOTES, 'UTF-8') ?></h2>
+                <!-- <p><?= htmlspecialchars(date('d-m-Y', strtotime($nextMission['start-time'])), ENT_QUOTES, 'UTF-8') ?>
+                    <span><?= htmlspecialchars(date('H:i', strtotime($nextMission['start-time'])) . ' - ' . date('H:i', strtotime($nextMission['end-time'])), ENT_QUOTES, 'UTF-8') ?></span>
+                </p> -->
+                <p class="mission-progress">Missievoortgang <strong><?= $missionProgress ?>%</strong></p>
                 <div class="progress cyan">
-                    <div style="width: 66%"></div>
+                    <div style="width: <?= $missionProgress ?>%;"></div>
                 </div>
                 <ul>
-                    <li>Biomassascan <span>Gereed</span></li>
-                    <li>Wateranalyse <span>Gereed</span></li>
-                    <li>Inventarisatie <span class="actief">Actief</span></li>
+                    <?php for ($i = 0; $i < count($nextMission['purpose'] ?? []); $i++):
+                        $state = $nextMission['state'][$i]; ?>
+                        <li>
+                            <?= htmlspecialchars($nextMission['purpose'][$i], ENT_QUOTES, 'UTF-8') ?><span
+                                class="<?= strtolower($state) ?>">
+                                <?= $state ?>
+                            </span>
+                        </li>
+                    <?php endfor; ?>
                 </ul>
             </section>
             <section class="card">

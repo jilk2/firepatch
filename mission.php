@@ -1,6 +1,7 @@
 <?php
 require_once('./DB/DBConnect.php');
 date_default_timezone_set('Europe/Amsterdam');
+$today = date('Y-m-d');
 
 //add to $db the values from input fields
 if (isset($_POST['submit'])) {
@@ -9,28 +10,18 @@ if (isset($_POST['submit'])) {
     $interventions = json_encode($_POST['interventions'] ?? []);
     $startMinutes = (int) ($_POST['start_time'] ?? 0);
     $endMinutes = (int) ($_POST['end_time'] ?? 0);
-    $startTime = date('Y-m-d') . ' ' . sprintf('%02d:%02d:00', intdiv($startMinutes, 60), $startMinutes % 60);
-    $endTime = date('Y-m-d') . ' ' . sprintf('%02d:%02d:00', intdiv($endMinutes, 60), $endMinutes % 60);
+    $startTime = $today . ' ' . sprintf('%02d:%02d:00', intdiv($startMinutes, 60), $startMinutes % 60);
+    $endTime = $today . ' ' . sprintf('%02d:%02d:00', intdiv($endMinutes, 60), $endMinutes % 60);
     //Bijv:     2026-9-23          %d-> int, 02-> 2cijfers met 0 vooraf  360/60 = 6(uur)    360%60 = 0(minuten)     geeft 2026-09-23 06:00:00
+    $states = json_encode(["Klaar", "Actief", "Gepland", "Gepland"]); 
 
-    $query = "INSERT INTO missions (area, purpose, interventions, `start-time`, `end-time`) VALUES (?, ?, ?, ?, ?)";
+    $query = "INSERT INTO missions (area, purpose, interventions, `start-time`, `end-time`, state) VALUES (?, ?, ?, ?, ?, ?)";
     $result = mysqli_prepare($db, $query);
-    $result->bind_param('sssss', $sector, $goals, $interventions, $startTime, $endTime);
+    $result->bind_param('ssssss', $sector, $goals, $interventions, $startTime, $endTime, $states);
     $result->execute();
 }
 
-$query = "SELECT * FROM missions ORDER BY `start-time` ASC";
-$result = mysqli_prepare($db, $query);
-$result->execute();
-$result = $result->get_result();
-$missions = [];
-while ($row = $result->fetch_assoc()) {
-    $row['purpose'] = json_decode($row['purpose']);
-    $row['interventions'] = json_decode($row['interventions']);
-    $missions[] = $row;
-}
-$nextMission = $missions[0] ?? null;
-$queuedMissions = array_slice($missions, 1);
+require_once('./partials/currentmission.php');
 ?>
 
 <!doctype html>
@@ -52,21 +43,21 @@ $queuedMissions = array_slice($missions, 1);
         <main class="page">
             <?php if ($nextMission): ?>
                 <section class="card mission">
-                    <h4>EERSTVOLGENDE MISSIE</h4>
+                    <h4>HUIDIGE MISSIE</h4>
                     <h2><?= htmlspecialchars($nextMission['area'], ENT_QUOTES, 'UTF-8') ?></h2>
                     <p><?= htmlspecialchars(date('d-m-Y', strtotime($nextMission['start-time'])), ENT_QUOTES, 'UTF-8') ?> 
                         <span><?= htmlspecialchars(date('H:i', strtotime($nextMission['start-time'])) . ' - ' . date('H:i', strtotime($nextMission['end-time'])), ENT_QUOTES, 'UTF-8') ?></span></p>
                     <div class="progress cyan">
-                        <div style="width: 40%;"></div>
+                        <div style="width: <?= $missionProgress ?>%;"></div>
                     </div>
-                    <p class="mission-progress">Missievoortgang <strong>40%</strong></p>
+                    <p class="mission-progress">Missievoortgang <strong><?= $missionProgress ?>%</strong></p>
 
                     <h3>Missiedoelen</h3>
                     <ul>
-                        <?php foreach ($nextMission['purpose'] ?? [] as $goal): 
-                            $state = htmlspecialchars($nextMission['state'], ENT_QUOTES, 'UTF-8'); ?>
-                            <li><?= htmlspecialchars($goal, ENT_QUOTES, 'UTF-8') ?><span class="<?= strtolower($state) ?>"><?= $state ?></span></li>
-                        <?php endforeach; ?>
+                        <?php for ($i = 0; $i < count($nextMission['purpose'] ?? []); $i++):
+                            $state = $nextMission['state'][$i]; ?>
+                            <li><?= htmlspecialchars($nextMission['purpose'][$i], ENT_QUOTES, 'UTF-8') ?><span class="<?= strtolower($state) ?>"><?= $state ?></span></li>
+                        <?php endfor; ?>
                     </ul>
 
                     <?php if (!empty($nextMission['interventions'])): ?>
@@ -86,7 +77,24 @@ $queuedMissions = array_slice($missions, 1);
                 </section>
             <?php endif; ?>
 
-            <section class="mission-queue">
+            <section class="card queue">
+                <div class="content">
+                    <div>
+                        <h4>GEPLANDE INTERVENTIE</h4>
+                        <h3>Brand gedetecteerd - VerifyNET</h3>
+                        <p>Brand gedetecteerd door 4 mensen op 51°56'31.2"N - 4°31'10.1"E</p>
+                    </div>
+                    <div class="alert-actions">
+                        <a href="#" class="btn ghost">check verifyNET</a>
+                        <a href="#" class="btn primary">Stuur drone</a>
+                    </div>
+                </div>
+                <div class="image-container">
+                    <img src="images/brandje.jpg" alt="verifynet img">
+                </div>
+            </section>
+
+            <!-- <section class="mission-queue">
                 <div class="queue-heading">
                     <h3>MISSIES IN DE QUEUE</h3>
                     <span><?= count($queuedMissions) ?></span>
@@ -107,7 +115,7 @@ $queuedMissions = array_slice($missions, 1);
                 <?php else: ?>
                     <p class="queue-empty">Er staan geen andere missies in de queue.</p>
                 <?php endif; ?>
-            </section>
+            </section> -->
         </main>
 
         <aside class="rightbar mission-rightbar">
