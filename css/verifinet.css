@@ -121,3 +121,16 @@ textarea.input:focus,
     border-color: var(--cyan, #00d5ff) !important;
     box-shadow: 0 0 0 2px rgba(0, 213, 255, 0.2) !important;
 }
+
+/* Styling voor het gekleurde streepje (status) aan de linkerkant van de rij */
+.verifinet-table tbody tr {
+    /* Gebruikt de variabele die we in PHP hebben gezet. Val terug op oranje als er geen is. */
+    border-left: 4px solid var(--row-color, #ff9f0a); 
+}
+
+/* Zet de kleur van de tijd terug naar de normale, rustige dashboard-kleur */
+.verifinet-table td.tijd-col {
+    color: #e8f5ff; /* Dezelfde kleur als de rest van je input-velden/tekst */
+    font-family: 'Courier New', Courier, monospace; /* Optioneel: Geeft een technische/klok look */
+    font-weight: bold;
+}

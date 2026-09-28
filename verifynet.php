@@ -52,23 +52,29 @@ mysqli_close($db);
                                 </tr>
                             <?php else: ?>
                                 <?php foreach ($claims as $claim): 
-                                    $tijd = isset($claim['timestamp']) ? date('H:i', strtotime($claim['timestamp'])) : 'N.v.t.';
-                                    $statusKleur = (isset($claim['Status']) && $claim['Status'] === 'true') ? '#22f693' : ((isset($claim['Status']) && $claim['Status'] === 'false') ? '#96031A' : '#ff9f0a');
+                                        $tijd = isset($claim['timestamp']) ? date('H:i', strtotime($claim['timestamp'])) : 'N.v.t.';
+    
+                                    $statusKleur = '#ff9f0a'; // Oranje (In onderzoek / Pending) als standaard
+                                    if (isset($claim['Status'])) {
+                                        if ($claim['Status'] === 'true') $statusKleur = '#22f693'; // Groen
+                                        if ($claim['Status'] === 'false') $statusKleur = '#96031A'; // Rood
+                                    }
                                 ?>
-                                 <!-- Klikbare rij die doorstuurt naar de detailpagina -->
-                                    <tr onclick="window.location.href='article.php?id=<?= $claim['id']; ?>'">
-                                    <td style="color: <?= $statusKleur; ?>; font-weight: bold;"><?= $tijd; ?></td>
-                                    <td><?= htmlspecialchars($claim['Title'] ?? 'Geen titel'); ?></td>
-                                    <td><?= htmlspecialchars($claim['source'] ?? 'Onbekend'); ?></td>
-                                    <td>
-                                        <?php if (!empty($claim['image_path'])): ?>
-                                        <div style="width: 80px; height: 40px; background: url('<?= htmlspecialchars($claim['image_path']); ?>') center/cover; border-radius: 4px; border: 1px solid #6D676E;"></div>
-                                        <?php else: ?>
-                                        <span style="color: #777; font-size: 12px;">Geen beeld</span>
-                                        <?php endif; ?>
+    
+                                    <tr style="--row-color: <?= $statusKleur; ?>;" onclick="window.location.href='article.php?id=<?= $claim['id']; ?>'">
+        
+                                        <td class="tijd-col"><?= $tijd; ?></td>
+                                        <td><?= htmlspecialchars($claim['Title'] ?? 'Geen titel'); ?></td>
+                                        <td><?= htmlspecialchars($claim['source'] ?? 'Onbekend'); ?></td>
+                                        <td>
+                                            <?php if (!empty($claim['image_path'])): ?>
+                                                <div style="width: 80px; height: 40px; background: url('<?= htmlspecialchars($claim['image_path']); ?>') center/cover; border-radius: 4px; border: 1px solid #6D676E;"></div>
+                                            <?php else: ?>
+                                                <span style="color: #777; font-size: 12px;">Geen beeld</span>
+                                            <?php endif; ?>
                                         </td>
                                     </tr>
-                                <?php endforeach; ?>
+                                <?php endforeach; ?>    
                             <?php endif; ?>
                         </tbody>
                     </table>
