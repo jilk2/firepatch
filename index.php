@@ -15,7 +15,8 @@
 <!doctype html>
 <html lang="nl">
 
-<head>    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>NatureGuard Dashboard - Overzicht</title>
     <link rel="stylesheet" href="./css/main.css" />
     <link rel="stylesheet" href="./css/kaart.css" />
@@ -37,7 +38,7 @@
                     </div>
                 </div>
                 <div class="map">
-                    <img id="map" src="image/map.png" alt="map of the region">
+                    <img id="map" src="images/map.png" alt="map of the region">
                     <img id="vlam" src="image/vlammetjes-6-st.jpg" alt="flames">
                 </div>
             </section>
@@ -45,7 +46,7 @@
             <section class="alert-card">
                 <div>
                     <h3>⚠ ACTIE GEVRAAGD</h3>
-                    <p>Brand gedetecteerd in Sector <?php echo "4"?>.</p>
+                    <p>Brand gedetecteerd in Sector <?php echo "4" ?>.</p>
                 </div>
                 <div class="page-actions">
                     <a href="mission.php" class="btn primary">Bekijk</a>
