@@ -6,14 +6,21 @@ $today = date('Y-m-d');
 //add to $db the values from input fields
 if (isset($_POST['submit'])) {
     $sector = $_POST['sector'] ?? '';
-    $goals = json_encode($_POST['goals'] ?? []);
-    $interventions = json_encode($_POST['interventions'] ?? []);
+    $goals = $_POST['goals'] ?? '';
+    $interventions = $_POST['interventions'] ?? [];
     $startMinutes = (int) ($_POST['start_time'] ?? 0);
     $endMinutes = (int) ($_POST['end_time'] ?? 0);
     $startTime = $today . ' ' . sprintf('%02d:%02d:00', intdiv($startMinutes, 60), $startMinutes % 60);
     $endTime = $today . ' ' . sprintf('%02d:%02d:00', intdiv($endMinutes, 60), $endMinutes % 60);
     //Bijv:     2026-9-23          %d-> int, 02-> 2cijfers met 0 vooraf  360/60 = 6(uur)    360%60 = 0(minuten)     geeft 2026-09-23 06:00:00
-    $states = json_encode(["Klaar", "Actief", "Gepland", "Gepland"]); 
+    $states = [];
+    foreach ($goals as $goal) {
+        $states[] = 'Gepland';
+    }
+    $goals = json_encode($goals);
+    $interventions = json_encode($interventions);
+    $states = json_encode($states);
+
 
     $query = "INSERT INTO missions (area, purpose, interventions, `start-time`, `end-time`, state) VALUES (?, ?, ?, ?, ?, ?)";
     $result = mysqli_prepare($db, $query);
@@ -45,18 +52,19 @@ require_once('./partials/currentmission.php');
                 <section class="card mission">
                     <h4>HUIDIGE MISSIE</h4>
                     <h2><?= htmlspecialchars($nextMission['area'], ENT_QUOTES, 'UTF-8') ?></h2>
-                    <p><?= htmlspecialchars(date('d-m-Y', strtotime($nextMission['start-time'])), ENT_QUOTES, 'UTF-8') ?> 
-                        <span><?= htmlspecialchars(date('H:i', strtotime($nextMission['start-time'])) . ' - ' . date('H:i', strtotime($nextMission['end-time'])), ENT_QUOTES, 'UTF-8') ?></span></p>
+                    <p><?= htmlspecialchars(date('d-m-Y', strtotime($nextMission['start-time'])), ENT_QUOTES, 'UTF-8') ?>
+                        <span><?= htmlspecialchars(date('H:i', strtotime($nextMission['start-time'])) . ' - ' . date('H:i', strtotime($nextMission['end-time'])), ENT_QUOTES, 'UTF-8') ?></span>
+                    </p>
                     <div class="progress cyan">
-                        <div style="width: <?= $missionProgress ?>%;"></div>
+                        <div style="width: <?= $timeProgress ?>%;"></div>
                     </div>
-                    <p class="mission-progress">Missievoortgang <strong><?= $missionProgress ?>%</strong></p>
+                    <p class="mission-progress">Missievoortgang <strong><?= floor($timeProgress) ?>%</strong></p>
 
                     <h3>Missiedoelen</h3>
                     <ul>
-                        <?php for ($i = 0; $i < count($nextMission['purpose'] ?? []); $i++):
-                            $state = $nextMission['state'][$i]; ?>
-                            <li><?= htmlspecialchars($nextMission['purpose'][$i], ENT_QUOTES, 'UTF-8') ?><span class="<?= strtolower($state) ?>"><?= $state ?></span></li>
+                        <?php for ($i = 0; $i < count($nextMission['purpose'] ?? []); $i++): ?>
+                            <li><?= htmlspecialchars($nextMission['purpose'][$i], ENT_QUOTES, 'UTF-8') ?><span
+                                    class="<?= strtolower($state[$i]) ?>"><?= $state[$i] ?></span></li>
                         <?php endfor; ?>
                     </ul>
 
