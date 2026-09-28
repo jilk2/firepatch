@@ -40,5 +40,3 @@ startTime.addEventListener("input", () => syncTimeRange(startTime));
 endTime.addEventListener("input", () => syncTimeRange(endTime));
 
 syncTimeRange(); //zodat hij balk laat zien zonder te tijden veranderd te hebben
-
-

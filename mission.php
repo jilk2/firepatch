@@ -1,17 +1,23 @@
 <?php
 
-require_once('./DB/DBConnect.php');
+require_once __DIR__ . '/config/database.php';
 
 date_default_timezone_set('Europe/Amsterdam');
 $today = date('Y-m-d');
 
 //add to $db the values from input fields
-if (isset($_POST['submit'])) {
-    $sector = $_POST['sector'] ?? '';
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit'])) {
+    $sector = trim((string) ($_POST['sector'] ?? ''));
 
-    $goalsArray = $_POST['goals'] ?? [];
+    $goalsArray = array_values(array_filter(
+        (array) ($_POST['goals'] ?? []),
+        static fn ($goal): bool => is_string($goal) && trim($goal) !== ''
+    ));
 
-    $interventionsArray = $_POST['interventions'] ?? [];
+    $interventionsArray = array_values(array_filter(
+        (array) ($_POST['interventions'] ?? []),
+        static fn ($intervention): bool => is_string($intervention) && trim($intervention) !== ''
+    ));
 
 
 
@@ -20,16 +26,24 @@ if (isset($_POST['submit'])) {
     $startMinutes = (int) ($_POST['start_time'] ?? 0);
 
     $endMinutes = (int) ($_POST['end_time'] ?? 0);
-    $startTime = $today . ' ' . sprintf('%02d:%02d:00', intdiv($startMinutes, 60), $startMinutes % 60);
-    $endTime = $today . ' ' . sprintf('%02d:%02d:00', intdiv($endMinutes, 60), $endMinutes % 60);
-    //Bijv:     2026-9-23          %d-> int, 02-> 2cijfers met 0 vooraf  360/60 = 6(uur)    360%60 = 0(minuten)     geeft 2026-09-23 06:00:00
+
+    $startMinutes = max(0, min(1440, $startMinutes));
+    $endMinutes = max(0, min(1440, $endMinutes));
+
+    if ($sector === '' || $goalsArray === [] || $endMinutes <= $startMinutes) {
+        http_response_code(422);
+        exit('Kies een sector, minimaal een missiedoel en een eindtijd na de starttijd.');
+    }
+    $dayStart = new DateTimeImmutable($today . ' 00:00:00');
+    $startTime = $dayStart->modify('+' . $startMinutes . ' minutes')->format('Y-m-d H:i:s');
+    $endTime = $dayStart->modify('+' . $endMinutes . ' minutes')->format('Y-m-d H:i:s');
     $states = [];
     foreach ($goalsArray as $goal) {
         $states[] = 'Gepland';
     }
-    $goals = json_encode($goalsArray);
-    $interventions = json_encode($interventionsArray);
-    $states = json_encode($states);
+    $goals = json_encode($goalsArray, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
+    $interventions = json_encode($interventionsArray, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
+    $states = json_encode($states, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
 
 
     $query = "INSERT INTO missions (area, purpose, interventions, `start-time`, `end-time`, state) VALUES (?, ?, ?, ?, ?, ?)";
@@ -48,6 +62,7 @@ if (isset($_POST['submit'])) {
 
 
     $result->execute();
+    $result->close();
 
 
 
@@ -110,7 +125,7 @@ if (isset($_POST['submit'])) {
 
 }
 
-require_once('./partials/currentmission.php');
+require_once __DIR__ . '/partials/currentmission.php';
 
 ?>
 
@@ -146,8 +161,9 @@ require_once('./partials/currentmission.php');
                     <h3>Missiedoelen</h3>
                     <ul>
                         <?php for ($i = 0; $i < count($nextMission['purpose'] ?? []); $i++): ?>
+                            <?php $goalState = $state[$i] ?? 'Gepland'; ?>
                             <li><?= htmlspecialchars($nextMission['purpose'][$i], ENT_QUOTES, 'UTF-8') ?><span
-                                    class="<?= strtolower($state[$i]) ?>"><?= $state[$i] ?></span></li>
+                                    class="<?= strtolower($goalState) ?>"><?= htmlspecialchars($goalState, ENT_QUOTES, 'UTF-8') ?></span></li>
                         <?php endfor; ?>
                     </ul>
 

@@ -1,0 +1,10 @@
+/config/database.local.php
+/config/dbimport.lock
+/config/migration-*.lock
+/node_modules/
+/uploads/*
+!/uploads/.gitkeep
+/.merge-staging-*/
+/nas-upload/
+/team-main/
+/firepatch-team-main-*.zip
