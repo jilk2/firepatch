@@ -20,7 +20,6 @@
             <div class="user">
                 <div>
                     <strong id="header-user-email">Gast</strong>
-                    <!-- HIER ZAT DE FOUT: id toegevoegd zodat JS de tekst kan wijzigen -->
                     <p id="header-user-role">Niet ingelogd</p>
                 </div>
                 <div class="avatar" id="header-avatar">?</div>
@@ -39,7 +38,7 @@
 
         if (loggedInUser) {
             emailEl.textContent = loggedInUser;
-            roleEl.textContent = "VerifiNET Node"; // Dit verandert nu feilloos mee!
+            roleEl.textContent = "VerifiNET Node";
             avatarEl.textContent = loggedInUser.substring(0, 2).toUpperCase();
             authBtn.textContent = "Uitloggen";
             authBtn.style.borderColor = "var(--red)";

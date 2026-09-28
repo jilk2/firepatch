@@ -1,5 +1,4 @@
 <?php
-// 1. Zeg tegen de browser: "Alles is welkom, ook Vite op poort 5173!"
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type");
@@ -20,7 +19,6 @@ header("Content-Type: application/json; charset=UTF-8");
         $stmt->execute([$data->email]);
         $user = $stmt->fetch();
 
-    // 2. Controleer of de gebruiker bestaat, EN of het wachtwoord klopt met de hash
     if($user && password_verify($data->password, $user['Password'])) {
         
         echo json_encode([
