@@ -65,11 +65,6 @@ document.addEventListener("DOMContentLoaded", function () {
             filterValue.appendChild(option);
 
 
-            // Alleen bij Alles uitzetten
-
-            // filterValue.disabled = true;
-
-
             filterLogs();
 
             return;
