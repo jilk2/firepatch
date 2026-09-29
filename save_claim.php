@@ -46,8 +46,9 @@ date_default_timezone_set('Europe/Amsterdam');
                     <?php endfor; ?>
                 </select>
 
-                <label for="evidence">Bewijsafbeelding <small>(optioneel, JPG/PNG/WebP, maximaal 5 MB)</small></label>
-                <input class="input file-input" type="file" name="evidence" id="evidence"
+                <!-- 1. HIER IS DE 'required' TAG TOEGEVOEGD: Afbeelding is nu verplicht -->
+                <label for="evidence">Bewijsafbeelding <small>(Verplicht, JPG/PNG/WebP, maximaal 5 MB)</small></label>
+                <input class="input file-input" type="file" name="evidence" id="evidence" required
                        accept="image/jpeg,image/png,image/webp">
 
                 <button type="submit" class="btn primary submit-claim">Claim indienen</button>
@@ -57,12 +58,12 @@ date_default_timezone_set('Europe/Amsterdam');
 </div>
 
 <script>
+    // 2. CHECK: Als niet ingelogd, stuur gewoon "Gast" door
     const currentUser = localStorage.getItem('verifinet_user');
     const authorInput = document.getElementById('author-email');
 
     if (!currentUser) {
-        alert('Je moet ingelogd zijn om een claim in te dienen.');
-        window.location.replace('login.php');
+        authorInput.value = 'Gast'; // Dit wordt meegestuurd naar upload.php
     } else {
         authorInput.value = currentUser;
     }
