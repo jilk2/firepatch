@@ -1,8 +1,9 @@
 <?php
 
-require_once __DIR__ . '/config/database.php';
-
+require_once('./DB/DBConnect.php');
+$db = firepatchMysqli();
 date_default_timezone_set('Europe/Amsterdam');
+
 $today = date('Y-m-d');
 $errors = [];
 $editMissionId = null;
@@ -62,8 +63,11 @@ if (isset($_POST['submit'])) {
 
 
     $states = [];
+
     foreach ($goalsArray as $goal) {
+
         $states[] = 'Gepland';
+
     }
     $goals = json_encode($goalsArray, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
     $interventions = json_encode($interventionsArray, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
@@ -86,12 +90,11 @@ if (isset($_POST['submit'])) {
         $result->close();
 
         if (!$editMissionId) {
-            $logQuery = "INSERT INTO logboek (type, activity, location, status) VALUES (?, ?, ?, ?)";
+            $logQuery = "INSERT INTO logboek (activity, location, status) VALUES (?, ?, ?)";
             $logResult = mysqli_prepare($db, $logQuery);
-            $logType = implode(', ', $interventionsArray);
             $logActivity = implode(', ', $goalsArray);
             $logStatus = 'active';
-            $logResult->bind_param('ssss', $logType, $logActivity, $sector, $logStatus);
+            $logResult->bind_param('sss', $logActivity, $sector, $logStatus);
             $logResult->execute();
             $logResult->close();
         }

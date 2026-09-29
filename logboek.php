@@ -1,21 +1,36 @@
 <?php
 
-require_once __DIR__ . '/config/database.php';
+require_once('./DB/DBConnect.php');
 
 
-// Logboek gegevens ophalen
+// Databaseverbinding ophalen
+$db = firepatchMysqli();
 
-$query = "SELECT * FROM logboek ORDER BY created_at DESC";
+
+// =============================================
+// LOGBOEK GEGEVENS OPHALEN
+// =============================================
+
+$query = "
+    SELECT *
+    FROM logboek
+    ORDER BY created_at DESC
+";
 
 $result = mysqli_query($db, $query);
 
+
 $logs = [];
 
+
 while ($row = mysqli_fetch_assoc($result)) {
+
     $logs[] = $row;
+
 }
 
 ?>
+
 
 <!doctype html>
 
@@ -30,17 +45,33 @@ while ($row = mysqli_fetch_assoc($result)) {
         content="width=device-width, initial-scale=1.0"
     >
 
-    <title>Firepatch - Logboek</title>
+    <title>
+        Firepatch - Logboek
+    </title>
+
+
+    <!-- Algemene Firepatch CSS -->
+
+    <link
+        rel="stylesheet"
+        href="./css/main.css"
+    >
+
+
+    <!-- Logboek CSS -->
 
     <link
         rel="stylesheet"
         href="./css/logboek.css"
     >
-    
-    <link
-        rel="stylesheet"
-        href="./css/main.css"
-    >
+
+
+    <!-- Logboek JavaScript -->
+
+    <script
+        src="./js/logboek.js"
+        defer
+    ></script>
 
 </head>
 
@@ -48,19 +79,21 @@ while ($row = mysqli_fetch_assoc($result)) {
 <body>
 
 
-<?php include __DIR__ . '/partials/header.php'; ?>
+<?php include("./partials/header.php"); ?>
 
 
 <div class="layout">
 
 
-    <?php include __DIR__ . '/partials/sidebar.php'; ?>
+    <?php include("./partials/sidebar.php"); ?>
 
 
     <main class="page">
 
 
-        <!-- HEADER -->
+        <!-- =============================================
+             HEADER
+        ============================================== -->
 
         <div class="page-top">
 
@@ -75,95 +108,94 @@ while ($row = mysqli_fetch_assoc($result)) {
                 </p>
 
             </div>
+
         </div>
 
 
-        <!-- FILTERS -->
+
+        <!-- =============================================
+             FILTERS
+        ============================================== -->
 
         <div class="card log-filters">
 
 
-            <ul class="filter-keywords">
+            <!-- =============================================
+                 LINKERKANT
+            ============================================== -->
 
-                <li class="active">
-
-                    <a
-                        href="#"
-                        class="log-filter"
-                        data-filter="all"
-                    >
-                        Alles
-                    </a>
-
-                </li>
+            <div class="filter-left">
 
 
-                <li>
+                <!-- KIES FILTER -->
 
-                    <a
-                        href="#"
-                        class="log-filter"
-                        data-filter="scan"
-                    >
-                        Scans
-                    </a>
+                <div class="filter-group">
 
-                </li>
+                    <select id="filter-sort">
 
+                        <option value="all">
+                            Alles
+                        </option>
 
-                <li>
+                        <option value="activity">
+                            Activiteit
+                        </option>
 
-                    <a
-                        href="#"
-                        class="log-filter"
-                        data-filter="interventie"
-                    >
-                        Interventies
-                    </a>
+                        <option value="location">
+                            Locatie
+                        </option>
 
-                </li>
+                        <option value="status">
+                            Status
+                        </option>
 
+                    </select>
 
-                <li>
-
-                    <a
-                        href="#"
-                        class="log-filter"
-                        data-filter="drone"
-                    >
-                        Drones
-                    </a>
-
-                </li>
+                </div>
 
 
-                <li>
 
-                    <a
-                        href="#"
-                        class="log-filter"
-                        data-filter="probleem"
-                    >
-                        Problemen
-                    </a>
+                <!-- =============================================
+                     FILTER WAARDE
+                ============================================== -->
 
-                </li>
-
-            </ul>
-
-
-            <div class="filter-group">
-
-                <!-- <input
-                    type="text"
-                    id="filter-search"
-                    placeholder="Zoek op trefwoord..." -->
-                <!-- > -->
-
-                <input
-                    type="date"
-                    id="filter-date"
+                <div
+                    class="filter-group"
+                    id="value-filter-group"
                 >
+
+                    <select
+                        id="filter-value"
+                        disabled
+                    >
+
+                        <option value="all">
+                            Alles
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+            </div>
+
+
+
+            <!-- =============================================
+                 DATUM ALTIJD RECHTS
+            ============================================== -->
+
+            <div class="filter-right">
+
+                <div class="filter-group">
+
+                    <input
+                        type="date"
+                        id="filter-date"
+                    >
+
+                </div>
 
             </div>
 
@@ -171,153 +203,289 @@ while ($row = mysqli_fetch_assoc($result)) {
         </div>
 
 
-        <!-- LOGBOEK -->
+
+        <!-- =============================================
+             LOGBOEK TABEL
+        ============================================== -->
 
         <table class="card log-table">
 
+
+            <!-- =============================================
+                 TABEL HEADER
+            ============================================== -->
 
             <thead>
 
                 <tr>
 
-                    <th>Tijd</th>
+                    <th>
+                        Tijd
+                    </th>
 
-                    <th>Type</th>
+                    <th>
+                        Activiteit
+                    </th>
 
-                    <th>Activiteit</th>
+                    <th>
+                        Locatie
+                    </th>
 
-                    <th>Locatie</th>
-
-                    <th>Status</th>
+                    <th>
+                        Status
+                    </th>
 
                 </tr>
 
             </thead>
 
 
+
+            <!-- =============================================
+                 LOGBOEK REGELS
+            ============================================== -->
+
             <tbody id="logbook-body">
+
 
                 <?php foreach ($logs as $log): ?>
 
+
                     <tr
-                        data-type="<?= htmlspecialchars($log['type']) ?>"
-                        data-date="<?= date('Y-m-d', strtotime($log['created_at'])) ?>"
+
+                        data-activity="<?=
+                            htmlspecialchars(
+                                $log['activity'],
+                                ENT_QUOTES,
+                                'UTF-8'
+                            )
+                        ?>"
+
+                        data-location="<?=
+                            htmlspecialchars(
+                                $log['location'],
+                                ENT_QUOTES,
+                                'UTF-8'
+                            )
+                        ?>"
+
+                        data-status="<?=
+                            htmlspecialchars(
+                                $log['status'],
+                                ENT_QUOTES,
+                                'UTF-8'
+                            )
+                        ?>"
+
+                        data-date="<?=
+                            date(
+                                'Y-m-d',
+                                strtotime($log['created_at'])
+                            )
+                        ?>"
+
                     >
 
+
+
+                        <!-- =============================================
+                             TIJD
+                        ============================================== -->
+
                         <td>
 
-                            <?= date(
-                                'H:i',
-                                strtotime($log['created_at'])
-                            ) ?>
+                            <?=
+                                date(
+                                    'H:i',
+                                    strtotime($log['created_at'])
+                                )
+                            ?>
 
-                            ·
+                            -
 
-                            <?= date(
-                                'd-m-Y',
-                                strtotime($log['created_at'])
-                            ) ?>
+                            <?=
+                                date(
+                                    'd-m-Y',
+                                    strtotime($log['created_at'])
+                                )
+                            ?>
 
                         </td>
 
 
-                        <td>
 
-                            <?= htmlspecialchars($log['type']) ?>
-
-                        </td>
-
+                        <!-- =============================================
+                             ACTIVITEIT
+                        ============================================== -->
 
                         <td>
 
                             <strong>
 
-                                <?= htmlspecialchars(
-                                    $log['activity']
-                                ) ?>
+                                <?=
+                                    htmlspecialchars(
+                                        $log['activity'],
+                                        ENT_QUOTES,
+                                        'UTF-8'
+                                    )
+                                ?>
 
                             </strong>
 
                         </td>
 
 
+
+                        <!-- =============================================
+                             LOCATIE
+                        ============================================== -->
+
                         <td>
 
-                            <?= htmlspecialchars(
-                                $log['location']
-                            ) ?>
+                            <?=
+                                htmlspecialchars(
+                                    $log['location'],
+                                    ENT_QUOTES,
+                                    'UTF-8'
+                                )
+                            ?>
 
                         </td>
 
 
+
+                        <!-- =============================================
+                             STATUS
+                        ============================================== -->
+
                         <td>
 
+
                             <span
-                                class="status-pill <?= htmlspecialchars($log['status']) ?>"
+                                class="status-pill <?=
+                                    htmlspecialchars(
+                                        $log['status'],
+                                        ENT_QUOTES,
+                                        'UTF-8'
+                                    )
+                                ?>"
                             >
+
 
                                 <?php
 
                                 if ($log['status'] === 'done') {
+
                                     echo "Voltooid";
-                                }
 
-                                if ($log['status'] === 'pending') {
+                                } elseif ($log['status'] === 'pending') {
+
                                     echo "Wacht";
-                                }
 
-                                if ($log['status'] === 'active') {
+                                } elseif ($log['status'] === 'active') {
+
                                     echo "Monitoring";
+
+                                } else {
+
+                                    echo htmlspecialchars(
+                                        $log['status'],
+                                        ENT_QUOTES,
+                                        'UTF-8'
+                                    );
+
                                 }
 
                                 ?>
 
+
                             </span>
+
 
                         </td>
 
+
                     </tr>
+
 
                 <?php endforeach; ?>
 
+
             </tbody>
 
+
+
+            <!-- =============================================
+                 FOOTER
+            ============================================== -->
 
             <tfoot>
 
                 <tr>
 
-                    <td colspan="5">
+                    <td colspan="4">
+
 
                         <div class="log-footer-content">
 
+
+                            <!-- =============================================
+                                 AANTAL LOGREGELS
+                            ============================================== -->
+
                             <p id="logbook-count">
-                                Getoond: <?= count($logs) ?> logregels
+
+                                Getoond:
+                                <?= count($logs) ?>
+                                logregels
+
                             </p>
+
+
+
+                            <!-- =============================================
+                                 PAGINATION
+                            ============================================== -->
 
                             <div class="pagination">
 
+
                                 <button
+                                    type="button"
                                     id="previous-page"
                                     class="log-link"
                                 >
+
                                     Vorige
+
                                 </button>
 
+
+
                                 <span id="page-info">
+
                                     Pagina 1
+
                                 </span>
 
+
+
                                 <button
+                                    type="button"
                                     id="next-page"
                                     class="log-link"
                                 >
+
                                     Volgende
+
                                 </button>
+
 
                             </div>
 
+
                         </div>
+
 
                     </td>
 
@@ -331,10 +499,8 @@ while ($row = mysqli_fetch_assoc($result)) {
 
     </main>
 
+
 </div>
-
-
-<script src="js/logboek.js"></script>
 
 
 </body>

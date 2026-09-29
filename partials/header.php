@@ -19,14 +19,17 @@
         <div class="topbar-right">
             <span class="online-dot"></span>
             <span class="status">Connection: ONLINE</span>
-            <div class="user">
-                <div>
-                    <strong id="header-user-email">Gast</strong>
-                    <p id="header-user-role">Niet ingelogd</p>
-                </div>
-                <div class="avatar" id="header-avatar">?</div>
-                <button id="auth-action-btn" onclick="handleHeaderAuth()" class="btn ghost"
-                    style="padding: 6px 12px; font-size: 11px; cursor: pointer; margin-left: 10px;">Login</button>
+            <div class="user" style="display: flex; align-items: center;">
+                <!-- Link naar de profielpagina (werkt alleen logisch als je bent ingelogd) -->
+                <a href="profile.php" style="display: flex; align-items: center; gap: 10px; text-decoration: none; cursor: pointer;">
+                    <div>
+                        <strong id="header-user-email" style="color: var(--white);">Gast</strong>
+                        <p id="header-user-role" style="color: #888;">Niet ingelogd</p>
+                    </div>
+                    <div class="avatar" id="header-avatar">?</div>
+                </a>
+                
+                <button id="auth-action-btn" onclick="handleHeaderAuth()" class="btn ghost" style="padding: 6px 12px; font-size: 11px; cursor: pointer; margin-left: 15px;">Login</button>
             </div>
         </div>
     </header>
