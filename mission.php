@@ -11,10 +11,12 @@
 <?php
 
 require_once('./DB/DBConnect.php');
-$db = firepatchMysqli();
-date_default_timezone_set('Europe/Amsterdam');
 
+$db = firepatchMysqli();
+
+date_default_timezone_set('Europe/Amsterdam');
 $today = date('Y-m-d');
+
 $errors = [];
 $editMissionId = null;
 $claimMissionMessage = null;
@@ -120,98 +122,207 @@ if (isset($_POST['action']) && $_POST['action'] === 'prepare_mission') {
     }
 }
 
-//add to $db the values from input fields
+
+// Missie toevoegen of aanpassen
 if (isset($_POST['submit'])) {
+
     $editMissionId = filter_var($_POST['edit_id'] ?? null, FILTER_VALIDATE_INT, [
         'options' => ['min_range' => 1]
     ]) ?: null;
-    $sector = trim((string) ($_POST['sector'] ?? ''));
-    $goalsArray = is_array($_POST['goals'] ?? null) ? $_POST['goals'] : [];
-    $interventionsArray = is_array($_POST['interventions'] ?? null) ? $_POST['interventions'] : [];
 
-    // start validation
+    $sector = trim((string) ($_POST['sector'] ?? ''));
+
+    $goalsArray = is_array($_POST['goals'] ?? null)
+        ? $_POST['goals']
+        : [];
+
+    $interventionsArray = is_array($_POST['interventions'] ?? null)
+        ? $_POST['interventions']
+        : [];
+
+
+    // Validatie
     if (count($goalsArray) < 1) {
         $errors[] = 'Selecteer minimaal één missiedoel.';
     }
+
     if (empty($sector)) {
         $errors[] = 'Selecteer een gebied / sector.';
     }
 
+
     // Tijden
     $startMinutes = (int) ($_POST['start_time'] ?? 0);
     $endMinutes = (int) ($_POST['end_time'] ?? 0);
+
     if ($startMinutes < 0 || $startMinutes >= 1440 || $endMinutes <= 0 || $endMinutes > 1440) {
+
         $errors[] = 'Kies geldige operationele tijden.';
+
     } elseif ($endMinutes <= $startMinutes) {
+
         $errors[] = 'De eindtijd moet later zijn dan de starttijd.';
+
     } else {
-        $startTime = $today . ' ' . sprintf('%02d:%02d:00', intdiv($startMinutes, 60), $startMinutes % 60);
-        $endTime = $today . ' ' . sprintf('%02d:%02d:00', intdiv($endMinutes, 60), $endMinutes % 60);
+
+        $startTime = $today . ' ' . sprintf(
+            '%02d:%02d:00',
+            intdiv($startMinutes, 60),
+            $startMinutes % 60
+        );
+
+        $endTime = $today . ' ' . sprintf(
+            '%02d:%02d:00',
+            intdiv($endMinutes, 60),
+            $endMinutes % 60
+        );
 
         if ($endMinutes === 1440) {
             $endTime = date('Y-m-d', strtotime($today . ' +1 day')) . ' 00:00:00';
         }
-
-        $now = new DateTimeImmutable();
-        $startDateTime = new DateTimeImmutable($startTime);
-        $endDateTime = new DateTimeImmutable($endTime);
-
-        // if ($startDateTime <= $now) {
-        //     $errors[] = 'De starttijd moet later zijn dan de huidige tijd.';
-        // }
     }
 
-    // DIT STOND OP DE MAIN??? IK HAD MERGE CONFLICT DUS HEB DIT UIT GECOMMEND
-
-    // $startMinutes = max(0, min(1440, $startMinutes));
-    // $endMinutes = max(0, min(1440, $endMinutes));
-
-    // if ($sector === '' || $goalsArray === [] || $endMinutes <= $startMinutes) {
-    //     http_response_code(422);
-    //     exit('Kies een sector, minimaal een missiedoel en een eindtijd na de starttijd.');
-    // }
-    // $dayStart = new DateTimeImmutable($today . ' 00:00:00');
-    // $startTime = $dayStart->modify('+' . $startMinutes . ' minutes')->format('Y-m-d H:i:s');
-    // $endTime = $dayStart->modify('+' . $endMinutes . ' minutes')->format('Y-m-d H:i:s');
-
-
+    // Status van de doelen
     $states = [];
 
     foreach ($goalsArray as $goal) {
-
         $states[] = 'Gepland';
-
     }
-    $goals = json_encode($goalsArray, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
-    $interventions = json_encode($interventionsArray, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
-    $states = json_encode($states, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
+
+    $goals = json_encode(
+        $goalsArray,
+        JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR
+    );
+
+    $interventions = json_encode(
+        $interventionsArray,
+        JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR
+    );
+
+    $states = json_encode(
+        $states,
+        JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR
+    );
+
 
     if (empty($errors)) {
+
+        // Bestaande missie aanpassen
         if ($editMissionId) {
-            $query = "UPDATE missions SET area = ?, purpose = ?, interventions = ?, `start-time` = ?, `end-time` = ?, state = ? WHERE id = ?";
+
+            $query = "UPDATE missions
+                      SET area = ?, purpose = ?, interventions = ?, `start-time` = ?, `end-time` = ?, state = ?
+                      WHERE id = ?";
+
+            $result = mysqli_prepare($db, $query);
+
+            $result->bind_param(
+                'ssssssi',
+                $sector,
+                $goals,
+                $interventions,
+                $startTime,
+                $endTime,
+                $states,
+                $editMissionId
+            );
+
+            $result->execute();
+            $result->close();
+
+            $missionId = $editMissionId;
+
+
+            // Oude logboekregels van deze missie verwijderen
+            $deleteLogQuery = "DELETE FROM logboek WHERE mission_id = ?";
+
+            $deleteLogResult = mysqli_prepare($db, $deleteLogQuery);
+
+            $deleteLogResult->bind_param(
+                'i',
+                $missionId
+            );
+
+            $deleteLogResult->execute();
+            $deleteLogResult->close();
+
         } else {
-            $query = "INSERT INTO missions (area, purpose, interventions, `start-time`, `end-time`, state) VALUES (?, ?, ?, ?, ?, ?)";
+
+            // Nieuwe missie toevoegen
+            $query = "INSERT INTO missions
+                      (area, purpose, interventions, `start-time`, `end-time`, state)
+                      VALUES (?, ?, ?, ?, ?, ?)";
+
+            $result = mysqli_prepare($db, $query);
+
+            $result->bind_param(
+                'ssssss',
+                $sector,
+                $goals,
+                $interventions,
+                $startTime,
+                $endTime,
+                $states
+            );
+
+            $result->execute();
+
+            $missionId = mysqli_insert_id($db);
+
+            $result->close();
         }
 
-        $result = mysqli_prepare($db, $query);
-        if ($editMissionId) {
-            $result->bind_param('ssssssi', $sector, $goals, $interventions, $startTime, $endTime, $states, $editMissionId);
-        } else {
-            $result->bind_param('ssssss', $sector, $goals, $interventions, $startTime, $endTime, $states);
-        }
-        $result->execute();
-        $result->close();
 
         // Logboek entry for new mission
         if (!$editMissionId) {
-            $logQuery = "INSERT INTO logboek (activity, location, status) VALUES (?, ?, ?)";
-            $logResult = mysqli_prepare($db, $logQuery);
-            $logActivity = implode(', ', $goalsArray);
+            // Logboek
+            $logQuery = "INSERT INTO logboek
+                     (mission_id, activity, location, status)
+                     VALUES (?, ?, ?, ?)";
+
             $logStatus = 'active';
-            $logResult->bind_param('sss', $logActivity, $sector, $logStatus);
-            $logResult->execute();
-            $logResult->close();
+
+
+            // Elk missiedoel apart in het logboek
+            foreach ($goalsArray as $goal) {
+
+                $logActivity = $goal;
+
+                $logResult = mysqli_prepare($db, $logQuery);
+
+                $logResult->bind_param(
+                    'isss',
+                    $missionId,
+                    $logActivity,
+                    $sector,
+                    $logStatus
+                );
+
+                $logResult->execute();
+                $logResult->close();
+            }
+
+
+            // Elke interventie apart in het logboek
+            foreach ($interventionsArray as $intervention) {
+
+                $logActivity = $intervention;
+
+                $logResult = mysqli_prepare($db, $logQuery);
+
+                $logResult->bind_param(
+                    'isss',
+                    $missionId,
+                    $logActivity,
+                    $sector,
+                    $logStatus
+                );
+
+                $logResult->execute();
+                $logResult->close();
+            }
         }
+
 
         header('Location: mission.php');
         exit();
@@ -220,65 +331,135 @@ if (isset($_POST['submit'])) {
 
 // DELETE LOGIC
 if (isset($_GET['action']) && $_GET['action'] === 'delete' && isset($_GET['id']) && is_numeric($_GET['id'])) {
-    $missionId = $_GET['id'];
 
-    // Delete the mission from the database
+    $missionId = (int) $_GET['id'];
+
+
+    // Eerst logboekregels verwijderen
+    $deleteLogQuery = "DELETE FROM logboek WHERE mission_id = ?";
+
+    $deleteLogResult = mysqli_prepare($db, $deleteLogQuery);
+
+    $deleteLogResult->bind_param(
+        'i',
+        $missionId
+    );
+
+    $deleteLogResult->execute();
+    $deleteLogResult->close();
+
+
+    // Daarna missie verwijderen
     $deleteQuery = "DELETE FROM missions WHERE id = ?";
+
     $deleteResult = mysqli_prepare($db, $deleteQuery);
-    $deleteResult->bind_param('i', $missionId);
+
+    $deleteResult->bind_param(
+        'i',
+        $missionId
+    );
+
     $deleteResult->execute();
     $deleteResult->close();
 
-    // Optionally, you can also delete related logs if needed
-    // $deleteLogQuery = "DELETE FROM logboek WHERE mission_id = ?";
-    // $deleteLogResult = mysqli_prepare($db, $deleteLogQuery);
-    // $deleteLogResult->bind_param('i', $missionId);
-    // $deleteLogResult->execute();
-    // $deleteLogResult->close();
 
-    // Redirect to avoid resubmission
     header("Location: mission.php");
     exit();
+}
 
-    // EDIT LOGIC
-} else if (isset($_GET["action"]) && $_GET["action"] === "edit" && isset($_GET["id"]) && is_numeric($_GET["id"])) {
-    $missionId = $_GET["id"];
 
-    // Fetch the mission data from the database
+// Missie aanpassen
+else if (
+    isset($_GET["action"]) &&
+    $_GET["action"] === "edit" &&
+    isset($_GET["id"]) &&
+    is_numeric($_GET["id"])
+) {
+
+    $missionId = (int) $_GET["id"];
+
+
+    // Missie ophalen
     $fetchQuery = "SELECT * FROM missions WHERE id = ?";
+
     $fetchResult = mysqli_prepare($db, $fetchQuery);
-    $fetchResult->bind_param("i", $missionId);
+
+    $fetchResult->bind_param(
+        "i",
+        $missionId
+    );
+
     $fetchResult->execute();
-    $missionData = $fetchResult->get_result()->fetch_assoc();
+
+    $missionData = $fetchResult
+        ->get_result()
+        ->fetch_assoc();
+
     $fetchResult->close();
 
-    if ($missionData) {
-        // Pre-fill the form with the existing mission data
-        $_POST["sector"] = $missionData["area"];
-        $_POST["goals"] = json_decode($missionData["purpose"], true);
-        $_POST["interventions"] = json_decode($missionData["interventions"], true);
 
-        // Convert start and end times to minutes for the slider
-        $startDateTime = new DateTime($missionData["start-time"]);
-        $endDateTime = new DateTime($missionData["end-time"]);
-        $_POST["start_time"] = ($startDateTime->format("H") * 60) + (int) $startDateTime->format("i");
-        $_POST["end_time"] = $endDateTime->format('H:i') === '00:00'
+    if ($missionData) {
+
+        // Formulier invullen met bestaande gegevens
+        $_POST["sector"] = $missionData["area"];
+
+        $_POST["goals"] = json_decode(
+            $missionData["purpose"],
+            true
+        );
+
+        $_POST["interventions"] = json_decode(
+            $missionData["interventions"],
+            true
+        );
+
+
+        // Tijden terug omzetten naar minuten
+        $startDateTime = new DateTime(
+            $missionData["start-time"]
+        );
+
+        $endDateTime = new DateTime(
+            $missionData["end-time"]
+        );
+
+        $_POST["start_time"] =
+            ($startDateTime->format("H") * 60)
+            + (int) $startDateTime->format("i");
+
+        $_POST["end_time"] =
+            $endDateTime->format('H:i') === '00:00'
             ? 1440
-            : ($endDateTime->format("H") * 60) + (int) $endDateTime->format("i");
+            : ($endDateTime->format("H") * 60)
+            + (int) $endDateTime->format("i");
+
         $_POST['edit_id'] = (int) $missionData['id'];
+
     } else {
-        // If the mission doesn't exist, redirect back to the mission page
+
         header("Location: mission.php");
         exit();
     }
 }
 
+
+// Waarden voor formulier
 $formSector = (string) ($_POST['sector'] ?? '');
-$formGoals = is_array($_POST['goals'] ?? null) ? $_POST['goals'] : [];
-$formInterventions = is_array($_POST['interventions'] ?? null) ? $_POST['interventions'] : [];
+
+$formGoals = is_array($_POST['goals'] ?? null)
+    ? $_POST['goals']
+    : [];
+
+$formInterventions = is_array($_POST['interventions'] ?? null)
+    ? $_POST['interventions']
+    : [];
+
 $formStartTime = (int) ($_POST['start_time'] ?? 360);
+
 $formEndTime = (int) ($_POST['end_time'] ?? 1080);
+
 $formEditId = (int) ($_POST['edit_id'] ?? 0);
+
 
 require_once('./partials/currentmission.php');
 
@@ -363,7 +544,8 @@ $notification = mysqli_fetch_assoc($notification);
                                 </div>
                                 <div>
                                     <dt>Sector</dt>
-                                    <dd><?= htmlspecialchars($urgentMissionSuggestion['sector'] ?: 'Handmatig kiezen', ENT_QUOTES, 'UTF-8') ?></dd>
+                                    <dd><?= htmlspecialchars($urgentMissionSuggestion['sector'] ?: 'Handmatig kiezen', ENT_QUOTES, 'UTF-8') ?>
+                                    </dd>
                                 </div>
                                 <div>
                                     <dt>Duur</dt>
@@ -372,7 +554,8 @@ $notification = mysqli_fetch_assoc($notification);
                             </dl>
                             <div class="urgent-mission-actions">
                                 <button type="submit" value="adjust" class="btn ghost">Aanpassen</button>
-                                <button type="submit" form="mission-form" name="submit" class="btn primary">Missie starten</button>
+                                <button type="submit" form="mission-form" name="submit" class="btn primary">Missie
+                                    starten</button>
                             </div>
                         </form>
                     </dialog>

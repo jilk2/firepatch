@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="BackgroundAgentGlobalSettings">
+    <option name="selectedModelId" value="auto" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="7a6602e8-66cf-4669-bc8f-a1a44d5fb17f" name="Changes" comment="Map sectors gegeven">
+      <change beforePath="$PROJECT_DIR$/kaart.php" beforeDir="false" afterPath="$PROJECT_DIR$/kaart.php" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ComposerSettings">
+    <execution>
+      <execution>
+        <execution>
+          <execution>
+            <execution>
+              <execution>
+                <execution />
+              </execution>
+            </execution>
+          </execution>
+        </execution>
+      </execution>
+    </execution>
+  </component>
+  <component name="CopilotPersistence">
+    <persistenceIdMap>
+      <entry key="_C:/Users/trace/Development/jaar2/MOD5/TLE1/firepatch" value="3Jfz6PnRQPzYhbOmcHFoYyu7hvg" />
+    </persistenceIdMap>
+  </component>
+  <component name="DatabaseLocalColorSettings">
+    <colors>
+      <entry key="1dedfc63-bdbc-42a5-9c19-7e31cc86b043" value="" />
+    </colors>
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="PHP File" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <excluded-from-favorite>
+      <branch-storage>
+        <map>
+          <entry type="LOCAL">
+            <value>
+              <list>
+                <branch-info repo="$PROJECT_DIR$" source="main" />
+              </list>
+            </value>
+          </entry>
+        </map>
+      </branch-storage>
+    </excluded-from-favorite>
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="main" />
+      </map>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;Bramm404&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/jilk2/firepatch.git&quot;,
+    &quot;accountId&quot;: &quot;c6727956-6c35-4ba0-9cca-5ceca0a7916b&quot;
+  }
+}</component>
+  <component name="PhpWorkspaceProjectConfiguration" interpreter_name="PHP" />
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 0,
+  &quot;fromUser&quot;: false
+}</component>
+  <component name="ProjectId" id="3JdCW9GJg7uyJhRjcrcxh3YovP4" />
+  <component name="ProjectSessionTemplates">
+    <option name="panelTemplate">
+      <template>
+        <option name="modeId" value="Agent" />
+        <option name="model">
+          <model>
+            <option name="modelType" value="builtin_id" />
+            <option name="modelValue" value="auto" />
+          </model>
+        </option>
+        <option name="targetType" value="BACKGROUND" />
+        <option name="worktreeMode" value="WORKSPACE" />
+      </template>
+    </option>
+  </component>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Database Script.map_sectors.sql.executor": "Run",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "codeWithMe.voiceChat.enabledByDefault": "false",
+    "copilot.chat.legacySessionMetadata.migrated": "true",
+    "git-widget-placeholder": "Kaart",
+    "git.auto.fetch.suggestion.counter": "3",
+    "last_opened_file_path": "C:/Users/trace/Development/jaar2/MOD5/TLE1/firepatch",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "preferences.pluginManager",
+    "vue.rearranger.settings.migration": "true"
+  },
+  "keyToStringList": {
+    "DatabaseDriversLRU": [
+      "mysql"
+    ],
+    "RunConfigurationTargetLRU": [
+      "1dedfc63-bdbc-42a5-9c19-7e31cc86b043"
+    ]
+  }
+}]]></component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\trace\Development\jaar2\MOD5\TLE1\firepatch" />
+    </key>
+  </component>
+  <component name="RunManager">
+    <configuration name="map_sectors.sql" type="DatabaseScript" editBeforeRun="true" nameIsGenerated="true">
+      <script-file value="$PROJECT_DIR$/DB/map_sectors.sql" />
+      <script-mode>FILE</script-mode>
+      <data-source id="1dedfc63-bdbc-42a5-9c19-7e31cc86b043" />
+      <method v="2" />
+    </configuration>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-js-predefined-d6986cc7102b-4abd2a77f808-JavaScript-PS-262.10968.76" />
+        <option value="bundled-php-predefined-a98d8de5180a-9522f28f0b20-com.jetbrains.php.sharedIndexes-PS-262.10968.76" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="7a6602e8-66cf-4669-bc8f-a1a44d5fb17f" name="Changes" comment="" />
+      <created>1763461765259</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1763461765259</updated>
+      <workItem from="1763461766775" duration="223000" />
+      <workItem from="1789981587685" duration="4267000" />
+      <workItem from="1789989838110" duration="15266000" />
+      <workItem from="1790078759751" duration="13000" />
+      <workItem from="1790148872120" duration="11084000" />
+      <workItem from="1790585716855" duration="76000" />
+      <workItem from="1790586309111" duration="37000" />
+      <workItem from="1790586676636" duration="5481000" />
+    </task>
+    <task id="LOCAL-00001" summary="added crd pages for login">
+      <option name="closed" value="true" />
+      <created>1789981982668</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1789981982668</updated>
+    </task>
+    <task id="LOCAL-00002" summary="Updated styling for main and partials">
+      <option name="closed" value="true" />
+      <created>1790075815284</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1790075815284</updated>
+    </task>
+    <task id="LOCAL-00003" summary="Dashboard ready for php/js interactivity">
+      <option name="closed" value="true" />
+      <created>1790078431613</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1790078431613</updated>
+    </task>
+    <task id="LOCAL-00004" summary="Kaart styling geupdate">
+      <option name="closed" value="true" />
+      <created>1790155901664</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1790155901664</updated>
+    </task>
+    <task id="LOCAL-00005" summary="Kaart styling geupdate">
+      <option name="closed" value="true" />
+      <created>1790159124750</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1790159124750</updated>
+    </task>
+    <task id="LOCAL-00006" summary="map fixed, pointer event test for symbols on map">
+      <option name="closed" value="true" />
+      <created>1790161301102</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1790161301102</updated>
+    </task>
+    <task id="LOCAL-00007" summary="Map sectors gegeven">
+      <option name="closed" value="true" />
+      <created>1790592597228</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1790592597228</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="added crd pages for login" />
+    <MESSAGE value="Updated styling for main and partials" />
+    <MESSAGE value="Dashboard ready for php/js interactivity" />
+    <MESSAGE value="Kaart styling geupdate" />
+    <MESSAGE value="map fixed, pointer event test for symbols on map" />
+    <MESSAGE value="Map sectors gegeven" />
+    <option name="LAST_COMMIT_MESSAGE" value="Map sectors gegeven" />
+  </component>
+</project>
