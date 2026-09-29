@@ -54,8 +54,7 @@ while ($row = mysqli_fetch_assoc($result)) {
                     </div>
                 </div>
                 <div class="map">
-                    <img id="vlam" src="image/vlammetjes-6-st.jpg" alt="flames">
-                    <img id="vlam" src="images/vlammetjes-6-st.jpg" alt="flames">
+                    <img src="./images/map.png" alt = "kaart voor simulatie">
                 </div>
             </section>
 
