@@ -15,7 +15,7 @@ function showSector(sectorNumber, state) {
 
 	name.textContent = `Sector ${sectorNumber}`;
 	status.className = `sector-state ${stateClass(state)}`;
-	status.textContent = state;
+	status.textContent = "Status: " + state;
 	sectorOverlay.append(name, status);
 }
 
@@ -57,3 +57,5 @@ fetch('get_sectors.php', { cache: 'no-store' })
 		});
 	})
 	.catch((error) => console.error('Sectoren konden niet worden geladen:', error));
+
+

@@ -9,13 +9,13 @@
 
 <body>
     <header>
-        <div class="brand">
+        <a href="index.php" class="brand">
             <span class="shield">◈</span>
             <div>
                 <h1><span>FIRE</span>PATCH</h1>
                 <p>AUTONOMOUS BIOSPHERE DEFENSE</p>
             </div>
-        </div>
+        </a>
         <div class="topbar-right">
             <span class="online-dot"></span>
             <span class="status">Connection: ONLINE</span>

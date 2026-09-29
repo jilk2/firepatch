@@ -30,9 +30,8 @@ while ($row = mysqli_fetch_assoc($result)) {
 <!doctype html>
 <html lang="nl">
 
-<head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Firepatch Nature's guardians</title>
+<head>    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Firepatch - Dashboard</title>
     <link rel="stylesheet" href="./css/main.css" />
     <link rel="stylesheet" href="./css/kaart.css" />
     <link rel="stylesheet" href="./css/mission.css" />
@@ -54,18 +53,21 @@ while ($row = mysqli_fetch_assoc($result)) {
                 </div>
                 <div class="map">
                     <img id="map" src="images/map.png" alt="map of the region">
-                    <img id="vlam" src="images/vlammetjes-6-st.jpg" alt="flames">
+                    <!-- <img id="vlam" src="images/vlammetjes-6-st.jpg" alt="flames"> -->
                     <img id="drone" src="images/drone.png" alt="Drone">
                 </div>
             </section>
 
-            <section class="alert-card">
-                <div>
-                    <h3>⚠ ACTIE GEVRAAGD</h3>
-                    <p>Brand gedetecteerd in Sector <?php echo "4" ?>.</p>
-                </div>
+            <section class="alert-card" id="claim-alert" hidden>
+                
+                    <img id="claim-alert-image" class="claim-alert-image" alt="" hidden>
+                    <div>
+                        <h3>NIEUWE CLAIM</h3>
+                        <p id="claim-alert-message"></p>
+                    </div>
+    
                 <div class="page-actions">
-                    <a href="mission.php" class="btn primary">Bekijk</a>
+                    <a href="article.php" id="claim-alert-link" class="btn primary">Bekijk</a>
                 </div>
             </section>
 
@@ -174,6 +176,7 @@ while ($row = mysqli_fetch_assoc($result)) {
             </section>
         </aside>
     </div>
+    <script src="./js/dashboard-alert.js"></script>
 </body>
 
 </html>

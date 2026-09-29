@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="./css/sidebar.css" />
+    <script src="./js/connection.js" defer></script>
 </head>
 
 <body>
@@ -21,8 +22,8 @@
         <a href="verifynet.php" style="text-decoration: none; color: inherit; display: block;">
             <div class="fleet">
                 <h3>VerifyNET</h3>
-                <p> Status: <span>Online</span></p>
-                <p> Ongelezen: <span id="unread"></span></p>
+                <p>Status: <span>Online</span></p>
+                <p>Claims: <span id="unread"></span></p>
             </div>
         </a>
     </aside>
