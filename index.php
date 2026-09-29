@@ -30,11 +30,13 @@ while ($row = mysqli_fetch_assoc($result)) {
 <!doctype html>
 <html lang="nl">
 
-<head>    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Firepatch Nature's guardians</title>
     <link rel="stylesheet" href="./css/main.css" />
     <link rel="stylesheet" href="./css/kaart.css" />
     <link rel="stylesheet" href="./css/mission.css" />
+    <script src="js/map.js" defer></script>
 </head>
 
 <body>
@@ -51,7 +53,9 @@ while ($row = mysqli_fetch_assoc($result)) {
                     </div>
                 </div>
                 <div class="map">
-                    <img id="map" src="image/map.png" alt="map of the region">
+                    <img id="map" src="images/map.png" alt="map of the region">
+                    <img id="vlam" src="images/vlammetjes-6-st.jpg" alt="flames">
+                    <img id="drone" src="images/drone.png" alt="Drone">
                 </div>
             </section>
 
@@ -124,29 +128,28 @@ while ($row = mysqli_fetch_assoc($result)) {
 
         <aside class="rightbar">
 
-            <?php if($nextMission): ?>
-            <section class="card mission">
-                <h4>HUIDIGE MISSIE</h4>
-                <h2><?= htmlspecialchars($nextMission['area'], ENT_QUOTES, 'UTF-8') ?></h2>
-                <!-- <p><?= htmlspecialchars(date('d-m-Y', strtotime($nextMission['start-time'])), ENT_QUOTES, 'UTF-8') ?>
+            <?php if ($nextMission): ?>
+                <section class="card mission">
+                    <h4>HUIDIGE MISSIE</h4>
+                    <h2><?= htmlspecialchars($nextMission['area'], ENT_QUOTES, 'UTF-8') ?></h2>
+                    <!-- <p><?= htmlspecialchars(date('d-m-Y', strtotime($nextMission['start-time'])), ENT_QUOTES, 'UTF-8') ?>
                     <span><?= htmlspecialchars(date('H:i', strtotime($nextMission['start-time'])) . ' - ' . date('H:i', strtotime($nextMission['end-time'])), ENT_QUOTES, 'UTF-8') ?></span>
                 </p> -->
-                <p class="mission-progress">Missievoortgang <strong><?= floor($timeProgress) ?>%</strong></p>
-                <div class="progress cyan">
-                    <div style="width: <?= $timeProgress ?>%;"></div>
-                </div>
-                <ul>
-                    <?php for ($i = 0; $i < count($nextMission['purpose'] ?? []); $i++): ?>
-                        <li>
-                            <?php $goalState = $state[$i] ?? 'Gepland'; ?>
-                            <?= htmlspecialchars($nextMission['purpose'][$i], ENT_QUOTES, 'UTF-8') ?><span
-                                class="<?= strtolower($goalState) ?>">
-                                <?= htmlspecialchars($goalState, ENT_QUOTES, 'UTF-8') ?>
-                            </span>
-                        </li>
-                    <?php endfor; ?>
-                </ul>
-            </section>
+                    <p class="mission-progress">Missievoortgang <strong><?= floor($timeProgress) ?>%</strong></p>
+                    <div class="progress cyan">
+                        <div style="width: <?= $timeProgress ?>%;"></div>
+                    </div>
+                    <ul>
+                        <?php for ($i = 0; $i < count($nextMission['purpose'] ?? []); $i++): ?>
+                            <li>
+                                <?= htmlspecialchars($nextMission['purpose'][$i], ENT_QUOTES, 'UTF-8') ?><span
+                                    class="<?= strtolower($state[$i]) ?>">
+                                    <?= $state[$i] ?>
+                                </span>
+                            </li>
+                        <?php endfor; ?>
+                    </ul>
+                </section>
             <?php else: ?>
                 <section class="card mission empty-state">
                     <h4>MISSIES</h4>

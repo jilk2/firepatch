@@ -1,6 +1,11 @@
-const startTime = document.getElementById("start");
-const endTime = document.getElementById("end");
-const range = document.getElementById("range");
+const startTime = document.querySelector("#start");
+const endTime = document.querySelector("#end");
+const range = document.querySelector("#range");
+// const changeMission = document.querySelector('#change-mission');
+
+startTime.addEventListener("input", () => syncTimeRange(startTime));
+endTime.addEventListener("input", () => syncTimeRange(endTime));
+// changeMission.addEventListener('click', changeMissionHandler)
 
 function formatTime(minutes) {
   const hours = Math.floor(minutes / 60);
@@ -29,14 +34,16 @@ function syncTimeRange(changed) {
   range.style.left = (startValue / 1440 * 100) + "%";
   range.style.width = ((endValue - startValue) / 1440 * 100) + "%";
 
-  document.getElementById("startLabel").textContent =
+  document.querySelector("#startLabel").textContent =
     formatTime(startValue);
 
-  document.getElementById("endLabel").textContent =
+  document.querySelector("#endLabel").textContent =
     formatTime(endValue);
 }
 
-startTime.addEventListener("input", () => syncTimeRange(startTime));
-endTime.addEventListener("input", () => syncTimeRange(endTime));
-
 syncTimeRange(); //zodat hij balk laat zien zonder te tijden veranderd te hebben
+
+// function changeMissionHandler(e) {
+//   e.preventDefault();
+  
+// }

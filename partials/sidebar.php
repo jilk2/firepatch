@@ -8,7 +8,8 @@
 </head>
 
 <body>
-    <aside>
+    
+    <aside id="firepatch-sidebar" style="display: none;"> 
         <nav>
             <?php $currentpage = basename($_SERVER['PHP_SELF']); ?>
             <a href="index.php" class="nav-item <?= $currentpage === 'index.php' ? ' current' : '' ?>"><span class="nav-icon">⌂</span>Overzicht</a>
@@ -26,6 +27,41 @@
         </a>
     </aside>
     <script src="./js/connection.js"></script>
+
+    <script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const currentUser = localStorage.getItem('verifinet_user');
+        
+        
+        const adminEmail = "admin@firepatch.nl"; 
+        
+        
+        const currentPage = window.location.pathname.split("/").pop();
+
+        
+        const allowedPages = ["verifynet.php", "article.php", "login.php", "register.php", "save_claim.php", "profile.php"];
+
+        const sidebar = document.getElementById('firepatch-sidebar');
+        const layoutContainer = document.querySelector('.layout');
+
+        
+        if (currentUser === adminEmail) {
+            
+            sidebar.style.display = "flex";
+        } else {
+            
+            if (layoutContainer) {
+                layoutContainer.style.gridTemplateColumns = "1fr"; 
+            }
+
+            
+            if (currentPage && !allowedPages.includes(currentPage)) {
+            
+                window.location.href = "verifynet.php";
+            }
+        }
+    });
+    </script>
 </body>
 
 </html>

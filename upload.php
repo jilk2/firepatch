@@ -9,6 +9,9 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 
 require_once __DIR__ . '/database.php';
 
+// 1. VUL HIER JOUW ADMIN E-MAILS IN
+$adminEmails = ['admin@firepatch.nl'];
+
 $title = trim((string) ($_POST['title'] ?? ''));
 $description = trim((string) ($_POST['description'] ?? ''));
 $source = trim((string) ($_POST['source'] ?? ''));
@@ -34,6 +37,18 @@ if ($source === '' && $sector !== false) {
 if (strlen($source) > 2048) {
     failUpload('De bron of locatie is te lang.');
 }
+
+// BEREKENING: Vertaal de sector (1-36) naar X (1-6) en Y (0-5) coördinaten
+$x_value = null;
+$y_value = null;
+
+if ($sector !== false) {
+    $x_value = ($sector - 1) % 6; // Kolom: 1, 2, 3, 4, 5, 6
+    $y_value = floor(($sector - 1) / 6); // Rij: 0, 1, 2, 3, 4, 5
+}
+
+// 2. CHECK: Is de indiener een admin?
+$claimStatus = in_array($authorEmail, $adminEmails, true) ? 'true' : 'pending';
 
 $relativeImagePath = null;
 $absoluteImagePath = null;
@@ -69,7 +84,12 @@ if (is_array($upload) && ($upload['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR
     }
 
     if (!is_writable($uploadDirectory)) {
-        failUpload('De map uploads is niet schrijfbaar op de NAS.');
+        @chmod($uploadDirectory, 0775);
+        clearstatcache(true, $uploadDirectory);
+    }
+
+    if (!is_writable($uploadDirectory)) {
+        failUpload('De map uploads is niet schrijfbaar door de lokale PHP-webserver. Controleer de maprechten van uploads.');
     }
 
     $filename = bin2hex(random_bytes(16)) . '.' . $allowedTypes[$mimeType];
@@ -82,17 +102,21 @@ if (is_array($upload) && ($upload['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR
 }
 
 try {
+    // 3. DATABASE UPDATE: We sturen nu ook x_value en y_value mee
     $statement = $pdo->prepare(
-        'INSERT INTO claims (Title, description, source, Status, author_email, image_path) '
-        . 'VALUES (?, ?, ?, ?, ?, ?)'
+        'INSERT INTO claims (Title, description, source, Status, author_email, image_path, x_value, y_value) '
+        . 'VALUES (?, ?, ?, ?, ?, ?, ?, ?)'
     );
+    
     $statement->execute([
         $title,
         $description !== '' ? $description : null,
         $source !== '' ? $source : null,
-        'pending',
+        $claimStatus, 
         $authorEmail,
         $relativeImagePath,
+        $x_value,
+        $y_value
     ]);
 
     $claimId = (int) $pdo->lastInsertId();
