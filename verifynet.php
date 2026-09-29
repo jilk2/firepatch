@@ -17,7 +17,7 @@ mysqli_close($db);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VerifyNET</title>
     <link rel="stylesheet" href="./css/main.css" />
-    <link rel="stylesheet" href="./css/verifinet.css" /> <!-- Onze eigen strakke tabel-styling -->
+    <link rel="stylesheet" href="./css/verifinet.css" />
 </head>
 <body>
     <?php include("./partials/header.php"); ?>
@@ -28,7 +28,7 @@ mysqli_close($db);
         <main class="page">
             <div class="page-actions">
                 <h2 style="margin:0; font-size: 24px; color: var(--white);">VerifyNET Monitor</h2>
-                <a href="save_claim.php" class="btn primary">Nieuwe claim</a>
+                <a href="save_claim.php" class="btn primary" style="width: 15vw; justify-self: flex-end;">Nieuwe claim</a>
             </div>
 
             <section class="card">

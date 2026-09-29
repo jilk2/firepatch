@@ -31,7 +31,7 @@ while ($row = mysqli_fetch_assoc($result)) {
 <html lang="nl">
 
 <head>    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Firepatch Nature's guardians</title>
+    <title>Firepatch - Dashboard</title>
     <link rel="stylesheet" href="./css/main.css" />
     <link rel="stylesheet" href="./css/kaart.css" />
     <link rel="stylesheet" href="./css/mission.css" />
@@ -55,13 +55,13 @@ while ($row = mysqli_fetch_assoc($result)) {
                 </div>
             </section>
 
-            <section class="alert-card">
+            <section class="alert-card" id="claim-alert" hidden>
                 <div>
                     <h3>⚠ ACTIE GEVRAAGD</h3>
-                    <p>Brand gedetecteerd in Sector <?php echo "4" ?>.</p>
+                    <p id="claim-alert-message"></p>
                 </div>
                 <div class="page-actions">
-                    <a href="mission.php" class="btn primary">Bekijk</a>
+                    <a href="article.php" id="claim-alert-link" class="btn primary">Bekijk</a>
                 </div>
             </section>
 
@@ -171,6 +171,7 @@ while ($row = mysqli_fetch_assoc($result)) {
             </section>
         </aside>
     </div>
+    <script src="./js/dashboard-alert.js"></script>
 </body>
 
 </html>
