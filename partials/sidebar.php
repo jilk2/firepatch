@@ -27,6 +27,8 @@
             </div>
         </a>
     </aside>
+
+    
     <script src="./js/connection.js"></script>
 
     <script>
