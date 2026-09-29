@@ -25,14 +25,6 @@ body {
   min-height: 100vh;
 }
 
-#vlam {
-  position: absolute;
-  width: 150px;
-  height: auto;
-  z-index: 999;
-  pointer-events: none;
-}
-
 .layout {
   display: grid;
   grid-template-columns: 205px 1fr;

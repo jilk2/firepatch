@@ -26,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         http_response_code(400);
         echo json_encode(["success" => false, "message" => "Fout: E-mail en wachtwoord ontbreken."]);
     }
-    
+
     // HEEL BELANGRIJK: Zorg dat PHP hier stopt, anders stuurt hij ook de HTML mee naar de JSON API!
     exit();
 }
@@ -43,29 +43,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </head>
 <body>
     <?php include("./partials/header.php"); ?>
-    
+
     <div class="layout short">
         <?php include("./partials/sidebar.php"); ?>
-        
+
         <main class="page" style="display: flex; justify-content: center; align-items: center;">
             <div class="card" style="width: 100%; max-width: 450px; padding: 25px;">
                 <div class="card-head">
                     <h2>Node Authenticatie</h2>
                 </div>
-                
+
                 <form id="login-form" onsubmit="submitLogin(event)" style="margin-top: 20px;">
                     <div style="margin-bottom: 15px;">
                         <label style="display: block; margin-bottom: 6px; font-size: 13px; color: var(--text);">E-mailadres</label>
                         <input type="email" id="email" class="input" required placeholder="naam@domein.nl">
                     </div>
-                    
+
                     <div style="margin-bottom: 20px;">
                         <label style="display: block; margin-bottom: 6px; font-size: 13px; color: var(--text);">Wachtwoord</label>
                         <input type="password" id="password" class="input" required placeholder="••••••••">
                     </div>
-                    
+
                     <button type="submit" class="btn primary" style="width: 100%; margin-bottom: 15px;">INLOGGEN</button>
-                    
+
                     <p style="text-align: center; font-size: 13px; color: #888;">
                         Nog geen node-account? <a href="register.php" style="color: var(--cyan); text-decoration: none;">Registreer hier</a>
                     </p>

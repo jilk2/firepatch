@@ -1,6 +1,6 @@
 <?php
-require_once "DB/DBConnect.php";
-/** @var mysqli $db */
+require_once __DIR__ . '/config/database.php';
+
 $sql = "SELECT * FROM claims ORDER BY id DESC";
 $result = mysqli_query($db, $sql);
 
@@ -21,20 +21,21 @@ mysqli_close($db);
 </head>
 <body>
     <?php include("./partials/header.php"); ?>
-    
+
     <div class="layout">
         <?php include("./partials/sidebar.php"); ?>
-        
+
         <main class="page">
             <div class="page-actions">
                 <h2 style="margin:0; font-size: 24px; color: var(--white);">VerifyNET Monitor</h2>
+                <a href="save_claim.php" class="btn primary">Nieuwe claim</a>
             </div>
-            
+
             <section class="card">
                 <div class="card-head">
                     <h2>Live Claims Overzicht</h2>
                 </div>
-                
+
                 <div style="padding: 15px;">
                     <table class="verifinet-table">
                         <thead>
@@ -51,18 +52,18 @@ mysqli_close($db);
                                     <td colspan="4" style="text-align: center; color: #888;">Geen claims gevonden in de database.</td>
                                 </tr>
                             <?php else: ?>
-                                <?php foreach ($claims as $claim): 
+                                <?php foreach ($claims as $claim):
                                         $tijd = isset($claim['timestamp']) ? date('H:i', strtotime($claim['timestamp'])) : 'N.v.t.';
-    
+
                                     $statusKleur = '#ff9f0a'; // Oranje (In onderzoek / Pending) als standaard
                                     if (isset($claim['Status'])) {
                                         if ($claim['Status'] === 'true') $statusKleur = '#22f693'; // Groen
                                         if ($claim['Status'] === 'false') $statusKleur = '#96031A'; // Rood
                                     }
                                 ?>
-    
+
                                     <tr style="--row-color: <?= $statusKleur; ?>;" onclick="window.location.href='article.php?id=<?= $claim['id']; ?>'">
-        
+
                                         <td class="tijd-col"><?= $tijd; ?></td>
                                         <td><?= htmlspecialchars($claim['Title'] ?? 'Geen titel'); ?></td>
                                         <td><?= htmlspecialchars($claim['source'] ?? 'Onbekend'); ?></td>
@@ -74,7 +75,7 @@ mysqli_close($db);
                                             <?php endif; ?>
                                         </td>
                                     </tr>
-                                <?php endforeach; ?>    
+                                <?php endforeach; ?>
                             <?php endif; ?>
                         </tbody>
                     </table>
