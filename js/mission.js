@@ -48,6 +48,16 @@ if (urgentMissionDialog) {
   urgentMissionDialog.showModal();
 }
 
+const missionForm = document.querySelector("#mission-form");
+const notification = document.querySelector(".notification");
+const claimIdInput = missionForm?.querySelector('input[name="claim_id"]');
+
+if (missionForm && notification && claimIdInput?.value) {
+  missionForm.addEventListener("submit", () => {
+    notification.classList.add("is-fading");
+  });
+}
+
 // function changeMissionHandler(e) {
 //   e.preventDefault();
   

@@ -103,7 +103,7 @@ if (is_array($upload) && ($upload['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR
 try {
     
     $statement = $pdo->prepare(
-        'INSERT INTO claims (Title, description, source, status, author_email, image_path, x_value, y_value) '
+        'INSERT INTO claims (title, description, source, status, author_email, image_path, x_value, y_value) '
         . 'VALUES (?, ?, ?, ?, ?, ?, ?, ?)'
     );
     

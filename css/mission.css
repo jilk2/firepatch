@@ -160,6 +160,14 @@
   align-items: center;
   justify-content: space-between;
   gap: 14px;
+  opacity: 1;
+  transform: translateY(0);
+  transition: all 350ms ease;
+}
+
+.notification.is-fading {
+  opacity: 0;
+  transform: translateY(-8px);
 }
 
 .notification h4 {

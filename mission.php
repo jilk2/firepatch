@@ -21,6 +21,7 @@ $errors = [];
 $editMissionId = null;
 $claimMissionMessage = null;
 $urgentMissionSuggestion = null;
+$claimMissionId = 0;
 
 function missionSuggestionFromClaim(array $claim): array
 {
@@ -89,7 +90,7 @@ if (isset($_POST['action']) && $_POST['action'] === 'prepare_mission') {
 
     if (!$claimId) {
         $errors[] = 'De melding kon niet worden gevonden.';
-    } else {
+    } else {    // get claim from database and check if it is confirmed
         $claimStatement = mysqli_prepare($db, "SELECT * FROM claims WHERE id = ? AND `status` = 'true'");
         $claimStatement->bind_param('i', $claimId);
         $claimStatement->execute();
@@ -98,7 +99,7 @@ if (isset($_POST['action']) && $_POST['action'] === 'prepare_mission') {
 
         if (!$claim) {
             $errors[] = 'Alleen bevestigde meldingen kunnen een missievoorstel maken.';
-        } else {
+        } else {    // prepare mission suggestion from claim
             $suggestion = missionSuggestionFromClaim($claim);
             $_POST['sector'] = $suggestion['sector'];
             $_POST['goals'] = [$suggestion['goal']];
@@ -108,6 +109,8 @@ if (isset($_POST['action']) && $_POST['action'] === 'prepare_mission') {
             $currentTime = date('H') * 60 + date('i'); // current time in minutes
             $_POST['start_time'] = $currentTime;
             $_POST['end_time'] = $currentTime + 120; // default to 2 hours later
+            $_POST['claim_id'] = $claimId;
+            $claimMissionId = $claimId;
             $urgentMissionSuggestion = $suggestion['priority'] === 'hoog' ? $suggestion : null;
             $claimMissionMessage = sprintf(
                 'Missievoorstel voor "%s" geladen. Prioriteit: %s.',
@@ -139,6 +142,22 @@ if (isset($_POST['submit'])) {
     $interventionsArray = is_array($_POST['interventions'] ?? null)
         ? $_POST['interventions']
         : [];
+
+    $claimMissionId = filter_var($_POST['claim_id'] ?? null, FILTER_VALIDATE_INT, [
+        'options' => ['min_range' => 1]
+    ]) ?: 0;
+
+    if ($claimMissionId > 0) {
+        $claimCheck = mysqli_prepare($db, "SELECT id FROM claims WHERE id = ? AND `status` = 'true'");
+        $claimCheck->bind_param('i', $claimMissionId);
+        $claimCheck->execute();
+        $claimExists = $claimCheck->get_result()->num_rows === 1;
+        $claimCheck->close();
+
+        if (!$claimExists) {
+            $errors[] = 'De bevestigde melding bestaat niet meer.';
+        }
+    }
 
 
     // Validatie
@@ -207,6 +226,11 @@ if (isset($_POST['submit'])) {
 
     if (empty($errors)) {
 
+        $claimTransactionStarted = $claimMissionId > 0 && !$editMissionId;
+        if ($claimTransactionStarted) {
+            mysqli_begin_transaction($db);
+        }
+
         // Bestaande missie aanpassen
         if ($editMissionId) {
 
@@ -274,7 +298,7 @@ if (isset($_POST['submit'])) {
 
 
         // Logboek entry for new mission
-        if (!$editMissionId) {
+        // if (!$editMissionId) {
             // Logboek
             $logQuery = "INSERT INTO logboek
                      (mission_id, activity, location, status)
@@ -321,11 +345,28 @@ if (isset($_POST['submit'])) {
                 $logResult->execute();
                 $logResult->close();
             }
+        // }
+
+        if ($claimTransactionStarted) {
+            $deleteClaimQuery = "DELETE FROM claims WHERE id = ? AND `status` = 'true'";
+            $deleteClaimResult = mysqli_prepare($db, $deleteClaimQuery);
+            $deleteClaimResult->bind_param('i', $claimMissionId);
+            $deleteClaimResult->execute();
+            $claimDeleted = $deleteClaimResult->affected_rows === 1;
+            $deleteClaimResult->close();
+
+            if ($claimDeleted) {
+                mysqli_commit($db);
+            } else {
+                mysqli_rollback($db);
+                $errors[] = 'De melding kon niet worden verwerkt en is behouden.';
+            }
         }
 
-
-        header('Location: mission.php');
-        exit();
+        if (empty($errors)) {
+            header('Location: mission.php');
+            exit();
+        }
     }
 }
 
@@ -528,7 +569,7 @@ $notification = mysqli_fetch_assoc($notification);
                         </div>
                     </div>
                     <div class="image-container">
-                        <img src="<?= htmlspecialchars($notification['image_path'] ?? 'images/brandje.jpg', ENT_QUOTES, 'UTF-8') ?>"
+                        <img src="<?= htmlspecialchars($notification['image_path'] ?? 'images/no-image.jpg', ENT_QUOTES, 'UTF-8') ?>"
                             alt="verifynet img">
                     </div>
                 </section>
@@ -655,6 +696,7 @@ $notification = mysqli_fetch_assoc($notification);
                 </div>
 
                 <input type="hidden" name="edit_id" value="<?= $formEditId ?>">
+                <input type="hidden" name="claim_id" value="<?= $claimMissionId ?>">
 
                 <?php if ($claimMissionMessage): ?>
                     <div class="form-message" role="status">
