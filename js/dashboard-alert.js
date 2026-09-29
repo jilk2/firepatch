@@ -1,4 +1,5 @@
 const claimAlert = document.getElementById('claim-alert');
+const claimAlertImage = document.getElementById('claim-alert-image');
 const claimAlertMessage = document.getElementById('claim-alert-message');
 const claimAlertLink = document.getElementById('claim-alert-link');
 
@@ -11,10 +12,13 @@ function handleClaimLocation(claim) {
 }
 
 function showLatestClaim(claim) {
-    if (!claimAlert || !claimAlertMessage || !claimAlertLink || !claim) return;
+    if (!claimAlert || !claimAlertImage || !claimAlertMessage || !claimAlertLink || !claim) return;
 
-    claimAlertMessage.textContent = `Nieuwe claim: ${claim.Title}`;
+    claimAlertMessage.textContent = `${claim.Title}`;
     claimAlertLink.href = `article.php?id=${encodeURIComponent(claim.id)}`;
+    claimAlertImage.hidden = !claim.image_path;
+    claimAlertImage.src = claim.image_path || '';
+    claimAlertImage.alt = claim.image_path ? `Bewijsafbeelding voor ${claim.Title}` : '';
     claimAlert.hidden = false;
     handleClaimLocation(claim);
 }

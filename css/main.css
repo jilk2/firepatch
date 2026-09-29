@@ -48,6 +48,8 @@ body {
   align-content: start;
 }
 
+
+
 .page-actions {
   display: flex;
   gap: 8px;
@@ -133,9 +135,21 @@ body {
   border-radius: 12px;
   padding: 14px;
   display: flex;
-  justify-content: space-between;
   align-items: center;
   gap: 14px;
+}
+
+.alert-card .page-actions {
+  margin-left: auto;
+}
+
+.claim-alert-image {
+  width: 96px;
+  height: 64px;
+  flex: 0 0 96px;
+  object-fit: cover;
+  border: 1px solid var(--gray);
+  border-radius: 6px;
 }
 
 .alert-card h3 {

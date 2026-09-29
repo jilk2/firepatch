@@ -7,7 +7,7 @@ header('Content-Type: application/json; charset=UTF-8');
 require_once __DIR__ . '/database.php';
 
 $statement = $pdo->query(
-    'SELECT id, Title, source, timestamp FROM claims ORDER BY id DESC LIMIT 1'
+    'SELECT id, Title, source, image_path, timestamp FROM claims ORDER BY id DESC LIMIT 1'
 );
 $claim = $statement->fetch() ?: null;
 

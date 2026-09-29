@@ -53,16 +53,19 @@ while ($row = mysqli_fetch_assoc($result)) {
                 </div>
                 <div class="map">
                     <img id="map" src="images/map.png" alt="map of the region">
-                    <img id="vlam" src="images/vlammetjes-6-st.jpg" alt="flames">
+                    <!-- <img id="vlam" src="images/vlammetjes-6-st.jpg" alt="flames"> -->
                     <img id="drone" src="images/drone.png" alt="Drone">
                 </div>
             </section>
 
             <section class="alert-card" id="claim-alert" hidden>
-                <div>
-                    <h3>⚠ ACTIE GEVRAAGD</h3>
-                    <p id="claim-alert-message"></p>
-                </div>
+                
+                    <img id="claim-alert-image" class="claim-alert-image" alt="" hidden>
+                    <div>
+                        <h3>NIEUWE CLAIM</h3>
+                        <p id="claim-alert-message"></p>
+                    </div>
+    
                 <div class="page-actions">
                     <a href="article.php" id="claim-alert-link" class="btn primary">Bekijk</a>
                 </div>
