@@ -48,18 +48,6 @@ if (isset($_POST['submit'])) {
         // }
     }
 
-    // DIT STOND OP DE MAIN??? IK HAD MERGE CONFLICT DUS HEB DIT UIT GECOMMEND
-
-    // $startMinutes = max(0, min(1440, $startMinutes));
-    // $endMinutes = max(0, min(1440, $endMinutes));
-
-    // if ($sector === '' || $goalsArray === [] || $endMinutes <= $startMinutes) {
-    //     http_response_code(422);
-    //     exit('Kies een sector, minimaal een missiedoel en een eindtijd na de starttijd.');
-    // }
-    // $dayStart = new DateTimeImmutable($today . ' 00:00:00');
-    // $startTime = $dayStart->modify('+' . $startMinutes . ' minutes')->format('Y-m-d H:i:s');
-    // $endTime = $dayStart->modify('+' . $endMinutes . ' minutes')->format('Y-m-d H:i:s');
 
 
     $states = [];
@@ -90,13 +78,45 @@ if (isset($_POST['submit'])) {
         $result->close();
 
         if (!$editMissionId) {
+
             $logQuery = "INSERT INTO logboek (activity, location, status) VALUES (?, ?, ?)";
-            $logResult = mysqli_prepare($db, $logQuery);
-            $logActivity = implode(', ', $goalsArray);
+
             $logStatus = 'active';
-            $logResult->bind_param('sss', $logActivity, $sector, $logStatus);
-            $logResult->execute();
-            $logResult->close();
+
+
+            // Alle missiedoelen apart toevoegen aan het logboek
+
+            foreach ($goalsArray as $goal) {
+
+                $logResult = mysqli_prepare($db, $logQuery);
+
+                $logActivity = $goal;
+
+                $logResult->bind_param('sss', $logActivity, $sector, $logStatus);
+
+                $logResult->execute();
+
+                $logResult->close();
+
+            }
+
+
+            // Alle interventies apart toevoegen aan het logboek
+
+            foreach ($interventionsArray as $intervention) {
+
+                $logResult = mysqli_prepare($db, $logQuery);
+
+                $logActivity = $intervention;
+
+                $logResult->bind_param('sss', $logActivity, $sector, $logStatus);
+
+                $logResult->execute();
+
+                $logResult->close();
+
+            }
+
         }
 
         header('Location: mission.php');
