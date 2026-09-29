@@ -53,8 +53,8 @@ mysqli_close($db);
                     <?php 
                         $statusText = "IN ONDERZOEK";
                         $statusClass = "badge-pending";
-                        if ($claim['Status'] === 'true') { $statusText = "WAAR"; $statusClass = "badge-true"; }
-                        if ($claim['Status'] === 'false') { $statusText = "ONWAAR"; $statusClass = "badge-false"; }
+                        if ($claim['status'] === 'true') { $statusText = "WAAR"; $statusClass = "badge-true"; }
+                        if ($claim['status'] === 'false') { $statusText = "ONWAAR"; $statusClass = "badge-false"; }
                     ?>
                     <span class="badge <?= $statusClass; ?>"><?= $statusText; ?></span>
 
