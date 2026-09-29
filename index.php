@@ -62,7 +62,7 @@ while ($row = mysqli_fetch_assoc($result)) {
                 
                     <img id="claim-alert-image" class="claim-alert-image" alt="" hidden>
                     <div>
-                        <h3>NIEUWE CLAIM</h3>
+                        <h3>NIEUWSTE CLAIM</h3>
                         <p id="claim-alert-message"></p>
                     </div>
     

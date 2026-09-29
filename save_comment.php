@@ -92,7 +92,7 @@ if(isset($data->claim_id) && isset($data->text) && isset($data->author_email)) {
 
         
         if ($newStatus !== null) {
-            $updateStmt = $pdo->prepare("UPDATE claims SET Status = ? WHERE id = ?");
+            $updateStmt = $pdo->prepare("UPDATE claims SET status = ? WHERE id = ?");
             $updateStmt->execute([$newStatus, $data->claim_id]);
         }
 
