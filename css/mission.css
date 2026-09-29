@@ -23,7 +23,29 @@
 }
 
 .mission {
+  position: relative;
   padding: 14px;
+}
+
+.mission .buttons.current-mission {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  display: flex;
+  gap: 8px;
+}
+
+.mission .buttons a {
+  text-decoration: none;
+  color: var(--white);
+  background: var(--gray);
+  padding: 6px 12px;
+  border-radius: 6px;
+}
+
+.mission .buttons a:hover {
+  transform: scale(1.05);
+  background: #454146;
 }
 
 .mission h4 {
@@ -69,7 +91,70 @@
   color: var(--orange);
 }
 
-.queue {
+/* MISSION QUEUE */
+.queue-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px solid var(--gray);
+}
+
+.queue-item {
+  border-radius: 0;
+  border: none;
+  padding: 5px 0;
+}
+
+.queue-item:hover {
+  background: #2c2c31;
+  /* transform: scale(1.01); */
+}
+
+.item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.queue-item ul {
+  margin: 8px 0 8px 15px;
+  padding: 0;
+}
+
+.queue-item li {
+  padding: 0;
+  border: none;
+  color: var(--white);
+}
+
+/* .queue-item:nth-child(even) {
+  background: #37373d;
+}
+
+.queue-item:nth-child(even) p {
+  color: var(--darktext);
+} */
+
+.queue-item h4 {
+  margin: 0;
+  font-size: 1rem;
+  color: var(--white);
+}
+
+.queue-item div {
+  display: flex;
+  justify-content: space-between;
+  gap: 4px;
+}
+
+.queue-item p {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--gray);
+}
+
+
+.notification {
   padding: 14px;
   display: flex;
   align-items: center;
@@ -77,21 +162,21 @@
   gap: 14px;
 }
 
-.queue h4 {
+.notification h4 {
   margin: 0;
   font-size: 0.75rem;
   letter-spacing: 0.0625rem;
   color: var(--warn);
 }
 
-.queue h3 {
+.notification h3 {
   margin: 6px 0 10px;
   font-size: 1.5rem;
 }
 
-.queue p {
+.notification p {
   margin: 0;
-  color: var(--darktext);
+  color: var(--gray);
 }
 
 .alert-actions {
@@ -135,6 +220,23 @@
   margin: 0;
   font-size: 1.5rem;
   line-height: 1.2;
+}
+
+.form-errors {
+  margin: 0 0 18px;
+  padding: 10px 12px;
+  border: 1px solid var(--red);
+  border-radius: 8px;
+  color: var(--white);
+  background: rgba(180, 35, 35, 0.2);
+}
+
+.form-errors p {
+  margin: 0;
+}
+
+.form-errors p + p {
+  margin-top: 6px;
 }
 
 .form-field {

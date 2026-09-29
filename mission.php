@@ -4,39 +4,63 @@ require_once __DIR__ . '/config/database.php';
 
 date_default_timezone_set('Europe/Amsterdam');
 $today = date('Y-m-d');
+$errors = [];
+$editMissionId = null;
 
 //add to $db the values from input fields
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit'])) {
+if (isset($_POST['submit'])) {
+    $editMissionId = filter_var($_POST['edit_id'] ?? null, FILTER_VALIDATE_INT, [
+        'options' => ['min_range' => 1]
+    ]) ?: null;
     $sector = trim((string) ($_POST['sector'] ?? ''));
+    $goalsArray = is_array($_POST['goals'] ?? null) ? $_POST['goals'] : [];
+    $interventionsArray = is_array($_POST['interventions'] ?? null) ? $_POST['interventions'] : [];
 
-    $goalsArray = array_values(array_filter(
-        (array) ($_POST['goals'] ?? []),
-        static fn ($goal): bool => is_string($goal) && trim($goal) !== ''
-    ));
-
-    $interventionsArray = array_values(array_filter(
-        (array) ($_POST['interventions'] ?? []),
-        static fn ($intervention): bool => is_string($intervention) && trim($intervention) !== ''
-    ));
-
-
+    if (count($goalsArray) < 1) {
+        $errors[] = 'Selecteer minimaal één missiedoel.';
+    }
+    if (empty($sector)) {
+        $errors[] = 'Selecteer een gebied / sector.';
+    }
 
     // Tijden
-
     $startMinutes = (int) ($_POST['start_time'] ?? 0);
-
     $endMinutes = (int) ($_POST['end_time'] ?? 0);
+    if ($startMinutes < 0 || $startMinutes >= 1440 || $endMinutes <= 0 || $endMinutes > 1440) {
+        $errors[] = 'Kies geldige operationele tijden.';
+    } elseif ($endMinutes <= $startMinutes) {
+        $errors[] = 'De eindtijd moet later zijn dan de starttijd.';
+    } else {
+        $startTime = $today . ' ' . sprintf('%02d:%02d:00', intdiv($startMinutes, 60), $startMinutes % 60);
+        $endTime = $today . ' ' . sprintf('%02d:%02d:00', intdiv($endMinutes, 60), $endMinutes % 60);
 
-    $startMinutes = max(0, min(1440, $startMinutes));
-    $endMinutes = max(0, min(1440, $endMinutes));
+        if ($endMinutes === 1440) {
+            $endTime = date('Y-m-d', strtotime($today . ' +1 day')) . ' 00:00:00';
+        }
 
-    if ($sector === '' || $goalsArray === [] || $endMinutes <= $startMinutes) {
-        http_response_code(422);
-        exit('Kies een sector, minimaal een missiedoel en een eindtijd na de starttijd.');
+        $now = new DateTimeImmutable();
+        $startDateTime = new DateTimeImmutable($startTime);
+        $endDateTime = new DateTimeImmutable($endTime);
+
+        // if ($startDateTime <= $now) {
+        //     $errors[] = 'De starttijd moet later zijn dan de huidige tijd.';
+        // }
     }
-    $dayStart = new DateTimeImmutable($today . ' 00:00:00');
-    $startTime = $dayStart->modify('+' . $startMinutes . ' minutes')->format('Y-m-d H:i:s');
-    $endTime = $dayStart->modify('+' . $endMinutes . ' minutes')->format('Y-m-d H:i:s');
+
+    // DIT STOND OP DE MAIN??? IK HAD MERGE CONFLICT DUS HEB DIT UIT GECOMMEND
+
+    // $startMinutes = max(0, min(1440, $startMinutes));
+    // $endMinutes = max(0, min(1440, $endMinutes));
+
+    // if ($sector === '' || $goalsArray === [] || $endMinutes <= $startMinutes) {
+    //     http_response_code(422);
+    //     exit('Kies een sector, minimaal een missiedoel en een eindtijd na de starttijd.');
+    // }
+    // $dayStart = new DateTimeImmutable($today . ' 00:00:00');
+    // $startTime = $dayStart->modify('+' . $startMinutes . ' minutes')->format('Y-m-d H:i:s');
+    // $endTime = $dayStart->modify('+' . $endMinutes . ' minutes')->format('Y-m-d H:i:s');
+
+
     $states = [];
     foreach ($goalsArray as $goal) {
         $states[] = 'Gepland';
@@ -45,87 +69,98 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit'])) {
     $interventions = json_encode($interventionsArray, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
     $states = json_encode($states, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
 
+    if (empty($errors)) {
+        if ($editMissionId) {
+            $query = "UPDATE missions SET area = ?, purpose = ?, interventions = ?, `start-time` = ?, `end-time` = ?, state = ? WHERE id = ?";
+        } else {
+            $query = "INSERT INTO missions (area, purpose, interventions, `start-time`, `end-time`, state) VALUES (?, ?, ?, ?, ?, ?)";
+        }
 
-    $query = "INSERT INTO missions (area, purpose, interventions, `start-time`, `end-time`, state) VALUES (?, ?, ?, ?, ?, ?)";
-    $result = mysqli_prepare($db, $query);
+        $result = mysqli_prepare($db, $query);
+        if ($editMissionId) {
+            $result->bind_param('ssssssi', $sector, $goals, $interventions, $startTime, $endTime, $states, $editMissionId);
+        } else {
+            $result->bind_param('ssssss', $sector, $goals, $interventions, $startTime, $endTime, $states);
+        }
+        $result->execute();
+        $result->close();
 
+        if (!$editMissionId) {
+            $logQuery = "INSERT INTO logboek (type, activity, location, status) VALUES (?, ?, ?, ?)";
+            $logResult = mysqli_prepare($db, $logQuery);
+            $logType = implode(', ', $interventionsArray);
+            $logActivity = implode(', ', $goalsArray);
+            $logStatus = 'active';
+            $logResult->bind_param('ssss', $logType, $logActivity, $sector, $logStatus);
+            $logResult->execute();
+            $logResult->close();
+        }
 
-    $result->bind_param(
-        'ssssss',
-        $sector,
-        $goals,
-        $interventions,
-        $startTime,
-        $endTime,
-        $states
-    );
-
-
-    $result->execute();
-    $result->close();
-
-
-
-
-    /* =====================================================
-       LOGBOEK TOEVOEGEN
-    ===================================================== */
-
-
-    // Interventies worden het type
-
-    $logType =
-        implode(", ", $interventionsArray);
-
-
-    // Doelen worden de activiteit
-
-    $logActivity =
-        implode(", ", $goalsArray);
-
-
-    // Sector wordt locatie
-
-    $logLocation = $sector;
-
-
-    // Missie is bezig
-
-    $logStatus = "active";
-
-
-    $logQuery = "
-        INSERT INTO logboek
-        (
-            type,
-            activity,
-            location,
-            status
-        )
-        VALUES (?, ?, ?, ?)
-    ";
-
-
-    $logResult =
-        mysqli_prepare($db, $logQuery);
-
-
-    $logResult->bind_param(
-        'ssss',
-        $logType,
-        $logActivity,
-        $logLocation,
-        $logStatus
-    );
-
-
-    $logResult->execute();
-
-    $logResult->close();
-
+        header('Location: mission.php');
+        exit();
+    }
 }
 
-require_once __DIR__ . '/partials/currentmission.php';
+if (isset($_GET['action']) && $_GET['action'] === 'delete' && isset($_GET['id']) && is_numeric($_GET['id'])) {
+    $missionId = $_GET['id'];
+
+    // Delete the mission from the database
+    $deleteQuery = "DELETE FROM missions WHERE id = ?";
+    $deleteResult = mysqli_prepare($db, $deleteQuery);
+    $deleteResult->bind_param('i', $missionId);
+    $deleteResult->execute();
+    $deleteResult->close();
+
+    // Optionally, you can also delete related logs if needed
+    // $deleteLogQuery = "DELETE FROM logboek WHERE mission_id = ?";
+    // $deleteLogResult = mysqli_prepare($db, $deleteLogQuery);
+    // $deleteLogResult->bind_param('i', $missionId);
+    // $deleteLogResult->execute();
+    // $deleteLogResult->close();
+
+    // Redirect to avoid resubmission
+    header("Location: mission.php");
+    exit();
+} else if (isset($_GET["action"]) && $_GET["action"] === "edit" && isset($_GET["id"]) && is_numeric($_GET["id"])) {
+    $missionId = $_GET["id"];
+
+    // Fetch the mission data from the database
+    $fetchQuery = "SELECT * FROM missions WHERE id = ?";
+    $fetchResult = mysqli_prepare($db, $fetchQuery);
+    $fetchResult->bind_param("i", $missionId);
+    $fetchResult->execute();
+    $missionData = $fetchResult->get_result()->fetch_assoc();
+    $fetchResult->close();
+
+    if ($missionData) {
+        // Pre-fill the form with the existing mission data
+        $_POST["sector"] = $missionData["area"];
+        $_POST["goals"] = json_decode($missionData["purpose"], true);
+        $_POST["interventions"] = json_decode($missionData["interventions"], true);
+
+        // Convert start and end times to minutes for the slider
+        $startDateTime = new DateTime($missionData["start-time"]);
+        $endDateTime = new DateTime($missionData["end-time"]);
+        $_POST["start_time"] = ($startDateTime->format("H") * 60) + (int) $startDateTime->format("i");
+        $_POST["end_time"] = $endDateTime->format('H:i') === '00:00'
+            ? 1440
+            : ($endDateTime->format("H") * 60) + (int) $endDateTime->format("i");
+        $_POST['edit_id'] = (int) $missionData['id'];
+    } else {
+        // If the mission doesn't exist, redirect back to the mission page
+        header("Location: mission.php");
+        exit();
+    }
+}
+
+$formSector = (string) ($_POST['sector'] ?? '');
+$formGoals = is_array($_POST['goals'] ?? null) ? $_POST['goals'] : [];
+$formInterventions = is_array($_POST['interventions'] ?? null) ? $_POST['interventions'] : [];
+$formStartTime = (int) ($_POST['start_time'] ?? 360);
+$formEndTime = (int) ($_POST['end_time'] ?? 1080);
+$formEditId = (int) ($_POST['edit_id'] ?? 0);
+
+require_once('./partials/currentmission.php');
 
 ?>
 
@@ -146,8 +181,30 @@ require_once __DIR__ . '/partials/currentmission.php';
     <div class="layout mission-layout">
         <?php include("./partials/sidebar.php"); ?>
         <main class="page">
+            <section class="card notification">
+                <div class="content">
+                    <div>
+                        <h4>GEPLANDE INTERVENTIE</h4>
+                        <h3>Brand gedetecteerd - VerifyNET</h3>
+                        <p>Brand gedetecteerd door 4 mensen in Sector 04</p>
+                    </div>
+                    <div class="alert-actions">
+                        <a href="verifynet.php" class="btn ghost">check verifyNET</a>
+                        <a href="#" class="btn primary">Stuur drone</a>
+                    </div>
+                </div>
+                <div class="image-container">
+                    <img src="images/brandje.jpg" alt="verifynet img">
+                </div>
+            </section>
+
+            <!-- CURRENT MISSION -->
             <?php if ($nextMission): ?>
                 <section class="card mission">
+                    <div class="current-mission buttons">
+                        <a href="?action=edit&id=<?= $nextMission['id'] ?>" class="queue-button">Aanpassen</a>
+                        <a href="?action=delete&id=<?= $nextMission['id'] ?>" class="queue-button">Verwijder</a>
+                    </div>
                     <h4>HUIDIGE MISSIE</h4>
                     <h2><?= htmlspecialchars($nextMission['area'], ENT_QUOTES, 'UTF-8') ?></h2>
                     <p><?= htmlspecialchars(date('d-m-Y', strtotime($nextMission['start-time'])), ENT_QUOTES, 'UTF-8') ?>
@@ -163,7 +220,8 @@ require_once __DIR__ . '/partials/currentmission.php';
                         <?php for ($i = 0; $i < count($nextMission['purpose'] ?? []); $i++): ?>
                             <?php $goalState = $state[$i] ?? 'Gepland'; ?>
                             <li><?= htmlspecialchars($nextMission['purpose'][$i], ENT_QUOTES, 'UTF-8') ?><span
-                                    class="<?= strtolower($goalState) ?>"><?= htmlspecialchars($goalState, ENT_QUOTES, 'UTF-8') ?></span></li>
+                                    class="<?= strtolower($goalState) ?>"><?= htmlspecialchars($goalState, ENT_QUOTES, 'UTF-8') ?></span>
+                            </li>
                         <?php endfor; ?>
                     </ul>
 
@@ -183,25 +241,8 @@ require_once __DIR__ . '/partials/currentmission.php';
                     <p>Maak rechts een nieuwe missie aan om de planning te starten.</p>
                 </section>
             <?php endif; ?>
-
-            <section class="card queue">
-                <div class="content">
-                    <div>
-                        <h4>GEPLANDE INTERVENTIE</h4>
-                        <h3>Brand gedetecteerd - VerifyNET</h3>
-                        <p>Brand gedetecteerd door 4 mensen op 51°56'31.2"N - 4°31'10.1"E</p>
-                    </div>
-                    <div class="alert-actions">
-                        <a href="#" class="btn ghost">check verifyNET</a>
-                        <a href="#" class="btn primary">Stuur drone</a>
-                    </div>
-                </div>
-                <div class="image-container">
-                    <img src="images/brandje.jpg" alt="verifynet img">
-                </div>
-            </section>
-
-            <!-- <section class="mission-queue">
+            <!-- QUEUED MISSIONS -->
+            <section class="card mission queue">
                 <div class="queue-heading">
                     <h3>MISSIES IN DE QUEUE</h3>
                     <span><?= count($queuedMissions) ?></span>
@@ -211,44 +252,82 @@ require_once __DIR__ . '/partials/currentmission.php';
                     <div class="queue-list">
                         <?php foreach ($queuedMissions as $queuedMission): ?>
                             <article class="card queue-item">
-                                <div>
+                                <div class="item-header">
                                     <h4><?= htmlspecialchars($queuedMission['area'], ENT_QUOTES, 'UTF-8') ?></h4>
-                                    <p><?= htmlspecialchars(date('d-m-Y H:i', strtotime($queuedMission['start-time'])), ENT_QUOTES, 'UTF-8') ?> - <?= htmlspecialchars(date('H:i', strtotime($queuedMission['end-time'])), ENT_QUOTES, 'UTF-8') ?></p>
+                                    <div>
+                                        <p><?= htmlspecialchars(date('d-m-Y', strtotime($queuedMission['start-time'])), ENT_QUOTES, 'UTF-8') ?>
+                                        </p>
+                                        <p>
+                                            <?= htmlspecialchars(date('H:i', strtotime($queuedMission['start-time'])), ENT_QUOTES, 'UTF-8') ?>
+                                            -
+                                            <?= htmlspecialchars(date('H:i', strtotime($queuedMission['end-time'])), ENT_QUOTES, 'UTF-8') ?>
+                                        </p>
+                                    </div>
                                 </div>
-                                <span class="queue-status">In queue</span>
+                                <ul>
+                                    <?php foreach ($queuedMission['purpose'] as $goal): ?>
+                                        <li>- <?= htmlspecialchars($goal, ENT_QUOTES, 'UTF-8') ?></li>
+                                    <?php endforeach; ?>
+                                </ul>
+                                <div class="buttons">
+                                    <a href="#" class="queue-button">Activeer nu</a>
+                                    <a href="?action=edit&id=<?= $queuedMission['id'] ?>" class="queue-button">Aanpassen</a>
+                                    <a href="?action=delete&id=<?= $queuedMission['id'] ?>" class="queue-button">Verwijder</a>
+                                </div>
                             </article>
                         <?php endforeach; ?>
                     </div>
                 <?php else: ?>
                     <p class="queue-empty">Er staan geen andere missies in de queue.</p>
                 <?php endif; ?>
-            </section> -->
+            </section>
         </main>
 
         <aside class="rightbar mission-rightbar">
             <form class="mission-form" method="POST">
                 <div class="form-header">
-                    <h3>NIEUWE MISSIE INITIALISEREN</h3>
+                    <h3><?= $formEditId ? 'MISSIE AANPASSEN' : 'NIEUWE MISSIE INITIALISEREN' ?></h3>
                 </div>
+
+                <input type="hidden" name="edit_id" value="<?= $formEditId ?>">
+
+                <?php if ($errors): ?>
+                    <div class="form-errors" role="alert">
+                        <?php foreach ($errors as $error): ?>
+                            <p><?= htmlspecialchars($error, ENT_QUOTES, 'UTF-8') ?></p>
+                        <?php endforeach; ?>
+                    </div>
+                <?php endif; ?>
 
                 <div class="form-field">
                     <label for="sector-select">Selecteer Gebied / Sector</label>
                     <select id="sector-select" name="sector" class="mission-select">
-                        <option value="Kralingse Bos">Kralingse Bos</option>
+                        <!-- onfocus="this.size=10;" onblur="this.size=1;" onchange="this.size=1; this.blur();" -->
+                        <?php for ($i = 1; $i <= 36; $i++): ?>
+                            <?php $sectorOption = "Section $i"; ?>
+                            <option value="<?= $sectorOption ?>" <?= $formSector === $sectorOption ? 'selected' : '' ?>>
+                                <?= $sectorOption ?></option>
+                        <?php endfor; ?>
                     </select>
                 </div>
 
                 <div class="form-field">
                     <label>Missie Doelen</label>
                     <ul class="checklist">
-                        <li><label><input type="checkbox" name="goals[]" value="Planten scannen" checked> Planten
+                        <li><label><input type="checkbox" name="goals[]" value="Planten scannen" <?= in_array('Planten scannen', $formGoals, true) ? 'checked' : '' ?>> Planten
                                 scannen </label></li>
-                        <li><label><input type="checkbox" name="goals[]" value="Grondvruchtbaarheid meten" checked>
+                        <li><label><input type="checkbox" name="goals[]" value="Grondvruchtbaarheid meten"
+                                    <?= in_array('Grondvruchtbaarheid meten', $formGoals, true) ? 'checked' : '' ?>>
                                 Grondvruchtbaarheid meten </label></li>
-                        <li><label><input type="checkbox" name="goals[]" value="Dieren monitoren"> Dieren monitoren
+                        <li><label><input type="checkbox" name="goals[]" value="Dieren monitoren" <?= in_array('Dieren monitoren', $formGoals, true) ? 'checked' : '' ?>> Dieren monitoren
                             </label></li>
-                        <li><label><input type="checkbox" name="goals[]" value="Lichtlevels controleren"> Lichtlevels
+                        <li><label><input type="checkbox" name="goals[]" value="Lichtlevels controleren"
+                                    <?= in_array('Lichtlevels controleren', $formGoals, true) ? 'checked' : '' ?>>
+                                Lichtlevels
                                 controleren </label></li>
+                        <!-- <span>+add new goal</span> -->
+                        <!-- <li><label><input type="checkbox" name="goals[]" value="Brand blussen" <?= in_array('Brand blussen', $formGoals, true) ? 'checked' : '' ?>> Brand blussen
+                            </label></li> -->
                     </ul>
                 </div>
 
@@ -256,14 +335,17 @@ require_once __DIR__ . '/partials/currentmission.php';
                     <label>Interventies Toestaan</label>
                     <ul class="checklist">
                         <li><label><input type="checkbox" name="interventions[]" value="Water geven aan planten"
-                                    checked> Water geven aan planten </label></li>
-                        <li><label><input type="checkbox" name="interventions[]" value="Grond bemesten"> Grond bemesten
-                            </label></li>
+                                    <?= in_array('Water geven aan planten', $formInterventions, true) ? 'checked' : '' ?>>
+                                Water geven aan planten </label></li>
+                        <li><label><input type="checkbox" name="interventions[]" value="Grond bemesten"
+                                    <?= in_array('Grond bemesten', $formInterventions, true) ? 'checked' : '' ?>>
+                                Grond bemesten </label></li>
                         <li><label><input type="checkbox" name="interventions[]"
-                                    value="Invasieve dierensoorten verwijderen"> Invasieve dierensoorten verwijderen
-                            </label></li>
-                        <li><label><input type="checkbox" name="interventions[]" value="Onkruid verwijderen"> Onkruid
-                                verwijderen </label></li>
+                                    value="Invasieve dierensoorten verwijderen" <?= in_array('Invasieve dierensoorten verwijderen', $formInterventions, true) ? 'checked' : '' ?>>
+                                Invasieve dierensoorten verwijderen </label></li>
+                        <li><label><input type="checkbox" name="interventions[]" value="Onkruid verwijderen"
+                                    <?= in_array('Onkruid verwijderen', $formInterventions, true) ? 'checked' : '' ?>>
+                                Onkruid verwijderen </label></li>
                     </ul>
                 </div>
 
@@ -277,9 +359,11 @@ require_once __DIR__ . '/partials/currentmission.php';
                         <div class="slider-track"></div>
                         <div class="slider-range" id="range"></div>
 
-                        <input id="start" name="start_time" type="range" min="0" max="1440" step="15" value="360">
+                        <input id="start" name="start_time" type="range" min="0" max="1440" step="15"
+                            value="<?= $formStartTime ?>">
 
-                        <input id="end" name="end_time" type="range" min="0" max="1440" step="15" value="1080">
+                        <input id="end" name="end_time" type="range" min="0" max="1440" step="15"
+                            value="<?= $formEndTime ?>">
                     </div>
                 </div>
 
@@ -289,8 +373,10 @@ require_once __DIR__ . '/partials/currentmission.php';
                     </li>
                 </ul> -->
 
-                <button type="submit" name="submit" class="mission-submit">MISSIE STARTEN</button>
+                <button type="submit" name="submit"
+                    class="mission-submit"><?= $formEditId ? 'MISSIE AANPASSEN' : 'MISSIE STARTEN' ?></button>
             </form>
+
         </aside>
     </div>
 </body>
