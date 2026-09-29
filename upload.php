@@ -42,8 +42,13 @@ $x_value = null;
 $y_value = null;
 
 if ($sector !== false) {
-    $x_value = ($sector - 1) % 6; 
-    $y_value = floor(($sector - 1) / 6); 
+    $x_start = ($sector - 1) % 6;
+    $y_start = floor(($sector - 1) / 6);
+    $x_offset = random_int(0, 999999) / 1000000;
+    $y_offset = random_int(0, 999999) / 1000000;
+
+    $x_value = ($x_start + $x_offset) / 6;
+    $y_value = ($y_start + $y_offset) / 6;
 }
 
 
