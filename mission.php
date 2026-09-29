@@ -1,24 +1,21 @@
 <?php
 
-require_once __DIR__ . '/config/database.php';
-
+require_once('./DB/DBConnect.php');
+$db = firepatchMysqli();
 date_default_timezone_set('Europe/Amsterdam');
+
 $today = date('Y-m-d');
 
-//add to $db the values from input fields
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit'])) {
-    $sector = trim((string) ($_POST['sector'] ?? ''));
 
-    $goalsArray = array_values(array_filter(
-        (array) ($_POST['goals'] ?? []),
-        static fn ($goal): bool => is_string($goal) && trim($goal) !== ''
-    ));
+// Add to $db the values from input fields
 
-    $interventionsArray = array_values(array_filter(
-        (array) ($_POST['interventions'] ?? []),
-        static fn ($intervention): bool => is_string($intervention) && trim($intervention) !== ''
-    ));
+if (isset($_POST['submit'])) {
 
+    $sector = $_POST['sector'] ?? '';
+
+    $goalsArray = $_POST['goals'] ?? [];
+
+    $interventionsArray = $_POST['interventions'] ?? [];
 
 
     // Tijden
@@ -27,26 +24,64 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit'])) {
 
     $endMinutes = (int) ($_POST['end_time'] ?? 0);
 
-    $startMinutes = max(0, min(1440, $startMinutes));
-    $endMinutes = max(0, min(1440, $endMinutes));
 
-    if ($sector === '' || $goalsArray === [] || $endMinutes <= $startMinutes) {
-        http_response_code(422);
-        exit('Kies een sector, minimaal een missiedoel en een eindtijd na de starttijd.');
-    }
-    $dayStart = new DateTimeImmutable($today . ' 00:00:00');
-    $startTime = $dayStart->modify('+' . $startMinutes . ' minutes')->format('Y-m-d H:i:s');
-    $endTime = $dayStart->modify('+' . $endMinutes . ' minutes')->format('Y-m-d H:i:s');
+    $startTime =
+        $today . ' ' .
+        sprintf(
+            '%02d:%02d:00',
+            intdiv($startMinutes, 60),
+            $startMinutes % 60
+        );
+
+
+    $endTime =
+        $today . ' ' .
+        sprintf(
+            '%02d:%02d:00',
+            intdiv($endMinutes, 60),
+            $endMinutes % 60
+        );
+
+
+    /* =====================================================
+       STATES MAKEN
+    ===================================================== */
+
     $states = [];
+
     foreach ($goalsArray as $goal) {
+
         $states[] = 'Gepland';
+
     }
-    $goals = json_encode($goalsArray, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
-    $interventions = json_encode($interventionsArray, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
-    $states = json_encode($states, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
 
 
-    $query = "INSERT INTO missions (area, purpose, interventions, `start-time`, `end-time`, state) VALUES (?, ?, ?, ?, ?, ?)";
+    $goals = json_encode($goalsArray);
+
+    $interventions = json_encode($interventionsArray);
+
+    $states = json_encode($states);
+
+
+
+    /* =====================================================
+       MISSIE TOEVOEGEN
+    ===================================================== */
+
+    $query = "
+        INSERT INTO missions
+        (
+            area,
+            purpose,
+            interventions,
+            `start-time`,
+            `end-time`,
+            state
+        )
+        VALUES (?, ?, ?, ?, ?, ?)
+    ";
+
+
     $result = mysqli_prepare($db, $query);
 
 
@@ -62,8 +97,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit'])) {
 
 
     $result->execute();
-    $result->close();
 
+    $result->close();
 
 
 
@@ -71,61 +106,87 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit'])) {
        LOGBOEK TOEVOEGEN
     ===================================================== */
 
-
-    // Interventies worden het type
-
-    $logType =
-        implode(", ", $interventionsArray);
-
-
-    // Doelen worden de activiteit
-
-    $logActivity =
-        implode(", ", $goalsArray);
-
-
-    // Sector wordt locatie
-
     $logLocation = $sector;
-
-
-    // Missie is bezig
 
     $logStatus = "active";
 
 
-    $logQuery = "
-        INSERT INTO logboek
-        (
-            type,
-            activity,
-            location,
-            status
-        )
-        VALUES (?, ?, ?, ?)
-    ";
+    /* =====================================================
+       MISSIE DOELEN
+    ===================================================== */
+
+    foreach ($goalsArray as $goal) {
+
+        $logQuery = "
+            INSERT INTO logboek
+            (
+                activity,
+                location,
+                status
+            )
+            VALUES (?, ?, ?)
+        ";
 
 
-    $logResult =
-        mysqli_prepare($db, $logQuery);
+        $logResult =
+            mysqli_prepare($db, $logQuery);
 
 
-    $logResult->bind_param(
-        'ssss',
-        $logType,
-        $logActivity,
-        $logLocation,
-        $logStatus
-    );
+        $logResult->bind_param(
+            'sss',
+            $goal,
+            $logLocation,
+            $logStatus
+        );
 
 
-    $logResult->execute();
+        $logResult->execute();
 
-    $logResult->close();
+        $logResult->close();
+
+    }
+
+
+
+    /* =====================================================
+       INTERVENTIES
+    ===================================================== */
+
+    foreach ($interventionsArray as $intervention) {
+
+        $logQuery = "
+            INSERT INTO logboek
+            (
+                activity,
+                location,
+                status
+            )
+            VALUES (?, ?, ?)
+        ";
+
+
+        $logResult =
+            mysqli_prepare($db, $logQuery);
+
+
+        $logResult->bind_param(
+            'sss',
+            $intervention,
+            $logLocation,
+            $logStatus
+        );
+
+
+        $logResult->execute();
+
+        $logResult->close();
+
+    }
 
 }
 
-require_once __DIR__ . '/partials/currentmission.php';
+
+require_once('./partials/currentmission.php');
 
 ?>
 
