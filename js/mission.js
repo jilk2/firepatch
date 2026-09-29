@@ -43,6 +43,11 @@ function syncTimeRange(changed) {
 
 syncTimeRange(); //zodat hij balk laat zien zonder te tijden veranderd te hebben
 
+const urgentMissionDialog = document.querySelector("#urgentMissionDialog");
+if (urgentMissionDialog) {
+  urgentMissionDialog.showModal();
+}
+
 // function changeMissionHandler(e) {
 //   e.preventDefault();
   

@@ -185,9 +185,19 @@
   padding: 12px 0 0;
 }
 
+.alert-actions form {
+  flex: 1;
+  margin: 0;
+}
+
 .alert-actions .btn {
   flex: 1;
   text-align: center;
+}
+
+.alert-actions form .btn {
+  width: 100%;
+  cursor: pointer;
 }
 
 .image-container {
@@ -237,6 +247,15 @@
 
 .form-errors p + p {
   margin-top: 6px;
+}
+
+.form-message {
+  margin: 0 0 18px;
+  padding: 10px 12px;
+  border: 1px solid var(--lightgreen);
+  border-radius: 8px;
+  color: var(--white);
+  background: rgba(33, 248, 137, 0.12);
 }
 
 .form-field {
@@ -376,6 +395,59 @@
   font-size: 1rem;
   padding: 18px 14px;
   margin-top: 16px;
+  cursor: pointer;
+}
+
+.urgent-mission-dialog {
+  width: min(420px, calc(100% - 32px));
+  padding: 22px;
+  border: 1px solid var(--orange);
+  border-radius: 12px;
+  background: var(--black);
+  color: var(--white);
+}
+
+.urgent-mission-dialog::backdrop {
+  background: rgba(0, 0, 0, 0.72);
+}
+
+.urgent-mission-dialog h2 {
+  margin: 0 0 8px;
+}
+
+.urgent-mission-dialog p {
+  margin: 0 0 18px;
+  color: var(--gray);
+}
+
+.urgent-mission-dialog dl {
+  margin: 0 0 20px;
+}
+
+.urgent-mission-dialog dl div {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 8px 0;
+  border-top: 1px solid var(--gray);
+}
+
+.urgent-mission-dialog dt {
+  color: var(--gray);
+}
+
+.urgent-mission-dialog dd {
+  margin: 0;
+  text-align: right;
+}
+
+.urgent-mission-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.urgent-mission-actions .btn {
   cursor: pointer;
 }
 

@@ -56,16 +56,16 @@ mysqli_close($db);
                                         $tijd = isset($claim['timestamp']) ? date('H:i', strtotime($claim['timestamp'])) : 'N.v.t.';
 
                                     $statusKleur = '#ff9f0a'; // Oranje (In onderzoek / Pending) als standaard
-                                    if (isset($claim['Status'])) {
-                                        if ($claim['Status'] === 'true') $statusKleur = '#22f693'; // Groen
-                                        if ($claim['Status'] === 'false') $statusKleur = '#96031A'; // Rood
+                                    if (isset($claim['status'])) {
+                                        if ($claim['status'] === 'true') $statusKleur = '#22f693'; // Groen
+                                        if ($claim['status'] === 'false') $statusKleur = '#96031A'; // Rood
                                     }
                                 ?>
 
                                     <tr style="--row-color: <?= $statusKleur; ?>;" onclick="window.location.href='article.php?id=<?= $claim['id']; ?>'">
 
                                         <td class="tijd-col"><?= $tijd; ?></td>
-                                        <td><?= htmlspecialchars($claim['Title'] ?? 'Geen titel'); ?></td>
+                                        <td><?= htmlspecialchars($claim['title'] ?? 'Geen titel'); ?></td>
                                         <td><?= htmlspecialchars($claim['source'] ?? 'Onbekend'); ?></td>
                                         <td>
                                             <?php if (!empty($claim['image_path'])): ?>
