@@ -36,6 +36,7 @@ while ($row = mysqli_fetch_assoc($result)) {
     <link rel="stylesheet" href="./css/main.css" />
     <link rel="stylesheet" href="./css/kaart.css" />
     <link rel="stylesheet" href="./css/mission.css" />
+    <script src="js/map.js" defer></script>
 </head>
 
 <body>
