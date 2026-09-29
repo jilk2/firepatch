@@ -60,7 +60,7 @@ while ($row = mysqli_fetch_assoc($result)) {
 
             <section class="alert-card" id="claim-alert" hidden>
                 
-                    <imgq id="claim-alert-image" class="claim-alert-image" alt="" hidden>
+                    <img id="claim-alert-image" class="claim-alert-image" alt="" hidden>
                     <div>
                         <h3>NIEUWSTE CLAIM</h3>
                         <p id="claim-alert-message"></p>
