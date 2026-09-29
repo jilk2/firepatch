@@ -1,12 +1,4 @@
 <?php
-//session_start();
-//if(!isset($_SESSION['username'])){
-//    header('Location: login.php');
-//    exit;
-//}
-
-
-
 
 ?>
 
@@ -29,7 +21,7 @@
     <main class="page kaart-main">
         <div class="page-top">
             <div>
-                <h1 class="page-title">Drone map</h1>
+                <h1 class="page-title">Drone Map</h1>
             </div>
             <div class="page-actions">
                 <span class="badge">SATELLIET</span>
@@ -49,7 +41,6 @@
                 <div>
                     <div class="map">
                         <img src="./images/map.png" alt="Kaart voor simulatie" id="map">
-
                         <div class="sector-grid" id="sector-grid" aria-label="Kaartsectoren"></div>
 
                         <div class="overlay-box" id="sector-overlay" aria-live="polite">
