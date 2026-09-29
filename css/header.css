@@ -13,6 +13,7 @@ header {
   display: flex;
   align-items: center;
   gap: 12px;
+  text-decoration: none;
 }
 
 .shield {
@@ -29,6 +30,7 @@ header {
   margin: 0;
   font-size: 1.8125rem;
   letter-spacing: 0.03125rem;
+  color: var(--white);
 }
 
 .brand h1 span {

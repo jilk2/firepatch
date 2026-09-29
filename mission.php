@@ -1,8 +1,9 @@
 <?php
 
-require_once __DIR__ . '/config/database.php';
-
+require_once('./DB/DBConnect.php');
+$db = firepatchMysqli();
 date_default_timezone_set('Europe/Amsterdam');
+
 $today = date('Y-m-d');
 $errors = [];
 $editMissionId = null;
@@ -47,23 +48,14 @@ if (isset($_POST['submit'])) {
         // }
     }
 
-    // DIT STOND OP DE MAIN??? IK HAD MERGE CONFLICT DUS HEB DIT UIT GECOMMEND
-
-    // $startMinutes = max(0, min(1440, $startMinutes));
-    // $endMinutes = max(0, min(1440, $endMinutes));
-
-    // if ($sector === '' || $goalsArray === [] || $endMinutes <= $startMinutes) {
-    //     http_response_code(422);
-    //     exit('Kies een sector, minimaal een missiedoel en een eindtijd na de starttijd.');
-    // }
-    // $dayStart = new DateTimeImmutable($today . ' 00:00:00');
-    // $startTime = $dayStart->modify('+' . $startMinutes . ' minutes')->format('Y-m-d H:i:s');
-    // $endTime = $dayStart->modify('+' . $endMinutes . ' minutes')->format('Y-m-d H:i:s');
 
 
     $states = [];
+
     foreach ($goalsArray as $goal) {
+
         $states[] = 'Gepland';
+
     }
     $goals = json_encode($goalsArray, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
     $interventions = json_encode($interventionsArray, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
@@ -86,14 +78,45 @@ if (isset($_POST['submit'])) {
         $result->close();
 
         if (!$editMissionId) {
-            $logQuery = "INSERT INTO logboek (type, activity, location, status) VALUES (?, ?, ?, ?)";
-            $logResult = mysqli_prepare($db, $logQuery);
-            $logType = implode(', ', $interventionsArray);
-            $logActivity = implode(', ', $goalsArray);
+
+            $logQuery = "INSERT INTO logboek (activity, location, status) VALUES (?, ?, ?)";
+
             $logStatus = 'active';
-            $logResult->bind_param('ssss', $logType, $logActivity, $sector, $logStatus);
-            $logResult->execute();
-            $logResult->close();
+
+
+            // Alle missiedoelen apart toevoegen aan het logboek
+
+            foreach ($goalsArray as $goal) {
+
+                $logResult = mysqli_prepare($db, $logQuery);
+
+                $logActivity = $goal;
+
+                $logResult->bind_param('sss', $logActivity, $sector, $logStatus);
+
+                $logResult->execute();
+
+                $logResult->close();
+
+            }
+
+
+            // Alle interventies apart toevoegen aan het logboek
+
+            foreach ($interventionsArray as $intervention) {
+
+                $logResult = mysqli_prepare($db, $logQuery);
+
+                $logActivity = $intervention;
+
+                $logResult->bind_param('sss', $logActivity, $sector, $logStatus);
+
+                $logResult->execute();
+
+                $logResult->close();
+
+            }
+
         }
 
         header('Location: mission.php');

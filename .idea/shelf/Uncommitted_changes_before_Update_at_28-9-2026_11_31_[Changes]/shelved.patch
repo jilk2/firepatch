@@ -1,0 +1,75 @@
+Index: js/kaart.js
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>const sectorGrid = document.querySelector('#sector-grid');\r\nconst sectorOverlay = document.querySelector('#sector-overlay');\r\n\r\nconst sectorStates = [\r\n\t'Healthy', 'Healthy', 'Moderate', 'Dangerous', 'Moderate', 'Healthy',\r\n\t'Healthy', 'Moderate', 'Moderate', 'Dangerous', 'Healthy', 'Healthy',\r\n\t'Moderate', 'Healthy', 'Dangerous', 'Dangerous', 'Moderate', 'Healthy',\r\n\t'Healthy', 'Healthy', 'Moderate', 'Moderate', 'Dangerous', 'Healthy',\r\n\t'Dangerous', 'Moderate', 'Healthy', 'Healthy', 'Moderate', 'Dangerous',\r\n\t'Healthy', 'Moderate', 'Healthy', 'Dangerous', 'Moderate', 'Healthy'\r\n];\r\n\r\nfunction showSector(sectorNumber, state) {\r\n\tsectorOverlay.innerHTML = `<strong>Sector ${sectorNumber}</strong><span class=\"sector-state ${state.toLowerCase()}\">${state}</span>`;\r\n}\r\n\r\nfor (let sectorNumber = 1; sectorNumber <= 36; sectorNumber += 1) {\r\n\tconst sector = document.createElement('button');\r\n\tconst state = sectorStates[sectorNumber - 1];\r\n\r\n\tsector.type = 'button';\r\n\tsector.className = 'sector';\r\n\tsector.dataset.sector = sectorNumber;\r\n\tsector.dataset.state = state;\r\n\tsector.setAttribute('aria-label', `Sector ${sectorNumber}: ${state}`);\r\n\r\n\tsector.addEventListener('mouseenter', () => showSector(sectorNumber, state));\r\n\tsector.addEventListener('focus', () => showSector(sectorNumber, state));\r\n\r\n\tsectorGrid.appendChild(sector);\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/js/kaart.js b/js/kaart.js
+--- a/js/kaart.js	(revision 0b49cc8d0b54b531573678214fc4cd6d4594f81a)
++++ b/js/kaart.js	(date 1790586961624)
+@@ -11,7 +11,7 @@
+ ];
+ 
+ function showSector(sectorNumber, state) {
+-	sectorOverlay.innerHTML = `<strong>Sector ${sectorNumber}</strong><span class="sector-state ${state.toLowerCase()}">${state}</span>`;
++	sectorOverlay.innerHTML = `<strong>Sector ${sectorNumber}</strong><p class="overlay-text">Status: <span class="sector-state ${state.toLowerCase()}">${state}</span></p>`;
+ }
+ 
+ for (let sectorNumber = 1; sectorNumber <= 36; sectorNumber += 1) {
+Index: css/kaart.css
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>.kaart-main {\r\n  grid-column: 2;\r\n}\r\n\r\n.map-layout {\r\n  display: grid;\r\n  grid-template-columns: minmax(0, 1fr);\r\n  gap: 14px;\r\n  align-items: start;\r\n}\r\n\r\n.page-top {\r\n  display: flex;\r\n  justify-content: space-between;\r\n}\r\n\r\n.page-title {\r\n  color: var(--darktext);\r\n}\r\n\r\n.page-subtitle {\r\n  color: var(--darktext);\r\n}\r\n\r\n.page-actions{\r\n  justify-content: flex-end;\r\n}\r\n\r\n.btn.refresh {\r\n  border: 2px solid var(--gray);\r\n  color: var(--red);\r\n  width: 8vw;\r\n  text-align: center;\r\n  overflow-x: hidden;\r\n}\r\n\r\n.btn.refresh:hover {\r\n  border: 2px solid var(--black);\r\n  font-weight: bold;\r\n  transform: scale(1.1);\r\n  font-size: 1.1rem;\r\n}\r\n\r\n\r\n.map-card {\r\n  width: 100%;\r\n}\r\n\r\n#map-image {\r\n  width: 100%;\r\n  height: auto;\r\n  border-radius: 25px;\r\n}\r\n\r\n.map-badges {\r\n  display: flex;\r\n  align-items: center;\r\n  gap: 8px;\r\n  font-size: 0.75rem;\r\n  color: var(--white);\r\n}\r\n\r\n.badge {\r\n  border: 1px solid var(--red);\r\n  color: #da0524;\r\n  border-radius: 6px;\r\n  padding: 3px 8px;\r\n  font-size: 0.75rem;\r\n}\r\n\r\n.map {\r\n  position: relative;\r\n  display: flex;\r\n  align-content: center;\r\n  justify-content: center;\r\n  padding: 5px;\r\n}\r\n\r\n#map {\r\n  width: 100%;\r\n  height: 100%;\r\n  display: block;\r\n  border-radius: 5px;\r\n}\r\n\r\n.sector-grid {\r\n  position: absolute;\r\n  inset: 5px;\r\n  z-index: 1;\r\n  display: grid;\r\n  grid-template-columns: repeat(6, 1fr);\r\n  grid-template-rows: repeat(6, 1fr);\r\n}\r\n\r\n.sector {\r\n  min-width: 0;\r\n  min-height: 0;\r\n  padding: 0;\r\n  border: 1px solid var(--black);\r\n  background: transparent;\r\n  cursor: pointer;\r\n}\r\n\r\n.sector:hover,\r\n.sector:focus-visible {\r\n  outline: 2px solid var(--white);\r\n  outline-offset: -3px;\r\n  background: rgb(from var(--white) r g b / 0.18);\r\n}\r\n\r\n.overlay-box {\r\n  position: absolute;\r\n  bottom: 2%;\r\n  right: 2%;\r\n  z-index: 2;\r\n  pointer-events: none;\r\n  height: 15%;\r\n  width: 15%;\r\n  min-width: 150px;\r\n  padding: 10px;\r\n  border: 2px solid var(--black);\r\n  display: flex;\r\n  flex-direction: column;\r\n  gap: 4px;\r\n  align-items: center;\r\n  justify-content: center;\r\n  border-radius: 25px;\r\n  background-color: rgb(from var(--gray) r g b / 0.64);\r\n  color: var(--white);\r\n  text-align: center;\r\n}\r\n\r\n.overlay-box p,\r\n.overlay-box strong {\r\n  margin: 0;\r\n}\r\n\r\n.sector-state {\r\n  font-size: 0.8rem;\r\n  font-weight: 700;\r\n}\r\n\r\n.healthy {\r\n  color: var(--lightgreen);\r\n}\r\n\r\n.moderate {\r\n  color: var(--orange);\r\n}\r\n\r\n.dangerous {\r\n  color: #ff5268;\r\n}\r\n\r\n@media (max-width: 700px) {\r\n  .overlay-box {\r\n    min-width: 120px;\r\n    width: 30%;\r\n    height: 20%;\r\n    font-size: 0.8rem;\r\n  }\r\n}\r\n\r\n/* .marker {\r\n  position: absolute;\r\n  z-index: 1;\r\n  background: rgba(8, 18, 31, 0.9);\r\n  border: 1px solid var(--cyan);\r\n  color: #fff;\r\n  padding: 5px 8px;\r\n  border-radius: 6px;\r\n  font-size: 0.75rem;\r\n}\r\n\r\n.marker.warn {\r\n  border-color: var(--warn);\r\n}\r\n\r\n.marker.ok {\r\n  border-color: #1de292;\r\n}\r\n\r\n.m1 {\r\n  top: 300px;\r\n  left: 432px;\r\n}\r\n\r\n.m2 {\r\n  top: 94px;\r\n  right: 650px;\r\n}\r\n\r\n.m3 {\r\n  bottom: 200px;\r\n  left: 700px;\r\n}\r\n\r\n.m4 {\r\n  top: 140px;\r\n  right: 280px;\r\n  border-color: #ff9f0a;\r\n} */\r\n\r\n/* .overlay-box {\r\n  position: absolute;\r\n  right: 14px;\r\n  bottom: 14px;\r\n  z-index: 2;\r\n  background: rgba(8, 16, 29, 0.88);\r\n  border: 1px solid #214b64;\r\n  border-radius: 10px;\r\n  padding: 10px;\r\n  min-width: 175px;\r\n  color: #c0d9eb;\r\n  font-size: 0.8125rem;\r\n}\r\n\r\n.overlay-box h4 {\r\n  margin: 0 0 4px;\r\n  color: var(--cyan);\r\n  font-size: 0.75rem;\r\n  letter-spacing: 0.0625rem;\r\n} */\r\n\r\n@media (max-width: 1200px) {\r\n  .kaart-rightbar {\r\n    padding: 0 22px 22px;\r\n  }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/css/kaart.css b/css/kaart.css
+--- a/css/kaart.css	(revision 0b49cc8d0b54b531573678214fc4cd6d4594f81a)
++++ b/css/kaart.css	(date 1790587411720)
+@@ -103,13 +103,11 @@
+ 
+ .sector:hover,
+ .sector:focus-visible {
+-  outline: 2px solid var(--white);
+-  outline-offset: -3px;
+-  background: rgb(from var(--white) r g b / 0.18);
++  background: rgb(from var(--white) r g b / 0.10);
+ }
+ 
+ .overlay-box {
+-  position: absolute;
++  position: fixed;
+   bottom: 2%;
+   right: 2%;
+   z-index: 2;
+@@ -122,7 +120,7 @@
+   display: flex;
+   flex-direction: column;
+   gap: 4px;
+-  align-items: center;
++  align-items: flex-start;
+   justify-content: center;
+   border-radius: 25px;
+   background-color: rgb(from var(--gray) r g b / 0.64);
+@@ -135,6 +133,11 @@
+   margin: 0;
+ }
+ 
++.overlay-text {
++  font-size: 0.8rem;
++  text-align: left;
++}
++
+ .sector-state {
+   font-size: 0.8rem;
+   font-weight: 700;
+@@ -149,7 +152,7 @@
+ }
+ 
+ .dangerous {
+-  color: #ff5268;
++  color: var(--red);
+ }
+ 
+ @media (max-width: 700px) {

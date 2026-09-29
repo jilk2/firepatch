@@ -1,0 +1,18 @@
+Index: kaart.php
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?php\r\n//session_start();\r\n//if(!isset($_SESSION['username'])){\r\n//    header('Location: login.php');\r\n//    exit;\r\n//}\r\n\r\n\r\n\r\n\r\n?>\r\n\r\n<!doctype html>\r\n<html lang=\"nl\">\r\n\r\n<head>\r\n    <meta charset=\"UTF-8\"/>\r\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"/>\r\n    <title>Firepatch - Kaart</title>\r\n    <link rel=\"stylesheet\" href=\"./css/main.css\"/>\r\n    <link rel=\"stylesheet\" href=\"./css/kaart.css\"/>\r\n    <script src=\"./js/main.js\" defer></script>\r\n</head>\r\n\r\n<body>\r\n<?php include(\"./partials/header.php\"); ?>\r\n<div class=\"layout\">\r\n    <?php include(\"./partials/sidebar.php\"); ?>\r\n    <main class=\"page kaart-main\">\r\n        <div class=\"page-top\">\r\n            <div>\r\n                <h1 class=\"page-title\">Drone map</h1>\r\n            </div>\r\n            <div class=\"page-actions\">\r\n                <span class=\"badge\">SATELLIET</span>\r\n                <a href=\"\" class=\"btn refresh\">Scan Vernieuwen</a>\r\n            </div>\r\n        </div>\r\n\r\n        <div class=\"map-layout\">\r\n            <section class=\"card map-card\">\r\n                <div class=\"card-head\">\r\n                    <h2>Kralingse bos</h2>\r\n                    <div class=\"map-badges\">\r\n                        <span>Zoom 100%</span>\r\n                        <span class=\"badge\">LIVE</span>\r\n                    </div>\r\n                </div>\r\n                <div>\r\n                    <div class=\"map\">\r\n                        <img src=\"./image/map.png\" alt=\"Kaart voor simulatie\" id=\"map\">\r\n\r\n                        <div class=\"overlay-box\">\r\n                            <p>filler</p>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n            </section>\r\n\r\n        </div>\r\n    </main>\r\n\r\n</div>\r\n</body>\r\n\r\n</html>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/kaart.php b/kaart.php
+--- a/kaart.php	(revision 905fc5aa2629b47bc822aa3c598d615bf8cced33)
++++ b/kaart.php	(date 1790581611344)
+@@ -49,7 +49,6 @@
+                 <div>
+                     <div class="map">
+                         <img src="./image/map.png" alt="Kaart voor simulatie" id="map">
+-
+                         <div class="overlay-box">
+                             <p>filler</p>
+                         </div>
