@@ -225,6 +225,19 @@
   letter-spacing: 0.0625rem;
 } */
 
+#drone {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 48px;
+  height: auto;
+  z-index: 2;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  /* needs to be in sync with unreal */
+  transition: left 1.5s ease, top 1.5s ease;
+}
+
 @media (max-width: 1200px) {
   .kaart-rightbar {
     padding: 0 22px 22px;
