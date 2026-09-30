@@ -1,6 +1,17 @@
 <?php
+require "database.php";
 
-declare(strict_types=1);
+require "database.php";
+$sectors = [];
+
+try {
+    $result = $pdo->query(
+            "SELECT `sector_number`, `sector_name` FROM `map_sectors` ORDER BY `sector_name`"
+        );
+    $sectors = $result->fetchAll(PDO::FETCH_ASSOC);
+} catch (PDOException $exception) {
+    error_log("Sectoren ophalen mislukt: " . $exception->getMessage());
+}
 
 date_default_timezone_set('Europe/Amsterdam');
 ?>
@@ -34,16 +45,17 @@ date_default_timezone_set('Europe/Amsterdam');
                 <label for="description">Beschrijving</label>
                 <textarea class="input" id="description" name="description" rows="5"></textarea>
 
-                <label for="source">Bron of locatie</label>
+                <!-- <label for="source">Bron of locatie</label>
                 <input class="input" type="text" id="source" name="source" maxlength="2048"
-                       placeholder="Bijvoorbeeld Sector 4 of een https://-link">
+                       placeholder="Bijvoorbeeld Sector 4 of een https://-link"> -->
 
                 <label for="sector">Sector</label>
                 <select class="input" name="sector" id="sector">
                     <option value="">Geen sector gekozen</option>
-                    <?php for ($sector = 1; $sector <= 36; $sector++): ?>
-                        <option value="<?= $sector ?>">Sector <?= $sector ?></option>
-                    <?php endfor; ?>
+                    <?php foreach ($sectors as $sectorRow): ?>
+                        <?php $sectorName = $sectorRow['sector_name']; ?>
+                        <option value="<?= htmlspecialchars($sectorRow["sector_number"]) ?>"><?= htmlspecialchars($sectorName, ENT_QUOTES, 'UTF-8') ?></option>
+                    <?php endforeach; ?>
                 </select>
 
                 <!-- 1. HIER IS DE 'required' TAG TOEGEVOEGD: Afbeelding is nu verplicht -->
