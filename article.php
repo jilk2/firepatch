@@ -67,7 +67,7 @@ mysqli_close($db);
                 </div>
 
                 <div class="claim-body" style="padding: 20px;">
-                    <h1 style="font-size: 1.5rem; margin-bottom: 10px; color: var(--white);"><?= htmlspecialchars($claim['Title']); ?></h1>
+                    <h1 style="font-size: 1.5rem; margin-bottom: 10px; color: var(--white);"><?= htmlspecialchars($claim['title']); ?></h1>
                     <p class="text-muted" style="margin-bottom: 15px; font-size: 0.9rem;">Indiener: <strong><?= htmlspecialchars($claim['author_email']); ?></strong> op <?= $claim['timestamp']; ?></p>
                     
                     <?php if (!empty($claim['description'])): ?>
