@@ -92,9 +92,10 @@ if (!move_uploaded_file((string) $upload['tmp_name'], $absoluteImagePath)) {
 }
 
 try {
+    
     $statement = $pdo->prepare(
-        'INSERT INTO claims (Title, description, status, author_email, image_path, x_value, y_value) '
-        . 'VALUES (?, ?, ?, ?, ?, ?, ?)'
+        'INSERT INTO claims (title, description, source, status, author_email, image_path, x_value, y_value) '
+        . 'VALUES (?, ?, ?, ?, ?, ?, ?, ?)'
     );
     
     $statement->execute([

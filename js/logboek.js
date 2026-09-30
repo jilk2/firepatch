@@ -31,7 +31,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     let currentPage = 1;
 
-    const rowsPerPage = 5;
+    const rowsPerPage = 20;
 
 
 
