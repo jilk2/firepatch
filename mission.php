@@ -121,7 +121,7 @@ function missionSuggestionFromClaim(array $claim): array
 
     $source = (string) ($claim['source'] ?? '');
     $sector = '';
-    if (preg_match('/(?:sector|section)\s*0*(\d{1,2})/i', $source, $matches)) {
+    if (preg_match('/0*(\d{1,2})/', $source, $matches)) {
         $sectorNumber = (int) $matches[1];
         if ($sectorNumber >= 1 && $sectorNumber <= 36) {
             $sector = 'Section ' . $sectorNumber;
