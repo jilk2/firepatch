@@ -7,6 +7,8 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
+
+
 require_once __DIR__ . '/database.php';
 
 $adminEmails = ['admin@firepatch.nl'];
