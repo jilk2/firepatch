@@ -1,6 +1,14 @@
 <?php
-
+//session_start();
+//if(!isset($_SESSION['username'])){
+//    header('Location: login.php');
+//    exit;
+//}
 require_once __DIR__ . '/config/database.php';
+date_default_timezone_set('Europe/Amsterdam');
+$today = date('Y-m-d');
+
+require_once __DIR__ . '/partials/currentmission.php';
 
 
 // Logboek gegevens ophalen
@@ -23,11 +31,11 @@ while ($row = mysqli_fetch_assoc($result)) {
 <html lang="nl">
 
 <head>    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>NatureGuard Dashboard - Overzicht</title>
+    <title>Firepatch - Dashboard</title>
     <link rel="stylesheet" href="./css/main.css" />
     <link rel="stylesheet" href="./css/kaart.css" />
     <link rel="stylesheet" href="./css/mission.css" />
-    <script src="./js/main.js" defer></script>
+    <script src="js/map.js" defer></script>
 </head>
 
 <body>
@@ -44,18 +52,22 @@ while ($row = mysqli_fetch_assoc($result)) {
                     </div>
                 </div>
                 <div class="map">
-                    <img id="map" src="image/map.png" alt="map of the region">
-                    <img id="vlam" src="image/vlammetjes-6-st.jpg" alt="flames">
+                    <img id="map" src="images/map.png" alt="map of the region">
+                    <!-- <img id="vlam" src="images/vlammetjes-6-st.jpg" alt="flames"> -->
+                    <img id="drone" src="images/drone.png" alt="Drone">
                 </div>
             </section>
 
-            <section class="alert-card">
-                <div>
-                    <h3>⚠ ACTIE GEVRAAGD</h3>
-                    <p>Brand gedetecteerd in Sector <?php echo "4"?>.</p>
-                </div>
+            <section class="alert-card" id="claim-alert" hidden>
+                
+                    <img id="claim-alert-image" class="claim-alert-image" alt="" hidden>
+                    <div>
+                        <h3>NIEUWSTE CLAIM</h3>
+                        <p id="claim-alert-message"></p>
+                    </div>
+    
                 <div class="page-actions">
-                    <a href="mission.php" class="btn primary">Bekijk</a>
+                    <a href="article.php" id="claim-alert-link" class="btn primary">Bekijk</a>
                 </div>
             </section>
 
@@ -118,20 +130,36 @@ while ($row = mysqli_fetch_assoc($result)) {
 
         <aside class="rightbar">
 
+            <?php if ($nextMission): ?>
+                <section class="card mission">
+                    <h4>HUIDIGE MISSIE</h4>
+                    <h2><?= htmlspecialchars($nextMission['area'], ENT_QUOTES, 'UTF-8') ?></h2>
+                    <!-- <p><?= htmlspecialchars(date('d-m-Y', strtotime($nextMission['start-time'])), ENT_QUOTES, 'UTF-8') ?>
+                    <span><?= htmlspecialchars(date('H:i', strtotime($nextMission['start-time'])) . ' - ' . date('H:i', strtotime($nextMission['end-time'])), ENT_QUOTES, 'UTF-8') ?></span>
+                </p> -->
+                    <p class="mission-progress">Missievoortgang <strong><?= floor($timeProgress) ?>%</strong></p>
+                    <div class="progress cyan">
+                        <div style="width: <?= $timeProgress ?>%;"></div>
+                    </div>
+                    <ul>
+                        <?php for ($i = 0; $i < count($nextMission['purpose'] ?? []); $i++): ?>
+                            <li>
+                                <?= htmlspecialchars($nextMission['purpose'][$i], ENT_QUOTES, 'UTF-8') ?><span
+                                    class="<?= strtolower($state[$i]) ?>">
+                                    <?= $state[$i] ?>
+                                </span>
+                            </li>
+                        <?php endfor; ?>
+                    </ul>
+                </section>
+            <?php else: ?>
+                <section class="card mission empty-state">
+                    <h4>MISSIES</h4>
+                    <h2>Geen missies gepland</h2>
+                    <p>Maak rechts een nieuwe missie aan om de planning te starten.</p>
+                </section>
+            <?php endif; ?>
 
-            <section class="card mission">
-                <h4>HUIDIGE MISSIE</h4>
-                <h2>Ecosysteemscan</h2>
-                <p>Missievoortgang <strong>66% Voltooid</strong></p>
-                <div class="progress cyan">
-                    <div style="width: 66%"></div>
-                </div>
-                <ul>
-                    <li>Biomassascan <span>Gereed</span></li>
-                    <li>Wateranalyse <span>Gereed</span></li>
-                    <li class="active">Inventarisatie <span>Actief</span></li>
-                </ul>
-            </section>
             <section class="card">
                 <div class="card-head">
                     <h2>Drone Status</h2>
@@ -148,7 +176,7 @@ while ($row = mysqli_fetch_assoc($result)) {
             </section>
         </aside>
     </div>
-    <script src="js/map.js"></script>
+    <script src="./js/dashboard-alert.js"></script>
 </body>
 
 </html>

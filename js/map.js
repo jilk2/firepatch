@@ -1,10 +1,16 @@
 const mapImage = document.getElementById("map");
 const ws = new WebSocket("ws://localhost:8080");
+const droneImage = document.getElementById("drone");
 let coordinates = { X: 0, Y: 0 };
 
 ws.addEventListener("open", () => {
   console.log("Connected to the WebSocket server");
 });
+
+function moveDrone(x, y) {
+  droneImage.style.left = `${x * 100}%`;
+  droneImage.style.top = `${y * 100}%`;
+}
 
 mapImage.addEventListener("click", (event) => {
   const rect = mapImage.getBoundingClientRect();
@@ -12,13 +18,14 @@ mapImage.addEventListener("click", (event) => {
   const x = (event.clientX - rect.left) / rect.width;
   const y = (event.clientY - rect.top) / rect.height;
 
-
   console.log("-------------------------------------");
   console.log(`x: ${x}, y: ${y}`);
   coordinates = {
     X: x,
     Y: y,
   };
+
+  moveDrone(x, y);
 
   if (ws.readyState === WebSocket.OPEN) {
     ws.send(JSON.stringify(coordinates));

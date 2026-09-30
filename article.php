@@ -1,5 +1,5 @@
 <?php
-require_once "DB/DBConnect.php";
+require_once __DIR__ . '/config/database.php';
 
 $id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 
@@ -44,7 +44,7 @@ mysqli_close($db);
         
         <main class="page">
             <div class="page-actions">
-                <a href="verifynet.php" class="btn ghost">&larr; Terug naar Overzicht</a>
+                <a href="verifynet.php" class="btn primary" style="width: 200px;">&larr; Terug naar Overzicht</a>
             </div>
 
             <div class="card claim-detail-card">
@@ -53,14 +53,21 @@ mysqli_close($db);
                     <?php 
                         $statusText = "IN ONDERZOEK";
                         $statusClass = "badge-pending";
-                        if ($claim['Status'] === 'true') { $statusText = "WAAR"; $statusClass = "badge-true"; }
-                        if ($claim['Status'] === 'false') { $statusText = "ONWAAR"; $statusClass = "badge-false"; }
+                        if ($claim['status'] === 'true') { $statusText = "WAAR"; $statusClass = "badge-true"; }
+                        if ($claim['status'] === 'false') { $statusText = "ONWAAR"; $statusClass = "badge-false"; }
                     ?>
                     <span class="badge <?= $statusClass; ?>"><?= $statusText; ?></span>
+
+                    <div id="admin-actions" style="display: none; margin-top: 15px; margin-bottom: 15px;">
+                            (<?= $claim['id']; ?>)
+                        <button onclick="verwijderClaim(<?= $claim['id'] ?? 0; ?>)" class="btn primary" style="background-color: #96031A; border-color: #96031A;">
+                            ☠ Claim Verwijderen
+                        </button>
+                    </div>
                 </div>
 
                 <div class="claim-body" style="padding: 20px;">
-                    <h1 style="font-size: 1.5rem; margin-bottom: 10px; color: var(--white);"><?= htmlspecialchars($claim['Title']); ?></h1>
+                    <h1 style="font-size: 1.5rem; margin-bottom: 10px; color: var(--white);"><?= htmlspecialchars($claim['title']); ?></h1>
                     <p class="text-muted" style="margin-bottom: 15px; font-size: 0.9rem;">Indiener: <strong><?= htmlspecialchars($claim['author_email']); ?></strong> op <?= $claim['timestamp']; ?></p>
                     
                     <?php if (!empty($claim['description'])): ?>
@@ -85,6 +92,8 @@ mysqli_close($db);
             <div class="card">
                 <div class="card-head">
                     <h2>Community Verificaties (<?= count($notes); ?>)</h2>
+                    <!-- ADMIN ACTIES (Standaard verborgen) -->
+
                 </div>
                 
                 <div style="padding: 20px;">
@@ -126,14 +135,25 @@ mysqli_close($db);
     </div>
 
     <script>
+    const currentUser = localStorage.getItem('verifinet_user');
+    
+    // Check admin status om de verwijder-knop zichtbaar te maken
+    const adminEmailsList = ["admin@firepatch.nl"]; // Vergeet niet aan te passen!
+    const adminActionsDiv = document.getElementById('admin-actions');
+
+    if (currentUser && adminEmailsList.includes(currentUser)) {
+        if (adminActionsDiv) {
+            adminActionsDiv.style.display = 'block';
+        }
+    }
+
     async function stuurNotitie(event, claimId) {
         event.preventDefault();
         const text = document.getElementById('note-text').value;
         const source = document.getElementById('note-source').value;
-        const currentUser = localStorage.getItem('verifinet_user');
 
         if (!currentUser) {
-            alert("Toegang geweigerd: Je moet ingelogd zijn  om te stemmen.");
+            alert("Toegang geweigerd: Je moet ingelogd zijn om te stemmen.");
             return;
         }
 
@@ -152,6 +172,40 @@ mysqli_close($db);
             const result = await response.json();
             if (result.success) {
                 window.location.reload();
+            } else {
+                alert("Fout: " + result.message);
+            }
+        } catch (err) {
+            console.error(err);
+            alert("Kan geen verbinding maken met de server.");
+        }
+    }
+
+    
+    async function verwijderClaim(claimId) {
+        if (!claimId || claimId === 0) return;
+        
+       
+        if (!confirm("⚠️ Weet je zeker dat je deze claim definitief wilt verwijderen? Dit wist ook alle comments en kan niet ongedaan worden gemaakt.")) {
+            return;
+        }
+
+        try {
+            const response = await fetch('delete_claim.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    claim_id: claimId,
+                    email: currentUser
+                })
+            });
+
+            const result = await response.json();
+            
+            if (result.success) {
+                alert("Claim is verwijderd.");
+                // Stuur de admin terug naar het dashboard
+                window.location.href = 'verifynet.php';
             } else {
                 alert("Fout: " + result.message);
             }

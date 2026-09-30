@@ -1,16 +1,19 @@
 document.addEventListener("DOMContentLoaded", function () {
 
-    // =====================================================
+    // =========================================
     // ELEMENTEN
-    // =====================================================
-
-    const filters =
-        document.querySelectorAll(".log-filter");
+    // =========================================
 
     const rows =
         document.querySelectorAll("#logbook-body tr");
 
-    const dateInput =
+    const filterSort =
+        document.getElementById("filter-sort");
+
+    const filterValue =
+        document.getElementById("filter-value");
+
+    const filterDate =
         document.getElementById("filter-date");
 
     const previousButton =
@@ -26,60 +29,276 @@ document.addEventListener("DOMContentLoaded", function () {
         document.getElementById("logbook-count");
 
 
-    // =====================================================
-    // INSTELLINGEN
-    // =====================================================
-
-    let currentFilter = "all";
-
     let currentPage = 1;
 
-    const rowsPerPage = 5;
+    const rowsPerPage = 20;
 
 
-    // =====================================================
-    // LOGBOEK FILTEREN
-    // =====================================================
 
-    function filterLogs() {
+    // =========================================
+    // TWEEDE DROPDOWN MAKEN
+    // =========================================
+
+    function updateSecondDropdown() {
+
+        const selectedFilter =
+            filterSort.value;
+
+
+        // Oude opties verwijderen
+
+        filterValue.innerHTML = "";
+
+
+        // =====================================
+        // ALLES
+        // =====================================
+
+        if (selectedFilter === "all") {
+
+            const option =
+                document.createElement("option");
+
+            option.value = "all";
+            option.textContent = "Alles";
+
+            filterValue.appendChild(option);
+
+
+            filterLogs();
+
+            return;
+        }
+
+
+
+        // =====================================
+        // ACTIVITEIT / LOCATIE / STATUS
+        // =====================================
+
+        filterValue.disabled = false;
+
+
+        // Eerst "Alles" toevoegen
+
+        const allOption =
+            document.createElement("option");
+
+        allOption.value = "all";
+        allOption.textContent = "Alles";
+
+        filterValue.appendChild(allOption);
+
+
+
+        // Unieke waarden verzamelen
+
+        const values = [];
+
 
         rows.forEach(function (row) {
 
-            const type =
-                row.dataset.type;
-
-            const date =
-                row.dataset.date;
+            let value = "";
 
 
-            // Controleer type
+            if (selectedFilter === "activity") {
 
-            let filterMatch = false;
-
-            if (currentFilter === "all") {
-
-                filterMatch = true;
-
-            } else if (type === currentFilter) {
-
-                filterMatch = true;
+                value = row.dataset.activity;
 
             }
 
 
-            // Controleer datum
+            if (selectedFilter === "location") {
+
+                value = row.dataset.location;
+
+            }
+
+
+            if (selectedFilter === "status") {
+
+                value = row.dataset.status;
+
+            }
+
+
+            if (
+                value &&
+                !values.includes(value)
+            ) {
+
+                values.push(value);
+
+            }
+
+        });
+
+
+
+        // Alfabetisch sorteren
+
+        values.sort(function (a, b) {
+
+            return a.localeCompare(
+                b,
+                "nl"
+            );
+
+        });
+
+
+
+        // Opties toevoegen
+
+        values.forEach(function (value) {
+
+            const option =
+                document.createElement("option");
+
+
+            option.value = value;
+
+
+            // Status netjes vertalen
+
+            if (selectedFilter === "status") {
+
+                if (value === "active") {
+
+                    option.textContent =
+                        "Monitoring";
+
+                } else if (value === "pending") {
+
+                    option.textContent =
+                        "Wacht";
+
+                } else if (value === "done") {
+
+                    option.textContent =
+                        "Voltooid";
+
+                } else {
+
+                    option.textContent =
+                        value;
+
+                }
+
+            } else {
+
+                option.textContent =
+                    value;
+
+            }
+
+
+            filterValue.appendChild(option);
+
+        });
+
+
+        // Opnieuw filteren
+
+        filterLogs();
+
+    }
+
+
+
+    // =========================================
+    // LOGS FILTEREN
+    // =========================================
+
+    function filterLogs() {
+
+        const selectedFilter =
+            filterSort.value;
+
+        const selectedValue =
+            filterValue.value;
+
+        const selectedDate =
+            filterDate.value;
+
+
+
+        rows.forEach(function (row) {
+
+            let filterMatch = true;
 
             let dateMatch = true;
 
-            if (dateInput.value !== "") {
 
-                dateMatch =
-                    date === dateInput.value;
+
+            // =====================================
+            // ACTIVITEIT
+            // =====================================
+
+            if (
+                selectedFilter === "activity" &&
+                selectedValue !== "all"
+            ) {
+
+                filterMatch =
+                    row.dataset.activity ===
+                    selectedValue;
 
             }
 
 
-            // Toon of verberg regel
+
+            // =====================================
+            // LOCATIE
+            // =====================================
+
+            if (
+                selectedFilter === "location" &&
+                selectedValue !== "all"
+            ) {
+
+                filterMatch =
+                    row.dataset.location ===
+                    selectedValue;
+
+            }
+
+
+
+            // =====================================
+            // STATUS
+            // =====================================
+
+            if (
+                selectedFilter === "status" &&
+                selectedValue !== "all"
+            ) {
+
+                filterMatch =
+                    row.dataset.status ===
+                    selectedValue;
+
+            }
+
+
+
+            // =====================================
+            // DATUM
+            // =====================================
+
+            if (selectedDate !== "") {
+
+                dateMatch =
+                    row.dataset.date ===
+                    selectedDate;
+
+            }
+
+
+
+            // =====================================
+            // RESULTAAT
+            // =====================================
 
             if (filterMatch && dateMatch) {
 
@@ -94,6 +313,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
 
 
+
         currentPage = 1;
 
         showPage();
@@ -101,9 +321,10 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
-    // =====================================================
-    // PAGINATION
-    // =====================================================
+
+    // =========================================
+    // PAGINA TONEN
+    // =========================================
 
     function showPage() {
 
@@ -112,13 +333,16 @@ document.addEventListener("DOMContentLoaded", function () {
 
         rows.forEach(function (row) {
 
-            if (row.dataset.visible === "true") {
+            if (
+                row.dataset.visible === "true"
+            ) {
 
                 visibleRows.push(row);
 
             }
 
         });
+
 
 
         const totalRows =
@@ -134,7 +358,6 @@ document.addEventListener("DOMContentLoaded", function () {
             );
 
 
-        // Controleer huidige pagina
 
         if (currentPage > totalPages) {
 
@@ -143,7 +366,8 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
 
-        // Eerst alles verbergen
+
+        // Alles eerst verbergen
 
         rows.forEach(function (row) {
 
@@ -152,18 +376,24 @@ document.addEventListener("DOMContentLoaded", function () {
         });
 
 
-        // Bepaal welke regels zichtbaar zijn
 
         const start =
-            (currentPage - 1) * rowsPerPage;
+            (currentPage - 1) *
+            rowsPerPage;
+
 
         const end =
-            start + rowsPerPage;
+            start +
+            rowsPerPage;
 
+
+
+        // Huidige pagina tonen
 
         for (
             let i = start;
-            i < end && i < visibleRows.length;
+            i < end &&
+            i < visibleRows.length;
             i++
         ) {
 
@@ -172,9 +402,10 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
 
-        // =================================================
-        // PAGINA INFORMATIE
-        // =================================================
+
+        // =====================================
+        // PAGINA INFO
+        // =====================================
 
         pageInfo.textContent =
             "Pagina " +
@@ -183,9 +414,10 @@ document.addEventListener("DOMContentLoaded", function () {
             totalPages;
 
 
-        // =================================================
+
+        // =====================================
         // AANTAL LOGREGELS
-        // =================================================
+        // =====================================
 
         if (totalRows === 0) {
 
@@ -196,6 +428,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
             const startNumber =
                 start + 1;
+
 
             const endNumber =
                 Math.min(
@@ -216,9 +449,10 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
 
-        // =================================================
+
+        // =====================================
         // PAGINATION BUTTONS
-        // =================================================
+        // =====================================
 
         previousButton.disabled =
             currentPage === 1;
@@ -230,56 +464,27 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
-    // =====================================================
-    // FILTER KNOPPEN
-    // =====================================================
 
-    filters.forEach(function (filter) {
+    // =========================================
+    // EERSTE DROPDOWN
+    // =========================================
 
-        filter.addEventListener(
-            "click",
-            function (event) {
+    filterSort.addEventListener(
+        "change",
+        function () {
 
-                event.preventDefault();
+            updateSecondDropdown();
 
-
-                // Welk filter is gekozen?
-
-                currentFilter =
-                    filter.dataset.filter;
+        }
+    );
 
 
-                // Active class veranderen
 
-                filters.forEach(function (item) {
+    // =========================================
+    // TWEEDE DROPDOWN
+    // =========================================
 
-                    item.parentElement.classList.remove(
-                        "active"
-                    );
-
-                });
-
-
-                filter.parentElement.classList.add(
-                    "active"
-                );
-
-
-                // Logboek opnieuw filteren
-
-                filterLogs();
-
-            }
-        );
-
-    });
-
-
-    // =====================================================
-    // DATUM FILTER
-    // =====================================================
-
-    dateInput.addEventListener(
+    filterValue.addEventListener(
         "change",
         function () {
 
@@ -289,9 +494,25 @@ document.addEventListener("DOMContentLoaded", function () {
     );
 
 
-    // =====================================================
+
+    // =========================================
+    // DATUM
+    // =========================================
+
+    filterDate.addEventListener(
+        "change",
+        function () {
+
+            filterLogs();
+
+        }
+    );
+
+
+
+    // =========================================
     // VORIGE PAGINA
-    // =====================================================
+    // =========================================
 
     previousButton.addEventListener(
         "click",
@@ -309,9 +530,10 @@ document.addEventListener("DOMContentLoaded", function () {
     );
 
 
-    // =====================================================
+
+    // =========================================
     // VOLGENDE PAGINA
-    // =====================================================
+    // =========================================
 
     nextButton.addEventListener(
         "click",
@@ -355,9 +577,10 @@ document.addEventListener("DOMContentLoaded", function () {
     );
 
 
-    // =====================================================
+
+    // =========================================
     // START
-    // =====================================================
+    // =========================================
 
     rows.forEach(function (row) {
 
@@ -366,6 +589,6 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
 
-    filterLogs();
+    updateSecondDropdown();
 
 });

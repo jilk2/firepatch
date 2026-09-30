@@ -1,12 +1,4 @@
 <?php
-//session_start();
-//if(!isset($_SESSION['username'])){
-//    header('Location: login.php');
-//    exit;
-//}
-
-
-
 
 ?>
 
@@ -19,7 +11,7 @@
     <title>Firepatch - Kaart</title>
     <link rel="stylesheet" href="./css/main.css"/>
     <link rel="stylesheet" href="./css/kaart.css"/>
-    <script src="./js/main.js" defer></script>
+    <script src="./js/kaart.js" defer></script>
 </head>
 
 <body>
@@ -29,7 +21,7 @@
     <main class="page kaart-main">
         <div class="page-top">
             <div>
-                <h1 class="page-title">Drone map</h1>
+                <h1 class="page-title">Drone Map</h1>
             </div>
             <div class="page-actions">
                 <span class="badge">SATELLIET</span>
@@ -48,10 +40,12 @@
                 </div>
                 <div>
                     <div class="map">
-                        <img src="./image/map.png" alt="Kaart voor simulatie" id="map">
+                        <img src="./images/map.png" alt="Kaart voor simulatie" id="map">
+                        <div class="sector-grid" id="sector-grid" aria-label="Kaartsectoren"></div>
+                        <div class="claim-pins" id="claim-pins" aria-label="Claims op de kaart"></div>
 
-                        <div class="overlay-box">
-                            <p>filler</p>
+                        <div class="overlay-box" id="sector-overlay" aria-live="polite">
+                            <p>Beweeg over een sector</p>
                         </div>
                     </div>
                 </div>
