@@ -1,32 +1,42 @@
 <?php
 
-$query = 'SELECT * FROM missions WHERE `start-time` >= ? ORDER BY `start-time` ASC';
-$statement = mysqli_prepare($db, $query);
-$statement->bind_param('s', $today);
-$statement->execute();
-$result = $statement->get_result();
+$activeQuery = "SELECT * FROM missions WHERE mission_state = 'active' ORDER BY id ASC LIMIT 1";
+$activeResult = mysqli_query($db, $activeQuery);
 
-$missions = [];
+$nextMission = mysqli_fetch_assoc($activeResult) ?: null;
+// mysqli_free_result($activeResult);
 
-while ($row = $result->fetch_assoc()) {
+$queueQuery = "SELECT * FROM missions
+               WHERE mission_state = 'queued'
+               ORDER BY CASE WHEN priority = 'high' THEN 0 ELSE 1 END,
+                        `start-time` ASC,
+                        id ASC";
+$queueResult = mysqli_query($db, $queueQuery);
+$queuedMissions = [];
+
+while ($row = mysqli_fetch_assoc($queueResult)) {
     $purpose = json_decode((string) ($row['purpose'] ?? '[]'), true);
     $interventions = json_decode((string) ($row['interventions'] ?? '[]'), true);
-    $storedState = json_decode((string) ($row['state'] ?? '[]'), true);
+    $storedState = json_decode((string) ($row['purpose_state'] ?? '[]'), true);
 
     $row['purpose'] = is_array($purpose) ? $purpose : [];
     $row['interventions'] = is_array($interventions) ? $interventions : [];
-    $row['state'] = is_array($storedState) ? $storedState : [];
+    $row['purpose_state'] = is_array($storedState) ? $storedState : [];
 
-    $missions[] = $row;
+    $queuedMissions[] = $row;
 }
 
-$statement->close();
+// mysqli_free_result($queueResult);
 
+if ($nextMission) {
+    $purpose = json_decode((string) ($nextMission['purpose'] ?? '[]'), true);
+    $interventions = json_decode((string) ($nextMission['interventions'] ?? '[]'), true);
+    $storedState = json_decode((string) ($nextMission['purpose_state'] ?? '[]'), true);
 
-// select the next mission and the queued missions
-
-$nextMission = $missions[0] ?? null;
-$queuedMissions = array_slice($missions, 1);
+    $nextMission['purpose'] = is_array($purpose) ? $purpose : [];
+    $nextMission['interventions'] = is_array($interventions) ? $interventions : [];
+    $nextMission['purpose_state'] = is_array($storedState) ? $storedState : [];
+}
 
 $timeProgress = 0.0;
 $state = [];
