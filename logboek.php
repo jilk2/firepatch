@@ -103,10 +103,6 @@ while ($row = mysqli_fetch_assoc($result)) {
                     Systeem Logboek
                 </h1>
 
-                <p class="page-subtitle">
-                    Bekijk biosfeer gebeurtenissen en interventies.
-                </p>
-
             </div>
 
         </div>
