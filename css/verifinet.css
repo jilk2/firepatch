@@ -121,3 +121,37 @@ textarea.input:focus,
     border-color: var(--cyan, #00d5ff) !important;
     box-shadow: 0 0 0 2px rgba(0, 213, 255, 0.2) !important;
 }
+
+.claim-button {
+    border: 1px solid;
+  background: var(--red);
+  color: var(--white);
+  border-radius: 10px;
+  padding: 11px 12px;
+  text-decoration: none;
+  font-size: 0.875rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.claim-button:hover,
+.claim-button.current {
+  background: var(--gray);
+  border-color: var(--black);
+  color: var(--white);
+}
+
+.claim-button.current {
+  background: var(--red);
+  border-color: var(--black);
+  color: var(--white);
+  font-weight: 700;
+  position: relative;
+}
+
+
+.claim-button.current .nav-icon {
+  margin-left: 5px;
+  font-weight: bold;
+}

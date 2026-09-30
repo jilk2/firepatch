@@ -1,40 +1,6 @@
 <?php
-// header("Access-Control-Allow-Origin: *");
-// header("Access-Control-Allow-Methods: POST, OPTIONS");
-// header("Access-Control-Allow-Headers: Content-Type");
-// header("Content-Type: application/json; charset=UTF-8");
-
-// if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') { http_response_code(200); exit(); }
-
-// require 'database.php';
-// $data = json_decode(file_get_contents("php://input"));
-
-// if(isset($data->title) && isset($data->author_email)) {
-//     $status = "pending"; 
-    
-//     $description = isset($data->description) ? $data->description : '';
-//     $source = isset($data->source) ? $data->source : '';
-    
-    
-//     $stmt = $pdo->prepare("INSERT INTO claims (Title, description, source, Status, author_email) VALUES (?, ?, ?, ?, ?)");
-    
-//     if($stmt->execute([$data->title, $description, $source, $status, $data->author_email])) {
-//         echo json_encode(["success" => true, "message" => "Claim succesvol ingediend.", "id" => $pdo->lastInsertId()]);
-//     } else {
-//         http_response_code(500);
-//         echo json_encode(["success" => false, "message" => "Fout bij opslaan claim in database."]);
-//     }
-// } else {
-//     http_response_code(400);
-//     echo json_encode(["success" => false, "message" => "Fout: Titel en auteur ontbreken."]);
-// }
-
 session_start();
 date_default_timezone_set("Europe/Amsterdam");
-
-if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    echo "Selected sector: " . $_POST["sector"];
-}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -44,25 +10,42 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="./css/main.css">
+    <link rel="stylesheet" href="./css/verifinet.css">
 </head>
 
 <body>
-    <form action="upload.php" method="post" enctype="multipart/form-data">
-        <label for="time">Time:</label>
-        <input type="text" id="" name="text" value="<?= date("H:i"); ?>" disabled>
-        
-        Activity: <input type="text" name="name"><br>
+    <section class="card">
+        <form action="upload.php" method="post" enctype="multipart/form-data" style="padding: 15px; display: grid; gap: 12px;">
+            <label for="time">Tijd:</label>
+            <input type="text" id="time" name="time" value="<?= date("d.M.Y - H:i"); ?>" readonly>
 
-        <label for="sector">Choose a sector:</label>
-        <select name="sector" id="sector">
-            <?php for ($i = 1; $i <= 32; $i++): ?>
-                <option value="<?= $i ?>">Sector <?= $i ?></option>
-            <?php endfor; ?>
-        </select>
+            <label for="name">Activiteit:</label>
+            <input class="input" type="text" id="name" name="name" required>
 
-        Select image to upload: <input type="file" name="fileToUpload" id="fileToUpload">
-        <input type="submit" name="submit">
-    </form>
+            <label for="sector">Kies een sector:</label>
+            <select class="input" name="sector" id="sector" required>
+                <?php for ($i = 1; $i <= 32; $i++): ?>
+                    <option value="<?= $i ?>">Sector <?= $i ?></option>
+                <?php endfor; ?>
+            </select>
+
+            <label for="fileToUpload">Selecteer foto voor upload (optioneel):</label>
+            <input class="input" type="file" name="fileToUpload" id="fileToUpload" accept="image/jpeg,image/png,image/gif,image/webp">
+            <input type="hidden" name="author_email" id="author_email">
+            <button class="btn primary" type="submit" name="submit">Verstuur claim</button>
+        </form>
+    </section>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const email = localStorage.getItem("verifinet_user");
+            const authorEmail = document.getElementById("author_email");
+            if (email) {
+                authorEmail.value = email;
+            }
+        });
+    </script>
 </body>
 
 </html>

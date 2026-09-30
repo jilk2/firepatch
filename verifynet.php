@@ -29,6 +29,10 @@ mysqli_close($db);
             <div class="page-actions">
                 <h2 style="margin:0; font-size: 24px; color: var(--white);">VerifyNET Monitor</h2>
             </div>
+
+            <div>
+                <button class="claim-button" onclick="window.location.href='save_claim.php';">Maak claim</button>
+            </div>
             
             <section class="card">
                 <div class="card-head">
