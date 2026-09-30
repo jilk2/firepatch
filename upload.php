@@ -97,6 +97,8 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
+
+
 require_once __DIR__ . '/database.php';
 
 $adminEmails = ['admin@firepatch.nl'];
@@ -182,12 +184,13 @@ if (!move_uploaded_file((string) $upload['tmp_name'], $absoluteImagePath)) {
 }
 
 try {
-    
+    // FIX: 'source' is hier verwijderd, en we gebruiken exact 7 vraagtekens
     $statement = $pdo->prepare(
-        'INSERT INTO claims (title, description, source, status, author_email, image_path, x_value, y_value) '
-        . 'VALUES (?, ?, ?, ?, ?, ?, ?, ?)'
+        'INSERT INTO claims (Title, description, status, author_email, image_path, x_value, y_value) '
+        . 'VALUES (?, ?, ?, ?, ?, ?, ?)'
     );
     
+    // FIX: We geven exact 7 waardes mee die perfect aansluiten bij de vraagtekens hierboven
     $statement->execute([
         $title,
         $description !== '' ? $description : null,
