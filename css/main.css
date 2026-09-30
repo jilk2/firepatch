@@ -81,10 +81,8 @@ body {
 }
 
 .card-map {
-  background: var(--green);
-  border: 1px solid var(--gray);
-  border-radius: 12px;
-  overflow: hidden;
+  width: 60%;
+  height: auto;
 }
 
 .btn.ghost {
@@ -98,6 +96,7 @@ body {
   border: 1px solid var(--gray);
   border-radius: 12px;
   overflow: hidden;
+  
 }
 
 .card-head {
@@ -190,17 +189,6 @@ body {
 
 .log-list .pending {
   color: #ffab2e;
-}
-
-
-@media (max-width: 1320px) {
-
-  /* .content-layout,
-  .map-layout,
-  .mission-grid,
-  .settings-grid {
-    grid-template-columns: 1fr;
-  } */
 }
 
 .drone-state {

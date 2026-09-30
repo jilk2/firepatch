@@ -30,6 +30,8 @@ function sectorNumberForCoordinates(x, y) {
 }
 
 function syncSectorStatuses(sectorCounts) {
+	if (!sectorGrid) return Promise.resolve();
+
 	const updates = [];
 
 	for (let sectorNumber = 1; sectorNumber <= 36; sectorNumber += 1) {
@@ -66,47 +68,49 @@ function syncSectorStatuses(sectorCounts) {
 	return Promise.all(updates);
 }
 
-for (let sectorNumber = 1; sectorNumber <= 36; sectorNumber += 1) {
-	const sector = document.createElement('button');
-	const state = sectorStates.get(sectorNumber) || 'Unknown';
+if (sectorGrid) {
+	for (let sectorNumber = 1; sectorNumber <= 36; sectorNumber += 1) {
+		const sector = document.createElement('button');
+		const state = sectorStates.get(sectorNumber) || 'Unknown';
 
-	sector.type = 'button';
-	sector.className = 'sector';
-	sector.dataset.sector = sectorNumber;
-	sector.dataset.state = state;
-	sector.setAttribute('aria-label', `Sector ${sectorNumber}: ${state}`);
+		sector.type = 'button';
+		sector.className = 'sector';
+		sector.dataset.sector = sectorNumber;
+		sector.dataset.state = state;
+		sector.setAttribute('aria-label', `Sector ${sectorNumber}: ${state}`);
 
-	const updateOverlay = () => showSector(sectorNumber, sectorStates.get(sectorNumber) || 'Unknown');
-	sector.addEventListener('mouseenter', updateOverlay);
-	sector.addEventListener('focus', updateOverlay);
+		const updateOverlay = () => showSector(sectorNumber, sectorStates.get(sectorNumber) || 'Unknown');
+		sector.addEventListener('mouseenter', updateOverlay);
+		sector.addEventListener('focus', updateOverlay);
 
-	sectorGrid.appendChild(sector);
-}
+		sectorGrid.appendChild(sector);
+	}
 
-fetch('get_sectors.php', { cache: 'no-store' })
-	.then((response) => {
-		if (!response.ok) throw new Error(`HTTP ${response.status}`);
-		return response.json();
-	})
-	.then((result) => {
-		if (!result.success || !Array.isArray(result.data)) {
-			throw new Error('Ongeldige sector-response');
-		}
-
-		result.data.forEach((sector) => {
-			const sectorNumber = Number(sector.sector_number);
-			if (sectorNumber >= 1 && sectorNumber <= 36 && typeof sector.state === 'string') {
-				const state = statusesSynchronized
-					? sectorStates.get(sectorNumber) || sector.state
-					: problematicSectors.has(sectorNumber) ? 'problematic' : sector.state;
-				sectorStates.set(sectorNumber, state);
-				const sectorElement = sectorGrid.querySelector(`[data-sector="${sectorNumber}"]`);
-				sectorElement.dataset.state = state;
-				sectorElement.setAttribute('aria-label', `Sector ${sectorNumber}: ${state}`);
+	fetch('get_sectors.php', { cache: 'no-store' })
+		.then((response) => {
+			if (!response.ok) throw new Error(`HTTP ${response.status}`);
+			return response.json();
+		})
+		.then((result) => {
+			if (!result.success || !Array.isArray(result.data)) {
+				throw new Error('Ongeldige sector-response');
 			}
-		});
-	})
-	.catch((error) => console.error('Sectoren konden niet worden geladen:', error));
+
+			result.data.forEach((sector) => {
+				const sectorNumber = Number(sector.sector_number);
+				if (sectorNumber >= 1 && sectorNumber <= 36 && typeof sector.state === 'string') {
+					const state = statusesSynchronized
+						? sectorStates.get(sectorNumber) || sector.state
+						: problematicSectors.has(sectorNumber) ? 'problematic' : sector.state;
+					sectorStates.set(sectorNumber, state);
+					const sectorElement = sectorGrid.querySelector(`[data-sector="${sectorNumber}"]`);
+					sectorElement.dataset.state = state;
+					sectorElement.setAttribute('aria-label', `Sector ${sectorNumber}: ${state}`);
+				}
+			});
+		})
+		.catch((error) => console.error('Sectoren konden niet worden geladen:', error));
+}
 
 fetch('get_claims.php', { cache: 'no-store' })
 	.then((response) => {
@@ -128,10 +132,12 @@ fetch('get_claims.php', { cache: 'no-store' })
 			const claimX = hasLocation ? x : 0;
 			const claimY = hasLocation ? y : 0;
 			const sectorNumber = sectorNumberForCoordinates(claimX, claimY);
+			sectorCounts.set(sectorNumber, (sectorCounts.get(sectorNumber) || 0) + 1);
+
+			if (!claimPins) return;
+
 			const anchor = document.createElement('a');
 			const pin = document.createElement('img');
-
-			sectorCounts.set(sectorNumber, (sectorCounts.get(sectorNumber) || 0) + 1);
 
 			anchor.className = 'claim-pin';
 			anchor.href = `article.php?id=${encodeURIComponent(claim.id)}`;
