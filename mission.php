@@ -23,6 +23,75 @@ $claimMissionMessage = null;
 $urgentMissionSuggestion = null;
 $claimMissionId = 0;
 
+function activateMission(mysqli $db, int $missionId): void
+{
+    mysqli_begin_transaction($db);
+
+    try {
+        $missionCheck = mysqli_prepare($db, 'SELECT id FROM missions WHERE id = ?');
+        $missionCheck->bind_param('i', $missionId);
+        $missionCheck->execute();
+        $missionExists = $missionCheck->get_result()->num_rows === 1;
+        $missionCheck->close();
+
+        if (!$missionExists) {
+            throw new RuntimeException('De missie kon niet worden gevonden.');
+        }
+
+        // set current active mission to queued
+        mysqli_query($db, "UPDATE missions SET mission_state = 'queued' WHERE mission_state = 'active'");
+
+        // set specific mission to active
+        $activateStatement = mysqli_prepare(
+            $db,
+            "UPDATE missions SET mission_state = 'active' WHERE id = ?"
+        );
+        $activateStatement->bind_param('i', $missionId);
+        $activateStatement->execute();
+        $activateStatement->close();
+
+        // Update logboek statuses
+        $pendingStatement = mysqli_prepare(
+            $db,
+            "UPDATE logboek SET status = 'pending' WHERE status = 'active' AND mission_id <> ?"
+        );
+        $pendingStatement->bind_param('i', $missionId);
+        $pendingStatement->execute();
+        $pendingStatement->close();
+
+        $activeStatement = mysqli_prepare(
+            $db,
+            "UPDATE logboek SET status = 'active' WHERE mission_id = ? AND status <> 'done'"
+        );
+        $activeStatement->bind_param('i', $missionId);
+        $activeStatement->execute();
+        $activeStatement->close();
+
+        mysqli_commit($db);
+    } catch (Throwable $exception) {
+        mysqli_rollback($db);
+        throw $exception;
+    }
+}
+
+if (isset($_POST['action']) && $_POST['action'] === 'activate_mission') {
+    $missionId = filter_var($_POST['mission_id'] ?? null, FILTER_VALIDATE_INT, [
+        'options' => ['min_range' => 1]
+    ]);
+
+    if (!$missionId) {
+        $errors[] = 'De missie kon niet worden gevonden.';
+    } else {
+        try {
+            activateMission($db, $missionId);
+            header('Location: mission.php');
+            exit();
+        } catch (Throwable $exception) {
+            $errors[] = $exception->getMessage();
+        }
+    }
+}
+
 function missionSuggestionFromClaim(array $claim): array
 {
     $claimText = strtolower(trim(implode(' ', [
@@ -157,6 +226,7 @@ if (isset($_POST['action']) && $_POST['action'] === 'prepare_mission') {
             $_POST['start_time'] = $currentTime;
             $_POST['end_time'] = $currentTime + 120; // default to 2 hours later
             $_POST['claim_id'] = $claimId;
+            $_POST['priority'] = $suggestion['priority'] === 'hoog' ? 'high' : 'normal';
             $claimMissionId = $claimId;
             $urgentMissionSuggestion = $suggestion['priority'] === 'hoog' ? $suggestion : null;
             $claimMissionMessage = sprintf(
@@ -193,6 +263,8 @@ if (isset($_POST['submit'])) {
     $claimMissionId = filter_var($_POST['claim_id'] ?? null, FILTER_VALIDATE_INT, [
         'options' => ['min_range' => 1]
     ]) ?: 0;
+
+    $priority = ($_POST['priority'] ?? '') === 'high' ? 'high' : 'normal';
 
     if ($claimMissionId > 0) {
         $claimCheck = mysqli_prepare($db, "SELECT id FROM claims WHERE id = ? AND `status` = 'true'");
@@ -282,7 +354,7 @@ if (isset($_POST['submit'])) {
         if ($editMissionId) {
 
             $query = "UPDATE missions
-                      SET area = ?, purpose = ?, interventions = ?, `start-time` = ?, `end-time` = ?, state = ?
+                      SET area = ?, purpose = ?, interventions = ?, `start-time` = ?, `end-time` = ?, purpose_state = ?
                       WHERE id = ?";
 
             $result = mysqli_prepare($db, $query);
@@ -318,22 +390,23 @@ if (isset($_POST['submit'])) {
             $deleteLogResult->close();
 
         } else {
-
             // Nieuwe missie toevoegen
+
             $query = "INSERT INTO missions
-                      (area, purpose, interventions, `start-time`, `end-time`, state)
-                      VALUES (?, ?, ?, ?, ?, ?)";
+                      (area, purpose, interventions, `start-time`, `end-time`, purpose_state, mission_state, priority)
+                      VALUES (?, ?, ?, ?, ?, ?, 'queued', ?)";
 
             $result = mysqli_prepare($db, $query);
 
             $result->bind_param(
-                'ssssss',
+                'sssssss',
                 $sector,
                 $goals,
                 $interventions,
                 $startTime,
                 $endTime,
-                $states
+                $states,
+                $priority
             );
 
             $result->execute();
@@ -351,7 +424,7 @@ if (isset($_POST['submit'])) {
                      (mission_id, activity, location, status)
                      VALUES (?, ?, ?, ?)";
 
-            $logStatus = 'active';
+            $logStatus = 'pending';
 
 
             // Elk missiedoel apart in het logboek
@@ -407,6 +480,14 @@ if (isset($_POST['submit'])) {
             } else {
                 mysqli_rollback($db);
                 $errors[] = 'De melding kon niet worden verwerkt en is behouden.';
+            }
+        }
+
+        if (empty($errors) && !$editMissionId && $priority === 'high') {
+            try {
+                activateMission($db, $missionId);
+            } catch (Throwable $exception) {
+                $errors[] = 'De high-priority missie kon niet worden geactiveerd.';
             }
         }
 
@@ -548,6 +629,8 @@ $formEndTime = (int) ($_POST['end_time'] ?? 1080);
 
 $formEditId = (int) ($_POST['edit_id'] ?? 0);
 
+$formPriority = ($_POST['priority'] ?? '') === 'high' ? 'high' : 'normal';
+
 
 require_once('./partials/currentmission.php');
 
@@ -655,8 +738,8 @@ $notification = mysqli_fetch_assoc($notification);
             <?php if ($nextMission): ?>
                 <section class="card mission">
                     <div class="current-mission buttons">
-                        <a href="?action=edit&id=<?= $nextMission['id'] ?>" class="queue-button">Aanpassen</a>
-                        <a href="?action=delete&id=<?= $nextMission['id'] ?>" class="queue-button">Verwijder</a>
+                        <a href="?action=edit&id=<?= $nextMission['id'] ?>" class="queue-button edit">Aanpassen</a>
+                        <a href="?action=delete&id=<?= $nextMission['id'] ?>" class="queue-button delete">Verwijderen</a>
                     </div>
                     <h4>HUIDIGE MISSIE</h4>
                     <h2><?= htmlspecialchars($nextMission['area'], ENT_QUOTES, 'UTF-8') ?></h2>
@@ -723,9 +806,13 @@ $notification = mysqli_fetch_assoc($notification);
                                     <?php endforeach; ?>
                                 </ul>
                                 <div class="buttons">
-                                    <a href="#" class="queue-button">Activeer nu</a>
-                                    <a href="?action=edit&id=<?= $queuedMission['id'] ?>" class="queue-button">Aanpassen</a>
-                                    <a href="?action=delete&id=<?= $queuedMission['id'] ?>" class="queue-button">Verwijder</a>
+                                    <form method="POST" class="queue-activation-form">
+                                        <input type="hidden" name="action" value="activate_mission">
+                                        <input type="hidden" name="mission_id" value="<?= (int) $queuedMission['id'] ?>">
+                                        <button type="submit" class="queue-button activate">Activeren</button>
+                                    </form>
+                                    <a href="?action=edit&id=<?= $queuedMission['id'] ?>" class="queue-button edit">Aanpassen</a>
+                                    <a href="?action=delete&id=<?= $queuedMission['id'] ?>" class="queue-button delete">Verwijderen</a>
                                 </div>
                             </article>
                         <?php endforeach; ?>
@@ -744,6 +831,7 @@ $notification = mysqli_fetch_assoc($notification);
 
                 <input type="hidden" name="edit_id" value="<?= $formEditId ?>">
                 <input type="hidden" name="claim_id" value="<?= $claimMissionId ?>">
+                <input type="hidden" name="priority" value="<?= htmlspecialchars($formPriority, ENT_QUOTES, 'UTF-8') ?>">
 
                 <?php if ($claimMissionMessage): ?>
                     <div class="form-message" role="status">

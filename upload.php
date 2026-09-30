@@ -1,5 +1,95 @@
-<?php
+<!-- <?php
+require_once "database.php";
 
+if ($_SERVER["REQUEST_METHOD"] !== "POST") {
+    exit("Ongeldige request.");
+}
+
+$author = $_POST["author_email"];
+$title = $_POST["title"];
+$description = $_POST["description"];
+$sector = $_POST["sector"];
+// $evidence = $_POST["evidence"];
+
+$adminEmails = ['admin@firepatch.nl'];
+$claimStatus = in_array($author, $adminEmails, true) ? 'true' : 'pending';
+
+$imagePath = null;
+
+if (isset($_FILES["evidence"]) && $_FILES["evidence"]["error"] !== UPLOAD_ERR_NO_FILE) {
+    if ($_FILES["evidence"]["error"] !== UPLOAD_ERR_OK) {
+        die("De foto kon niet worden geüpload.");
+    }
+
+    $allowedTypes = [
+        "image/jpeg" => "jpg",
+        "image/png" => "png",
+        "image/webp" => "webp",
+    ];
+
+    $finfo = @getimagesize($_FILES["evidence"]["tmp_name"]);
+    if ($finfo === false || !isset($allowedTypes[$finfo["mime"]])) {
+        die("Kies een geldige JPG, PNG of WebP foto.");
+    }
+
+    $uploadDir = __DIR__ . "/uploads/";
+    if (!is_dir($uploadDir) && !mkdir($uploadDir, 0777, true)) {
+        die("Uploadmap kon niet worden aangemaakt.");
+    }
+
+    $extension = $allowedTypes[$finfo["mime"]];
+    $fileName = uniqid("claim_", true) . "." . $extension;
+    $targetPath = $uploadDir . $fileName;
+
+    if (!move_uploaded_file($_FILES["evidence"]["tmp_name"], $targetPath)) {
+        die("De foto kon niet worden opgeslagen.");
+    }
+
+    $imagePath = "uploads/" . $fileName;
+}
+
+$x_value = null;
+$y_value = null;
+
+if ($sector !== false) {
+    $x_start = ($sector - 1) % 6;
+    $y_start = floor(($sector - 1) / 6);
+    $x_offset = random_int(0, 999999) / 1000000;
+    $y_offset = random_int(0, 999999) / 1000000;
+
+    $x_value = ($x_start + $x_offset) / 6;
+    $y_value = ($y_start + $y_offset) / 6;
+}
+
+try {
+    $sql = "INSERT INTO `claims`
+        (`title`, `description`, `image_path`, `source`, `status`, `author_email`, `timestamp`, `x_value`, `y_value`)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+    $stmt = $pdo->prepare($sql);
+
+    $stmt->execute([
+        $title,
+        $description !== '' ? $description : null,
+        $imagePath,
+        $sector,
+        $claimStatus,
+        $author,
+        date('Y-m-d H:i:s'),
+        $x_value,
+        $y_value
+    ]);
+
+    echo "New record created successfully";
+    header("Location: verifynet.php");
+    exit;
+
+} catch (PDOException $e) {
+    echo $sql . "<br>" . $e->getMessage();
+}
+
+exit;
+?>
 declare(strict_types=1);
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -135,4 +225,4 @@ function failUpload(string $message): never
         . '<h1>Claim niet opgeslagen</h1><p>' . $safeMessage . '</p>'
         . '<a class="btn primary" href="save_claim.php">Terug</a></section></main></body></html>';
     exit;
-}
+} -->

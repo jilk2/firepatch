@@ -42,7 +42,7 @@ mysqli_close($db);
                             <tr>
                                 <th>Tijd</th>
                                 <th>Activiteit / Claim</th>
-                                <th>Bron</th>
+                                <th>Sector</th>
                                 <th>Afbeelding</th>
                             </tr>
                         </thead>

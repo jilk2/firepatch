@@ -42,7 +42,7 @@
                     <div class="map">
                         <img src="./images/map.png" alt="Kaart voor simulatie" id="map">
                         <div class="sector-grid" id="sector-grid" aria-label="Kaartsectoren"></div>
-                        <div class="claim-pins" id="claim-pins" aria-label="Claims op de kaart"></div>
+                        <div class="claim-pins" id="claim-pins" aria-label="Openstaande claims"></div>
 
                         <div class="overlay-box" id="sector-overlay" aria-live="polite">
                             <p>Beweeg over een sector</p>
