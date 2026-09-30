@@ -21,7 +21,7 @@ $sectorNumber = filter_var($data['sector_number'] ?? null, FILTER_VALIDATE_INT, 
 ]);
 $state = $data['state'] ?? null;
 
-if ($sectorNumber === false || !in_array($state, ['Healthy', 'problematic'], true)) {
+if ($sectorNumber === false || !in_array($state, ['Healthy', 'Problematic'], true)) {
     http_response_code(400);
     echo json_encode([
         'success' => false,
