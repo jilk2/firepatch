@@ -13,39 +13,28 @@ $adminEmails = ['admin@firepatch.nl'];
 
 $title = trim((string) ($_POST['title'] ?? ''));
 $description = trim((string) ($_POST['description'] ?? ''));
-$source = trim((string) ($_POST['source'] ?? ''));
 $sector = filter_var($_POST['sector'] ?? null, FILTER_VALIDATE_INT, [
     'options' => ['min_range' => 1, 'max_range' => 36],
 ]);
-$authorEmail = trim((string) ($_POST['author_email'] ?? ''));
+$authorEmail = trim((string) ($_POST['author_email'] ?? 'Gast')); 
 
 if ($title === '' || strlen($title) > 255) {
     failUpload('Vul een geldige claimtitel in.');
 }
 
-if (!filter_var($authorEmail, FILTER_VALIDATE_EMAIL)) {
-    failUpload('Log opnieuw in voordat je een claim plaatst.');
-}
-
-if ($source === '' && $sector !== false) {
-    $source = 'Sector ' . $sector;
-} elseif ($sector !== false && !str_contains($source, 'Sector ')) {
-    $source .= ' (Sector ' . $sector . ')';
-}
-
-if (strlen($source) > 2048) {
-    failUpload('De bron of locatie is te lang.');
-}
-
-
+// Berekent de grid coördinaten
 $x_value = null;
 $y_value = null;
 
 if ($sector !== false) {
-    $x_value = ($sector - 1) % 6; 
-    $y_value = floor(($sector - 1) / 6); 
-}
+    $x_start = ($sector - 1) % 6;
+    $y_start = floor(($sector - 1) / 6);
+    $x_offset = random_int(0, 999999) / 1000000;
+    $y_offset = random_int(0, 999999) / 1000000;
 
+    $x_value = ($x_start + $x_offset) / 6;
+    $y_value = ($y_start + $y_offset) / 6;
+}
 
 $claimStatus = in_array($authorEmail, $adminEmails, true) ? 'true' : 'pending';
 
@@ -53,51 +42,53 @@ $relativeImagePath = null;
 $absoluteImagePath = null;
 $upload = $_FILES['evidence'] ?? null;
 
-if (is_array($upload) && ($upload['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_NO_FILE) {
-    if (($upload['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK) {
-        failUpload('De afbeelding kon niet worden ontvangen.');
-    }
+if (!is_array($upload) || ($upload['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_NO_FILE) {
+    failUpload('Een bewijsafbeelding is verplicht voor het indienen van een claim.');
+}
 
-    if (($upload['size'] ?? 0) < 1 || $upload['size'] > 5 * 1024 * 1024) {
-        failUpload('De afbeelding moet kleiner zijn dan 5 MB.');
-    }
+if (($upload['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK) {
+    failUpload('De afbeelding kon niet worden ontvangen.');
+}
 
-    if (!class_exists('finfo')) {
-        failUpload('De PHP-extensie fileinfo is niet ingeschakeld.');
-    }
+if (($upload['size'] ?? 0) < 1 || $upload['size'] > 5 * 1024 * 1024) {
+    failUpload('De afbeelding moet kleiner zijn dan 5 MB.');
+}
 
-    $mimeType = (new finfo(FILEINFO_MIME_TYPE))->file((string) $upload['tmp_name']);
-    $allowedTypes = [
-        'image/jpeg' => 'jpg',
-        'image/png' => 'png',
-        'image/webp' => 'webp',
-    ];
+if (!class_exists('finfo')) {
+    failUpload('De PHP-extensie fileinfo is niet ingeschakeld.');
+}
 
-    if (!isset($allowedTypes[$mimeType])) {
-        failUpload('Alleen JPG-, PNG- en WebP-afbeeldingen zijn toegestaan.');
-    }
+$mimeType = (new finfo(FILEINFO_MIME_TYPE))->file((string) $upload['tmp_name']);
+$allowedTypes = [
+    'image/jpeg' => 'jpg',
+    'image/png' => 'png',
+    'image/webp' => 'webp',
+];
 
-    $uploadDirectory = __DIR__ . '/uploads';
-    if (!is_dir($uploadDirectory) && !mkdir($uploadDirectory, 0750, true) && !is_dir($uploadDirectory)) {
-        failUpload('De uploadmap kon niet worden aangemaakt.');
-    }
+if (!isset($allowedTypes[$mimeType])) {
+    failUpload('Alleen JPG-, PNG- en WebP-afbeeldingen zijn toegestaan.');
+}
 
-    if (!is_writable($uploadDirectory)) {
-        @chmod($uploadDirectory, 0775);
-        clearstatcache(true, $uploadDirectory);
-    }
+$uploadDirectory = __DIR__ . '/uploads';
+if (!is_dir($uploadDirectory) && !mkdir($uploadDirectory, 0750, true) && !is_dir($uploadDirectory)) {
+    failUpload('De uploadmap kon niet worden aangemaakt.');
+}
 
-    if (!is_writable($uploadDirectory)) {
-        failUpload('De map uploads is niet schrijfbaar door de lokale PHP-webserver. Controleer de maprechten van uploads.');
-    }
+if (!is_writable($uploadDirectory)) {
+    @chmod($uploadDirectory, 0775);
+    clearstatcache(true, $uploadDirectory);
+}
 
-    $filename = bin2hex(random_bytes(16)) . '.' . $allowedTypes[$mimeType];
-    $relativeImagePath = 'uploads/' . $filename;
-    $absoluteImagePath = $uploadDirectory . '/' . $filename;
+if (!is_writable($uploadDirectory)) {
+    failUpload('De map uploads is niet schrijfbaar door de lokale PHP-webserver. Controleer de maprechten van uploads.');
+}
 
-    if (!move_uploaded_file((string) $upload['tmp_name'], $absoluteImagePath)) {
-        failUpload('De afbeelding kon niet worden opgeslagen.');
-    }
+$filename = bin2hex(random_bytes(16)) . '.' . $allowedTypes[$mimeType];
+$relativeImagePath = 'uploads/' . $filename;
+$absoluteImagePath = $uploadDirectory . '/' . $filename;
+
+if (!move_uploaded_file((string) $upload['tmp_name'], $absoluteImagePath)) {
+    failUpload('De afbeelding kon niet worden opgeslagen.');
 }
 
 try {
@@ -110,9 +101,8 @@ try {
     $statement->execute([
         $title,
         $description !== '' ? $description : null,
-        $source !== '' ? $source : null,
         $claimStatus, 
-        $authorEmail,
+        $authorEmail, 
         $relativeImagePath,
         $x_value,
         $y_value

@@ -15,28 +15,47 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $json = file_get_contents("php://input");
     $data = json_decode($json);
 
-    if(isset($data->email) && isset($data->password)) {
-        $checkStmt = $pdo->prepare("SELECT * FROM accounts WHERE Email = ?");
+    if (isset($data->email) && isset($data->password)) {
+        
+        
+        $checkStmt = $pdo->prepare("SELECT COUNT(*) FROM accounts WHERE Email = ?");
         $checkStmt->execute([$data->email]);
         
-        if($checkStmt->rowCount() > 0) {
-            http_response_code(409);
-            echo json_encode(["success" => false, "message" => "Dit e-mailadres is al geregistreerd in het systeem."]);
-        } else {
-            $hashedPassword = password_hash($data->password, PASSWORD_DEFAULT);
-            $insertStmt = $pdo->prepare("INSERT INTO accounts (Email, Password) VALUES (?, ?)");
+        
+        $count = $checkStmt->fetchColumn();
+        
+        if ($count > 0) {
             
-            if($insertStmt->execute([$data->email, $hashedPassword])) {
+            http_response_code(409); // 409 = Conflict
+            echo json_encode(["success" => false, "message" => "Dit e-mailadres is al in gebruik. Kies een ander e-mailadres of log in."]);
+            exit(); // Belangrijk: stop de uitvoering hier!
+        }
+
+        
+        $hashedPassword = password_hash($data->password, PASSWORD_DEFAULT);
+        
+        
+        $insertStmt = $pdo->prepare("INSERT INTO accounts (Email, Password) VALUES (?, ?)");
+        
+        try {
+            if ($insertStmt->execute([$data->email, $hashedPassword])) {
                 echo json_encode(["success" => true, "message" => "Account succesvol aangemaakt."]);
             } else {
                 http_response_code(500);
-                echo json_encode(["success" => false, "message" => "Systeemfout: Kon account niet opslaan."]);
+                echo json_encode(["success" => false, "message" => "Systeemfout: Kon account niet opslaan in de database."]);
             }
+        } catch (PDOException $e) {
+            
+            http_response_code(500);
+            echo json_encode(["success" => false, "message" => "Fout bij wegschrijven naar de database."]);
         }
+        
     } else {
         http_response_code(400);
         echo json_encode(["success" => false, "message" => "Fout: E-mail en wachtwoord zijn verplicht."]);
     }
+    
+    
     exit();
 }
 ?>
