@@ -38,8 +38,6 @@ async function updateClaimAlert() {
 }
 
 
-setInterval(() => {
-    console.log("het werkt")
-    updateClaimAlert()
-}, 1000);
+updateClaimAlert();
+setInterval(updateClaimAlert, 1000);
 

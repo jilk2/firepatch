@@ -30,7 +30,3 @@ try {
     ]);
 }
 
-echo json_encode([
-    'success' => true,
-    'data' => $claim,
-], JSON_UNESCAPED_UNICODE);
