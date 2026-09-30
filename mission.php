@@ -1,3 +1,13 @@
+<!-- 
+|||||      |||
+||   |    |   |
+||   |    |   |
+||||||   |||||||        ckend
+||   |   |     |
+||   |  |       |
+|||||   |       |
+-->
+
 <?php
 
 require_once('./DB/DBConnect.php');
@@ -9,6 +19,111 @@ $today = date('Y-m-d');
 
 $errors = [];
 $editMissionId = null;
+$claimMissionMessage = null;
+$urgentMissionSuggestion = null;
+$claimMissionId = 0;
+
+function missionSuggestionFromClaim(array $claim): array
+{
+    $claimText = strtolower(trim(implode(' ', [
+        (string) ($claim['title'] ?? ''),
+        (string) ($claim['description'] ?? ''),
+    ])));
+
+    $suggestion = [
+        'goal' => 'Inspectie uitvoeren',
+        'intervention' => '',
+        'priority' => 'normaal',
+    ];
+
+    if (str_contains($claimText, 'brand') || str_contains($claimText, 'vuur')) {
+        $suggestion = [
+            'goal' => 'Brand blussen',
+            'intervention' => 'Brand blussen',
+            'priority' => 'hoog',
+        ];
+    } elseif (str_contains($claimText, 'afval') || str_contains($claimText, 'vuilnis')) {
+        $suggestion = [
+            'goal' => 'Afval opruimen',
+            'intervention' => 'Afval opruimen',
+            'priority' => 'normaal',
+        ];
+    }
+
+    $source = (string) ($claim['source'] ?? '');
+    $sector = '';
+    if (preg_match('/(?:sector|section)\s*0*(\d{1,2})/i', $source, $matches)) {
+        $sectorNumber = (int) $matches[1];
+        if ($sectorNumber >= 1 && $sectorNumber <= 36) {
+            $sector = 'Section ' . $sectorNumber;
+        }
+    }
+    //    /.../
+    //    Markeren het begin en einde van het patroon.
+
+    //    (?:sector|section)
+    //    Zoek het woord sector óf section.
+    //    ?: betekent dat deze groep niet apart wordt opgeslagen.
+
+    //    \s*
+    //    Accepteer nul of meer spaties. Dus zowel Sector8 als Sector 8.
+
+    //    0*
+    //    Accepteer voorloopnullen. Dus 8 en 008.
+
+    //    (\d{1,2})
+    //    Zoek één of twee cijfers. De haakjes slaan het gevonden sectornummer op in $matches[1].
+
+    //    /i
+    //    Hoofdletterongevoelig. Sector, SECTOR en sector werken allemaal.
+
+    //    preg_match() geeft 1 terug wanneer er een match is, 0 wanneer er geen match is. Daarom kan het direct in een if worden gebruikt.
+
+    $suggestion['sector'] = $sector;
+    return $suggestion;
+}
+
+if (isset($_POST['action']) && $_POST['action'] === 'prepare_mission') {
+    $claimId = filter_var($_POST['claim_id'] ?? null, FILTER_VALIDATE_INT, [
+        'options' => ['min_range' => 1]
+    ]);
+
+    if (!$claimId) {
+        $errors[] = 'De melding kon niet worden gevonden.';
+    } else {    // get claim from database and check if it is confirmed
+        $claimStatement = mysqli_prepare($db, "SELECT * FROM claims WHERE id = ? AND `status` = 'true'");
+        $claimStatement->bind_param('i', $claimId);
+        $claimStatement->execute();
+        $claim = $claimStatement->get_result()->fetch_assoc();
+        $claimStatement->close();
+
+        if (!$claim) {
+            $errors[] = 'Alleen bevestigde meldingen kunnen een missievoorstel maken.';
+        } else {    // prepare mission suggestion from claim
+            $suggestion = missionSuggestionFromClaim($claim);
+            $_POST['sector'] = $suggestion['sector'];
+            $_POST['goals'] = [$suggestion['goal']];
+            $_POST['interventions'] = $suggestion['intervention'] === ''
+                ? []
+                : [$suggestion['intervention']];
+            $currentTime = date('H') * 60 + date('i'); // current time in minutes
+            $_POST['start_time'] = $currentTime;
+            $_POST['end_time'] = $currentTime + 120; // default to 2 hours later
+            $_POST['claim_id'] = $claimId;
+            $claimMissionId = $claimId;
+            $urgentMissionSuggestion = $suggestion['priority'] === 'hoog' ? $suggestion : null;
+            $claimMissionMessage = sprintf(
+                'Missievoorstel voor "%s" geladen. Prioriteit: %s.',
+                (string) ($claim['title'] ?? 'de melding'),
+                $suggestion['priority']
+            );
+
+            if ($suggestion['sector'] === '') {
+                $errors[] = 'De sector kon niet uit de melding worden gehaald. Kies deze handmatig.';
+            }
+        }
+    }
+}
 
 
 // Missie toevoegen of aanpassen
@@ -27,6 +142,22 @@ if (isset($_POST['submit'])) {
     $interventionsArray = is_array($_POST['interventions'] ?? null)
         ? $_POST['interventions']
         : [];
+
+    $claimMissionId = filter_var($_POST['claim_id'] ?? null, FILTER_VALIDATE_INT, [
+        'options' => ['min_range' => 1]
+    ]) ?: 0;
+
+    if ($claimMissionId > 0) {
+        $claimCheck = mysqli_prepare($db, "SELECT id FROM claims WHERE id = ? AND `status` = 'true'");
+        $claimCheck->bind_param('i', $claimMissionId);
+        $claimCheck->execute();
+        $claimExists = $claimCheck->get_result()->num_rows === 1;
+        $claimCheck->close();
+
+        if (!$claimExists) {
+            $errors[] = 'De bevestigde melding bestaat niet meer.';
+        }
+    }
 
 
     // Validatie
@@ -70,14 +201,12 @@ if (isset($_POST['submit'])) {
         }
     }
 
-
     // Status van de doelen
     $states = [];
 
     foreach ($goalsArray as $goal) {
         $states[] = 'Gepland';
     }
-
 
     $goals = json_encode(
         $goalsArray,
@@ -96,6 +225,11 @@ if (isset($_POST['submit'])) {
 
 
     if (empty($errors)) {
+
+        $claimTransactionStarted = $claimMissionId > 0 && !$editMissionId;
+        if ($claimTransactionStarted) {
+            mysqli_begin_transaction($db);
+        }
 
         // Bestaande missie aanpassen
         if ($editMissionId) {
@@ -163,67 +297,81 @@ if (isset($_POST['submit'])) {
         }
 
 
-        // Logboek
-        $logQuery = "INSERT INTO logboek
+        // Logboek entry for new mission
+        // if (!$editMissionId) {
+            // Logboek
+            $logQuery = "INSERT INTO logboek
                      (mission_id, activity, location, status)
                      VALUES (?, ?, ?, ?)";
 
-        $logStatus = 'active';
+            $logStatus = 'active';
 
 
-        // Elk missiedoel apart in het logboek
-        foreach ($goalsArray as $goal) {
+            // Elk missiedoel apart in het logboek
+            foreach ($goalsArray as $goal) {
 
-            $logActivity = $goal;
+                $logActivity = $goal;
 
-            $logResult = mysqli_prepare($db, $logQuery);
+                $logResult = mysqli_prepare($db, $logQuery);
 
-            $logResult->bind_param(
-                'isss',
-                $missionId,
-                $logActivity,
-                $sector,
-                $logStatus
-            );
+                $logResult->bind_param(
+                    'isss',
+                    $missionId,
+                    $logActivity,
+                    $sector,
+                    $logStatus
+                );
 
-            $logResult->execute();
-            $logResult->close();
+                $logResult->execute();
+                $logResult->close();
+            }
+
+
+            // Elke interventie apart in het logboek
+            foreach ($interventionsArray as $intervention) {
+
+                $logActivity = $intervention;
+
+                $logResult = mysqli_prepare($db, $logQuery);
+
+                $logResult->bind_param(
+                    'isss',
+                    $missionId,
+                    $logActivity,
+                    $sector,
+                    $logStatus
+                );
+
+                $logResult->execute();
+                $logResult->close();
+            }
+        // }
+
+        if ($claimTransactionStarted) {
+            $deleteClaimQuery = "DELETE FROM claims WHERE id = ? AND `status` = 'true'";
+            $deleteClaimResult = mysqli_prepare($db, $deleteClaimQuery);
+            $deleteClaimResult->bind_param('i', $claimMissionId);
+            $deleteClaimResult->execute();
+            $claimDeleted = $deleteClaimResult->affected_rows === 1;
+            $deleteClaimResult->close();
+
+            if ($claimDeleted) {
+                mysqli_commit($db);
+            } else {
+                mysqli_rollback($db);
+                $errors[] = 'De melding kon niet worden verwerkt en is behouden.';
+            }
         }
 
-
-        // Elke interventie apart in het logboek
-        foreach ($interventionsArray as $intervention) {
-
-            $logActivity = $intervention;
-
-            $logResult = mysqli_prepare($db, $logQuery);
-
-            $logResult->bind_param(
-                'isss',
-                $missionId,
-                $logActivity,
-                $sector,
-                $logStatus
-            );
-
-            $logResult->execute();
-            $logResult->close();
+        if (empty($errors)) {
+            header('Location: mission.php');
+            exit();
         }
-
-
-        header('Location: mission.php');
-        exit();
     }
 }
 
-
-// Missie verwijderen
-if (
-    isset($_GET['action']) &&
-    $_GET['action'] === 'delete' &&
-    isset($_GET['id']) &&
-    is_numeric($_GET['id'])
-) {
+// DELETE LOGIC
+if (isset($_GET['action']) && $_GET['action'] === 'delete' && isset($_GET['id']) && is_numeric($_GET['id'])) {
 
     $missionId = (int) $_GET['id'];
 
@@ -356,7 +504,31 @@ $formEditId = (int) ($_POST['edit_id'] ?? 0);
 
 require_once('./partials/currentmission.php');
 
+// Fetch the latest true notification from the claims table
+$notificationQuery = "SELECT * FROM claims WHERE `status` = 'true' ORDER BY `timestamp` DESC LIMIT 1";
+$notification = mysqli_query($db, $notificationQuery);
+$notification = mysqli_fetch_assoc($notification);
+
 ?>
+
+
+
+
+
+
+
+
+
+<!-- 
+            frontend
+-->
+
+
+
+
+
+
+
 
 <!doctype html>
 <html lang="nl">
@@ -375,22 +547,62 @@ require_once('./partials/currentmission.php');
     <div class="layout mission-layout">
         <?php include("./partials/sidebar.php"); ?>
         <main class="page">
-            <section class="card notification">
-                <div class="content">
-                    <div>
-                        <h4>GEPLANDE INTERVENTIE</h4>
-                        <h3>Brand gedetecteerd - VerifyNET</h3>
-                        <p>Brand gedetecteerd door 4 mensen in Sector 04</p>
+            <?php if ($notification): ?>
+
+                <section class="card notification">
+                    <div class="content">
+                        <div>
+                            <h4>GEPLANDE INTERVENTIE</h4>
+                            <h3><?= htmlspecialchars($notification['title'] ?? 'Geen titel', ENT_QUOTES, 'UTF-8') ?> -
+                                VerifyNET</h3>
+                            <p><?= htmlspecialchars($notification['description'] ?? 'Geen beschrijving', ENT_QUOTES, 'UTF-8') ?>
+                            </p>
+                        </div>
+                        <div class="alert-actions">
+                            <a href="article.php?id=<?= htmlspecialchars($notification['id'] ?? '', ENT_QUOTES, 'UTF-8') ?>"
+                                class="btn ghost">check verifyNET</a>
+                            <form method="POST">
+                                <input type="hidden" name="action" value="prepare_mission">
+                                <input type="hidden" name="claim_id" value="<?= (int) $notification['id'] ?>">
+                                <button type="submit" class="btn primary">Stuur drone</button>
+                            </form>
+                        </div>
                     </div>
-                    <div class="alert-actions">
-                        <a href="verifynet.php" class="btn ghost">check verifyNET</a>
-                        <a href="#" class="btn primary">Stuur drone</a>
+                    <div class="image-container">
+                        <img src="<?= htmlspecialchars($notification['image_path'] ?? 'images/no-image.jpg', ENT_QUOTES, 'UTF-8') ?>"
+                            alt="verifynet img">
                     </div>
-                </div>
-                <div class="image-container">
-                    <img src="images/brandje.jpg" alt="verifynet img">
-                </div>
-            </section>
+                </section>
+                <?php if ($urgentMissionSuggestion): ?>
+                    <dialog class="urgent-mission-dialog" id="urgentMissionDialog">
+                        <form method="dialog">
+                            <h2>Urgente missie starten?</h2>
+                            <p>Er is een melding met hoge prioriteit gevonden.</p>
+                            <dl>
+                                <div>
+                                    <dt>Doel</dt>
+                                    <dd><?= htmlspecialchars($urgentMissionSuggestion['goal'], ENT_QUOTES, 'UTF-8') ?></dd>
+                                </div>
+                                <div>
+                                    <dt>Sector</dt>
+                                    <dd><?= htmlspecialchars($urgentMissionSuggestion['sector'] ?: 'Handmatig kiezen', ENT_QUOTES, 'UTF-8') ?>
+                                    </dd>
+                                </div>
+                                <div>
+                                    <dt>Duur</dt>
+                                    <dd>2 uur</dd>
+                                </div>
+                            </dl>
+                            <div class="urgent-mission-actions">
+                                <button type="submit" value="adjust" class="btn ghost">Aanpassen</button>
+                                <button type="submit" form="mission-form" name="submit" class="btn primary">Missie
+                                    starten</button>
+                            </div>
+                        </form>
+                    </dialog>
+                <?php endif; ?>
+            <?php endif; ?>
+
 
             <!-- CURRENT MISSION -->
             <?php if ($nextMission): ?>
@@ -478,12 +690,19 @@ require_once('./partials/currentmission.php');
         </main>
 
         <aside class="rightbar mission-rightbar">
-            <form class="mission-form" method="POST">
+            <form class="mission-form" id="mission-form" method="POST">
                 <div class="form-header">
                     <h3><?= $formEditId ? 'MISSIE AANPASSEN' : 'NIEUWE MISSIE INITIALISEREN' ?></h3>
                 </div>
 
                 <input type="hidden" name="edit_id" value="<?= $formEditId ?>">
+                <input type="hidden" name="claim_id" value="<?= $claimMissionId ?>">
+
+                <?php if ($claimMissionMessage): ?>
+                    <div class="form-message" role="status">
+                        <?= htmlspecialchars($claimMissionMessage, ENT_QUOTES, 'UTF-8') ?>
+                    </div>
+                <?php endif; ?>
 
                 <?php if ($errors): ?>
                     <div class="form-errors" role="alert">
@@ -500,7 +719,8 @@ require_once('./partials/currentmission.php');
                         <?php for ($i = 1; $i <= 36; $i++): ?>
                             <?php $sectorOption = "Section $i"; ?>
                             <option value="<?= $sectorOption ?>" <?= $formSector === $sectorOption ? 'selected' : '' ?>>
-                                <?= $sectorOption ?></option>
+                                <?= $sectorOption ?>
+                            </option>
                         <?php endfor; ?>
                     </select>
                 </div>
@@ -519,6 +739,11 @@ require_once('./partials/currentmission.php');
                                     <?= in_array('Lichtlevels controleren', $formGoals, true) ? 'checked' : '' ?>>
                                 Lichtlevels
                                 controleren </label></li>
+                        <li><label><input type="checkbox" name="goals[]" value="Inspectie uitvoeren"
+                                    <?= in_array('Inspectie uitvoeren', $formGoals, true) ? 'checked' : '' ?>> Inspectie
+                                uitvoeren</label></li>
+                        <li><label><input type="checkbox" name="goals[]" value="Brand blussen" <?= in_array('Brand blussen', $formGoals, true) ? 'checked' : '' ?>> Brand blussen</label></li>
+                        <li><label><input type="checkbox" name="goals[]" value="Afval opruimen" <?= in_array('Afval opruimen', $formGoals, true) ? 'checked' : '' ?>> Afval opruimen</label></li>
                         <!-- <span>+add new goal</span> -->
                         <!-- <li><label><input type="checkbox" name="goals[]" value="Brand blussen" <?= in_array('Brand blussen', $formGoals, true) ? 'checked' : '' ?>> Brand blussen
                             </label></li> -->
@@ -540,6 +765,12 @@ require_once('./partials/currentmission.php');
                         <li><label><input type="checkbox" name="interventions[]" value="Onkruid verwijderen"
                                     <?= in_array('Onkruid verwijderen', $formInterventions, true) ? 'checked' : '' ?>>
                                 Onkruid verwijderen </label></li>
+                        <li><label><input type="checkbox" name="interventions[]" value="Brand blussen"
+                                    <?= in_array('Brand blussen', $formInterventions, true) ? 'checked' : '' ?>> Brand
+                                blussen</label></li>
+                        <li><label><input type="checkbox" name="interventions[]" value="Afval opruimen"
+                                    <?= in_array('Afval opruimen', $formInterventions, true) ? 'checked' : '' ?>> Afval
+                                opruimen</label></li>
                     </ul>
                 </div>
 

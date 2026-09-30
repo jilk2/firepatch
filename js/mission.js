@@ -43,6 +43,17 @@ function syncTimeRange(changed) {
 
 syncTimeRange(); //zodat hij balk laat zien zonder te tijden veranderd te hebben
 
+const urgentMissionDialog = document.querySelector("#urgentMissionDialog");
+if (urgentMissionDialog) {
+  urgentMissionDialog.showModal();
+}
+
+const missionForm = document.querySelector("#mission-form");
+const notification = document.querySelector(".notification");
+const claimIdInput = missionForm?.querySelector('input[name="claim_id"]');
+
+
+
 // function changeMissionHandler(e) {
 //   e.preventDefault();
   
