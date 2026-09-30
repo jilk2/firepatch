@@ -37,7 +37,7 @@ async function updateClaimAlert() {
     }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    updateClaimAlert();
-    setInterval(updateClaimAlert, 10000);
-});
+
+updateClaimAlert();
+setInterval(updateClaimAlert, 1000);
+

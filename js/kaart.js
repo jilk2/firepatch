@@ -134,8 +134,80 @@ if (sectorGrid) {
     );
 }
 
-setInterval(() => {
-  console.log("interval werkt");
+function renderClaim(claim, claimX, claimY) {
+  const anchor = document.createElement("a");
+  const image = document.createElement("img");
+  const isSectorAlert = Boolean(sectorGrid);
+
+  anchor.className = isSectorAlert ? "claim-pin claim-alert" : "claim-pin";
+  anchor.href = `article.php?id=${encodeURIComponent(claim.id)}`;
+  anchor.setAttribute(
+    "aria-label",
+    isSectorAlert
+      ? `Openstaande claim ${claim.id}`
+      : `Bekijk claim ${claim.id}`,
+  );
+
+  if (isSectorAlert) {
+    const sectorNumber = sectorNumberForCoordinates(claimX, claimY);
+    const column = (sectorNumber - 1) % 6;
+    const row = Math.floor((sectorNumber - 1) / 6);
+
+    anchor.style.left = `${((column + 0.5) / 6) * 100}%`;
+    anchor.style.top = `${((row + 0.5) / 6) * 100}%`;
+    image.src = "./images/fire_alert.png";
+    image.alt = "Openstaande claim";
+  } else {
+    anchor.style.left = `${claimX * 100}%`;
+    anchor.style.top = `${claimY * 100}%`;
+    image.src = "./images/pin.png";
+    image.alt = "";
+    image.setAttribute("aria-hidden", "true");
+  }
+
+  anchor.appendChild(image);
+  claimPins.appendChild(anchor);
+}
+
+function renderClaims(claims) {
+  if (!claimPins) return new Map();
+
+  claimPins.replaceChildren();
+  const sectorCounts = new Map();
+
+  claims.forEach((claim) => {
+    const x = Number(claim.x_value);
+    const y = Number(claim.y_value);
+    const hasLocation =
+      Number.isFinite(x) &&
+      Number.isFinite(y) &&
+      x >= 0 &&
+      x <= 1 &&
+      y >= 0 &&
+      y <= 1;
+    const claimX = hasLocation ? x : 0;
+    const claimY = hasLocation ? y : 0;
+    const sectorNumber = sectorNumberForCoordinates(claimX, claimY);
+
+    sectorCounts.set(
+      sectorNumber,
+      (sectorCounts.get(sectorNumber) || 0) + 1,
+    );
+
+    const status = String(claim.status ?? claim.Status ?? "").toLowerCase();
+    const isResolved = ["true", "false", "resolved"].includes(status);
+
+    if (sectorGrid && !isResolved) {
+      renderClaim(claim, claimX, claimY);
+    } else if (!sectorGrid) {
+      renderClaim(claim, claimX, claimY);
+    }
+  });
+
+  return sectorCounts;
+}
+
+function loadClaims() {
   fetch("get_claims.php", { cache: "no-store" })
     .then((response) => {
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
@@ -146,48 +218,13 @@ setInterval(() => {
         throw new Error("Ongeldige claims-response");
       }
 
-      const sectorCounts = new Map();
-
-      result.data.forEach((claim) => {
-        const x = Number(claim.x_value);
-        const y = Number(claim.y_value);
-        const hasLocation =
-          Number.isFinite(x) &&
-          Number.isFinite(y) &&
-          x >= 0 &&
-          x <= 1 &&
-          y >= 0 &&
-          y <= 1;
-        const claimX = hasLocation ? x : 0;
-        const claimY = hasLocation ? y : 0;
-        const sectorNumber = sectorNumberForCoordinates(claimX, claimY);
-        sectorCounts.set(
-          sectorNumber,
-          (sectorCounts.get(sectorNumber) || 0) + 1,
-        );
-
-        if (!claimPins) return;
-
-        const anchor = document.createElement("a");
-        const pin = document.createElement("img");
-
-        anchor.className = "claim-pin";
-        anchor.href = `article.php?id=${encodeURIComponent(claim.id)}`;
-        anchor.style.left = `${claimX * 100}%`;
-        anchor.style.top = `${claimY * 100}%`;
-        anchor.setAttribute("aria-label", `Bekijk claim ${claim.id}`);
-
-        pin.src = "./images/pin.png";
-        pin.alt = "";
-        pin.setAttribute("aria-hidden", "true");
-
-        anchor.appendChild(pin);
-        claimPins.appendChild(anchor);
-      });
-
+      const sectorCounts = renderClaims(result.data);
       return syncSectorStatuses(sectorCounts);
     })
     .catch((error) =>
       console.error("Claims konden niet op de kaart worden geladen:", error),
     );
-}, 1000);
+}
+
+loadClaims();
+setInterval(loadClaims, 1000);

@@ -4,7 +4,6 @@ $activeQuery = "SELECT * FROM missions WHERE mission_state = 'active' ORDER BY i
 $activeResult = mysqli_query($db, $activeQuery);
 
 $nextMission = mysqli_fetch_assoc($activeResult) ?: null;
-// mysqli_free_result($activeResult);
 
 $queueQuery = "SELECT * FROM missions
                WHERE mission_state = 'queued'
@@ -25,8 +24,6 @@ while ($row = mysqli_fetch_assoc($queueResult)) {
 
     $queuedMissions[] = $row;
 }
-
-// mysqli_free_result($queueResult);
 
 if ($nextMission) {
     $purpose = json_decode((string) ($nextMission['purpose'] ?? '[]'), true);
@@ -90,8 +87,9 @@ if ($nextMission) {
 
             $state[] = 'Gepland';
             $logStatus = 'pending';
-
         }
+
+        //zal ik hier state[] pushen naar de db?
 
 
         // Status ook aanpassen in het logboek
@@ -113,4 +111,23 @@ if ($nextMission) {
         $logResult->execute();
         $logResult->close();
     }
+
+    $purposeState = json_encode(
+        $state,
+        JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR
+    );
+    $stateQuery = "
+    UPDATE missions
+    SET purpose_state = ?
+    WHERE id = ?
+";
+
+    $stateStatement = mysqli_prepare($db, $stateQuery);
+    $stateStatement->bind_param(
+        'si',
+        $purposeState,
+        $nextMission['id']
+    );
+    $stateStatement->execute();
+    $stateStatement->close();
 }

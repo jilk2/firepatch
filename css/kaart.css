@@ -110,6 +110,11 @@
   pointer-events: auto;
 }
 
+.claim-alert {
+  width: 42px;
+  transform: translate(-50%, -50%);
+}
+
 .claim-pin img {
   display: block;
   width: 100%;

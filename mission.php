@@ -28,11 +28,6 @@ function activateMission(mysqli $db, int $missionId): void
     mysqli_begin_transaction($db);
 
     try {
-        // $lockResult = mysqli_query($db, 'SELECT id FROM missions FOR UPDATE');
-        // while (mysqli_fetch_assoc($lockResult)) {
-        // }
-        // mysqli_free_result($lockResult);
-
         $missionCheck = mysqli_prepare($db, 'SELECT id FROM missions WHERE id = ?');
         $missionCheck->bind_param('i', $missionId);
         $missionCheck->execute();
@@ -126,7 +121,7 @@ function missionSuggestionFromClaim(array $claim): array
 
     $source = (string) ($claim['source'] ?? '');
     $sector = '';
-    if (preg_match('/(?:sector|section)\s*0*(\d{1,2})/i', $source, $matches)) {
+    if (preg_match('/0*(\d{1,2})/', $source, $matches)) {
         $sectorNumber = (int) $matches[1];
         if ($sectorNumber >= 1 && $sectorNumber <= 36) {
             $sector = 'Section ' . $sectorNumber;
@@ -696,8 +691,8 @@ $notification = mysqli_fetch_assoc($notification);
             <?php if ($nextMission): ?>
                 <section class="card mission">
                     <div class="current-mission buttons">
-                        <a href="?action=edit&id=<?= $nextMission['id'] ?>" class="queue-button">Aanpassen</a>
-                        <a href="?action=delete&id=<?= $nextMission['id'] ?>" class="queue-button">Verwijder</a>
+                        <a href="?action=edit&id=<?= $nextMission['id'] ?>" class="queue-button edit">Aanpassen</a>
+                        <a href="?action=delete&id=<?= $nextMission['id'] ?>" class="queue-button delete">Verwijderen</a>
                     </div>
                     <h4>HUIDIGE MISSIE</h4>
                     <h2><?= htmlspecialchars($nextMission['area'], ENT_QUOTES, 'UTF-8') ?></h2>
@@ -767,10 +762,10 @@ $notification = mysqli_fetch_assoc($notification);
                                     <form method="POST" class="queue-activation-form">
                                         <input type="hidden" name="action" value="activate_mission">
                                         <input type="hidden" name="mission_id" value="<?= (int) $queuedMission['id'] ?>">
-                                        <button type="submit" class="queue-button">Activeer nu</button>
+                                        <button type="submit" class="queue-button activate">Activeren</button>
                                     </form>
-                                    <a href="?action=edit&id=<?= $queuedMission['id'] ?>" class="queue-button">Aanpassen</a>
-                                    <a href="?action=delete&id=<?= $queuedMission['id'] ?>" class="queue-button">Verwijder</a>
+                                    <a href="?action=edit&id=<?= $queuedMission['id'] ?>" class="queue-button edit">Aanpassen</a>
+                                    <a href="?action=delete&id=<?= $queuedMission['id'] ?>" class="queue-button delete">Verwijderen</a>
                                 </div>
                             </article>
                         <?php endforeach; ?>

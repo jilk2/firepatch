@@ -45,6 +45,11 @@ mysqli_close($db);
         <main class="page">
             <div class="page-actions">
                 <a href="verifynet.php" class="btn primary" style="width: 200px;">&larr; Terug naar Overzicht</a>
+                <form method="POST" action="mission.php">
+                    <input type="hidden" name="action" value="prepare_mission">
+                    <input type="hidden" name="claim_id" value="<?= (int) $claim['id'] ?>">
+                    <button type="submit" class="btn primary">Maak missie aan</button>
+                </form>
             </div>
 
             <div class="card claim-detail-card">
