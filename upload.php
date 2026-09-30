@@ -5,19 +5,19 @@ if ($_SERVER["REQUEST_METHOD"] !== "POST") {
     exit("Ongeldige request.");
 }
 
-$title = trim($_POST["name"] ?? "");
-$time = trim($_POST["time"] ?? "");
-$sector = filter_var($_POST["sector"] ?? null, FILTER_VALIDATE_INT);
-$authorEmail = trim($_POST["author_email"] ?? "");
+$author = $_POST["author_email"];
+$title = $_POST["title"];
+$description = $_POST["description"];
+$sector = $_POST["sector"];
+// $evidence = $_POST["evidence"];
 
-if ($title === "" || $time === "" || $sector === false || $sector < 1 || $sector > 32 || $authorEmail === "") {
-    die("Vul een activiteit, sector en ingelogde gebruiker in.");
-}
+$adminEmails = ['admin@firepatch.nl'];
+$claimStatus = in_array($author, $adminEmails, true) ? 'true' : 'pending';
 
 $imagePath = null;
 
-if (isset($_FILES["fileToUpload"]) && $_FILES["fileToUpload"]["error"] !== UPLOAD_ERR_NO_FILE) {
-    if ($_FILES["fileToUpload"]["error"] !== UPLOAD_ERR_OK) {
+if (isset($_FILES["evidence"]) && $_FILES["evidence"]["error"] !== UPLOAD_ERR_NO_FILE) {
+    if ($_FILES["evidence"]["error"] !== UPLOAD_ERR_OK) {
         die("De foto kon niet worden geüpload.");
     }
 
@@ -27,9 +27,9 @@ if (isset($_FILES["fileToUpload"]) && $_FILES["fileToUpload"]["error"] !== UPLOA
         "image/webp" => "webp",
     ];
 
-    $finfo = @getimagesize($_FILES["fileToUpload"]["tmp_name"]);
+    $finfo = @getimagesize($_FILES["evidence"]["tmp_name"]);
     if ($finfo === false || !isset($allowedTypes[$finfo["mime"]])) {
-        die("Kies een geldige JPG, PNG, GIF of WebP foto.");
+        die("Kies een geldige JPG, PNG of WebP foto.");
     }
 
     $uploadDir = __DIR__ . "/uploads/";
@@ -41,33 +41,55 @@ if (isset($_FILES["fileToUpload"]) && $_FILES["fileToUpload"]["error"] !== UPLOA
     $fileName = uniqid("claim_", true) . "." . $extension;
     $targetPath = $uploadDir . $fileName;
 
-    if (!move_uploaded_file($_FILES["fileToUpload"]["tmp_name"], $targetPath)) {
+    if (!move_uploaded_file($_FILES["evidence"]["tmp_name"], $targetPath)) {
         die("De foto kon niet worden opgeslagen.");
     }
 
     $imagePath = "uploads/" . $fileName;
 }
 
-$description = "Sector " . $sector . " | Tijd: " . $time;
+$x_value = null;
+$y_value = null;
 
-$stmt = $pdo->prepare("
-    INSERT INTO claims (Title, description, source, Status, author_email, image_path)
-    VALUES (?, ?, ?, ?, ?, ?)
-");
+if ($sector !== false) {
+    $x_start = ($sector - 1) % 6;
+    $y_start = floor(($sector - 1) / 6);
+    $x_offset = random_int(0, 999999) / 1000000;
+    $y_offset = random_int(0, 999999) / 1000000;
 
-$stmt->execute([
-    $title,
-    $description,
-    "",
-    "pending",
-    $authorEmail,
-    $imagePath
-]);
+    $x_value = ($x_start + $x_offset) / 6;
+    $y_value = ($y_start + $y_offset) / 6;
+}
 
-header("Location: verifynet.php");
+try {
+    $sql = "INSERT INTO `claims`
+        (`title`, `description`, `image_path`, `source`, `status`, `author_email`, `timestamp`, `x_value`, `y_value`)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+    $stmt = $pdo->prepare($sql);
+
+    $stmt->execute([
+        $title,
+        $description !== '' ? $description : null,
+        $imagePath,
+        $sector,
+        $claimStatus,
+        $author,
+        date('Y-m-d H:i:s'),
+        $x_value,
+        $y_value
+    ]);
+
+    echo "New record created successfully";
+    header("Location: verifynet.php");
+    exit;
+
+} catch (PDOException $e) {
+    echo $sql . "<br>" . $e->getMessage();
+}
+
 exit;
 ?>
-
 declare(strict_types=1);
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
