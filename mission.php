@@ -50,38 +50,85 @@ function missionSuggestionFromClaim(array $claim): array
         ];
     }
 
-    $source = (string) ($claim['source'] ?? '');
     $sector = '';
-    if (preg_match('/(?:sector|section)\s*0*(\d{1,2})/i', $source, $matches)) {
-        $sectorNumber = (int) $matches[1];
+    
+    
+    if (isset($claim['x_value']) && isset($claim['y_value'])) {
+        
+        $x_index = floor((float)$claim['x_value'] * 6);
+        $y_index = floor((float)$claim['y_value'] * 6);
+        
+        
+        $sectorNumber = ($y_index * 6) + $x_index + 1;
+        
         if ($sectorNumber >= 1 && $sectorNumber <= 36) {
             $sector = 'Section ' . $sectorNumber;
         }
     }
-    //    /.../
-    //    Markeren het begin en einde van het patroon.
-
-    //    (?:sector|section)
-    //    Zoek het woord sector óf section.
-    //    ?: betekent dat deze groep niet apart wordt opgeslagen.
-
-    //    \s*
-    //    Accepteer nul of meer spaties. Dus zowel Sector8 als Sector 8.
-
-    //    0*
-    //    Accepteer voorloopnullen. Dus 8 en 008.
-
-    //    (\d{1,2})
-    //    Zoek één of twee cijfers. De haakjes slaan het gevonden sectornummer op in $matches[1].
-
-    //    /i
-    //    Hoofdletterongevoelig. Sector, SECTOR en sector werken allemaal.
-
-    //    preg_match() geeft 1 terug wanneer er een match is, 0 wanneer er geen match is. Daarom kan het direct in een if worden gebruikt.
 
     $suggestion['sector'] = $sector;
     return $suggestion;
 }
+
+// function missionSuggestionFromClaim(array $claim): array
+// {
+//     $claimText = strtolower(trim(implode(' ', [
+//         (string) ($claim['title'] ?? ''),
+//         (string) ($claim['description'] ?? ''),
+//     ])));
+
+//     $suggestion = [
+//         'goal' => 'Inspectie uitvoeren',
+//         'intervention' => '',
+//         'priority' => 'normaal',
+//     ];
+
+//     if (str_contains($claimText, 'brand') || str_contains($claimText, 'vuur')) {
+//         $suggestion = [
+//             'goal' => 'Brand blussen',
+//             'intervention' => 'Brand blussen',
+//             'priority' => 'hoog',
+//         ];
+//     } elseif (str_contains($claimText, 'afval') || str_contains($claimText, 'vuilnis')) {
+//         $suggestion = [
+//             'goal' => 'Afval opruimen',
+//             'intervention' => 'Afval opruimen',
+//             'priority' => 'normaal',
+//         ];
+//     }
+
+//     $source = (string) ($claim['source'] ?? '');
+//     $sector = '';
+//     if (preg_match('/(?:sector|section)\s*0*(\d{1,2})/i', $source, $matches)) {
+//         $sectorNumber = (int) $matches[1];
+//         if ($sectorNumber >= 1 && $sectorNumber <= 36) {
+//             $sector = 'Section ' . $sectorNumber;
+//         }
+//     }
+//     //    /.../
+//     //    Markeren het begin en einde van het patroon.
+
+//     //    (?:sector|section)
+//     //    Zoek het woord sector óf section.
+//     //    ?: betekent dat deze groep niet apart wordt opgeslagen.
+
+//     //    \s*
+//     //    Accepteer nul of meer spaties. Dus zowel Sector8 als Sector 8.
+
+//     //    0*
+//     //    Accepteer voorloopnullen. Dus 8 en 008.
+
+//     //    (\d{1,2})
+//     //    Zoek één of twee cijfers. De haakjes slaan het gevonden sectornummer op in $matches[1].
+
+//     //    /i
+//     //    Hoofdletterongevoelig. Sector, SECTOR en sector werken allemaal.
+
+//     //    preg_match() geeft 1 terug wanneer er een match is, 0 wanneer er geen match is. Daarom kan het direct in een if worden gebruikt.
+
+//     $suggestion['sector'] = $sector;
+//     return $suggestion;
+// }
 
 if (isset($_POST['action']) && $_POST['action'] === 'prepare_mission') {
     $claimId = filter_var($_POST['claim_id'] ?? null, FILTER_VALIDATE_INT, [

@@ -58,11 +58,29 @@ mysqli_close($db);
                     ?>
                     <span class="badge <?= $statusClass; ?>"><?= $statusText; ?></span>
 
-                    <div id="admin-actions" style="display: none; margin-top: 15px; margin-bottom: 15px;">
-                            (<?= $claim['id']; ?>)
+                    <!-- ADMIN ACTIES (Standaard verborgen) -->
+                    <div id="admin-actions" style="display: none; margin-top: 15px; margin-bottom: 15px; gap: 10px; align-items: center; flex-wrap: wrap;">
+                        
+                        <!-- 1. Claim Verwijderen -->
                         <button onclick="verwijderClaim(<?= $claim['id'] ?? 0; ?>)" class="btn primary" style="background-color: #96031A; border-color: #96031A;">
                             ☠ Claim Verwijderen
                         </button>
+
+                        <!-- 2. Missie Aanmaken (POST direct naar mission.php) -->
+                        <?php if ($claim['status'] === 'true'): ?>
+                            <form method="POST" action="mission.php" style="margin: 0;">
+                                <input type="hidden" name="action" value="prepare_mission">
+                                <input type="hidden" name="claim_id" value="<?= $claim['id']; ?>">
+                                <button type="submit" class="btn primary" style="background-color: var(--cyan, #00d5ff); color: #000; border-color: var(--cyan, #00d5ff);">
+                                    🚀 Missie Aanmaken
+                                </button>
+                            </form>
+                        <?php else: ?>
+                            <button disabled class="btn primary" style="background-color: #333; color: #777; border-color: #333; cursor: not-allowed;" title="De status moet eerst 'WAAR' zijn">
+                                🚀 Missie Aanmaken (Vereist status WAAR)
+                            </button>
+                        <?php endif; ?>
+
                     </div>
                 </div>
 
@@ -137,13 +155,14 @@ mysqli_close($db);
     <script>
     const currentUser = localStorage.getItem('verifinet_user');
     
-    // Check admin status om de verwijder-knop zichtbaar te maken
+    
     const adminEmailsList = ["admin@firepatch.nl"]; // Vergeet niet aan te passen!
     const adminActionsDiv = document.getElementById('admin-actions');
 
     if (currentUser && adminEmailsList.includes(currentUser)) {
         if (adminActionsDiv) {
-            adminActionsDiv.style.display = 'block';
+            
+            adminActionsDiv.style.display = 'flex'; 
         }
     }
 
