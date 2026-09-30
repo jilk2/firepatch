@@ -45,11 +45,6 @@ mysqli_close($db);
         <main class="page">
             <div class="page-actions">
                 <a href="verifynet.php" class="btn primary" style="width: 200px;">&larr; Terug naar Overzicht</a>
-                <form method="POST" action="mission.php">
-                    <input type="hidden" name="action" value="prepare_mission">
-                    <input type="hidden" name="claim_id" value="<?= (int) $claim['id'] ?>">
-                    <button type="submit" class="btn primary">Maak missie aan</button>
-                </form>
             </div>
 
             <div class="card claim-detail-card">
@@ -90,7 +85,7 @@ mysqli_close($db);
                 </div>
 
                 <div class="claim-body" style="padding: 20px;">
-                    <h1 style="font-size: 1.5rem; margin-bottom: 10px; color: var(--white);"><?= htmlspecialchars($claim['Title']); ?></h1>
+                    <h1 style="font-size: 1.5rem; margin-bottom: 10px; color: var(--white);"><?= htmlspecialchars($claim['title']); ?></h1>
                     <p class="text-muted" style="margin-bottom: 15px; font-size: 0.9rem; color: white;">Indiener: <strong><?= htmlspecialchars($claim['author_email']); ?></strong> op <?= $claim['timestamp']; ?></p>
                     
                     <?php if (!empty($claim['description'])): ?>
