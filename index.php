@@ -35,6 +35,7 @@ while ($row = mysqli_fetch_assoc($result)) {
     <link rel="stylesheet" href="./css/main.css" />
     <link rel="stylesheet" href="./css/kaart.css" />
     <link rel="stylesheet" href="./css/mission.css" />
+    <script src="./js/kaart.js" defer></script>
     <script src="js/map.js" defer></script>
 </head>
 
@@ -43,7 +44,7 @@ while ($row = mysqli_fetch_assoc($result)) {
     <div class="layout dashboard-layout">
         <?php include("./partials/sidebar.php"); ?>
         <main class="page">
-            <section class="card">
+            <section class="card card-map">
                 <div class="card-head">
                     <h2>Live Kaart - Actieve Patrouilles</h2>
                     <div class="map-badges">
@@ -51,10 +52,11 @@ while ($row = mysqli_fetch_assoc($result)) {
                         <span class="badge">SAT-VIEW V4</span>
                     </div>
                 </div>
-                <div class="map">
+                <div class="map dashboard-map">
                     <img id="map" src="images/map.png" alt="map of the region">
                     <!-- <img id="vlam" src="images/vlammetjes-6-st.jpg" alt="flames"> -->
                     <img id="drone" src="images/drone.png" alt="Drone">
+                    <div class="claim-pins" id="claim-pins" aria-label="Claims op de kaart"></div>
                 </div>
             </section>
 
