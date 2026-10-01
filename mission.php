@@ -105,13 +105,22 @@ function missionSuggestionFromClaim(array $claim): array
         'priority' => 'normaal',
     ];
 
-    if (str_contains($claimText, 'brand') || str_contains($claimText, 'vuur')) {
+    if (
+        str_contains($claimText, 'brand') || 
+        str_contains($claimText, 'vuur') ||
+        str_contains($claimText, 'rook') 
+        ){
         $suggestion = [
             'goal' => 'Brand blussen',
             'intervention' => 'Brand blussen',
             'priority' => 'hoog',
         ];
-    } elseif (str_contains($claimText, 'afval') || str_contains($claimText, 'vuilnis')) {
+    } elseif (
+        str_contains($claimText, 'afval') ||
+        str_contains($claimText, 'vuilnis') ||
+        str_contains($claimText, 'rommel') ||
+        str_contains($claimText, 'zwerfvuil')
+    ) {
         $suggestion = [
             'goal' => 'Afval opruimen',
             'intervention' => 'Afval opruimen',
@@ -120,16 +129,16 @@ function missionSuggestionFromClaim(array $claim): array
     }
 
     $sector = '';
-    
-    
+
+
     if (isset($claim['x_value']) && isset($claim['y_value'])) {
-        
-        $x_index = floor((float)$claim['x_value'] * 6);
-        $y_index = floor((float)$claim['y_value'] * 6);
-        
-        
+
+        $x_index = floor((float) $claim['x_value'] * 6);
+        $y_index = floor((float) $claim['y_value'] * 6);
+
+
         $sectorNumber = ($y_index * 6) + $x_index + 1;
-        
+
         if ($sectorNumber >= 1 && $sectorNumber <= 36) {
             $sector = 'Section ' . $sectorNumber;
         }
@@ -365,69 +374,69 @@ if (isset($_POST['submit'])) {
 
         // Logboek entry for new mission
         // if (!$editMissionId) {
-            // Logboek
-            $logQuery = "INSERT INTO logboek
+        // Logboek
+        $logQuery = "INSERT INTO logboek
                      (mission_id, activity, location, status)
                      VALUES (?, ?, ?, ?)";
 
-            $logStatus = 'pending';
+        $logStatus = 'pending';
 
 
-            // Elk missiedoel apart in het logboek
-            foreach ($goalsArray as $goal) {
+        // Elk missiedoel apart in het logboek
+        foreach ($goalsArray as $goal) {
 
-                $logActivity = $goal;
+            $logActivity = $goal;
 
-                $logResult = mysqli_prepare($db, $logQuery);
+            $logResult = mysqli_prepare($db, $logQuery);
 
-                $logResult->bind_param(
-                    'isss',
-                    $missionId,
-                    $logActivity,
-                    $sector,
-                    $logStatus
-                );
+            $logResult->bind_param(
+                'isss',
+                $missionId,
+                $logActivity,
+                $sector,
+                $logStatus
+            );
 
-                $logResult->execute();
-                $logResult->close();
-            }
+            $logResult->execute();
+            $logResult->close();
+        }
 
 
-            // Elke interventie apart in het logboek
-            foreach ($interventionsArray as $intervention) {
+        // Elke interventie apart in het logboek
+        foreach ($interventionsArray as $intervention) {
 
-                $logActivity = $intervention;
+            $logActivity = $intervention;
 
-                $logResult = mysqli_prepare($db, $logQuery);
+            $logResult = mysqli_prepare($db, $logQuery);
 
-                $logResult->bind_param(
-                    'isss',
-                    $missionId,
-                    $logActivity,
-                    $sector,
-                    $logStatus
-                );
+            $logResult->bind_param(
+                'isss',
+                $missionId,
+                $logActivity,
+                $sector,
+                $logStatus
+            );
 
-                $logResult->execute();
-                $logResult->close();
-            }
+            $logResult->execute();
+            $logResult->close();
+        }
         // }
 
-        if ($claimTransactionStarted) {
-            $deleteClaimQuery = "DELETE FROM claims WHERE id = ? AND `status` = 'true'";
-            $deleteClaimResult = mysqli_prepare($db, $deleteClaimQuery);
-            $deleteClaimResult->bind_param('i', $claimMissionId);
-            $deleteClaimResult->execute();
-            $claimDeleted = $deleteClaimResult->affected_rows === 1;
-            $deleteClaimResult->close();
+        // if ($claimTransactionStarted) {
+        //     $deleteClaimQuery = "DELETE FROM claims WHERE id = ? AND `status` = 'true'";
+        //     $deleteClaimResult = mysqli_prepare($db, $deleteClaimQuery);
+        //     $deleteClaimResult->bind_param('i', $claimMissionId);
+        //     $deleteClaimResult->execute();
+        //     $claimDeleted = $deleteClaimResult->affected_rows === 1;
+        //     $deleteClaimResult->close();
 
-            if ($claimDeleted) {
-                mysqli_commit($db);
-            } else {
-                mysqli_rollback($db);
-                $errors[] = 'De melding kon niet worden verwerkt en is behouden.';
-            }
-        }
+        //     if ($claimDeleted) {
+        //         mysqli_commit($db);
+        //     } else {
+        //         mysqli_rollback($db);
+        //         $errors[] = 'De melding kon niet worden verwerkt en is behouden.';
+        //     }
+        // }
 
         if (empty($errors) && !$editMissionId && $priority === 'high') {
             try {
@@ -763,8 +772,10 @@ if (is_array($notification)) {
                                         <input type="hidden" name="mission_id" value="<?= (int) $queuedMission['id'] ?>">
                                         <button type="submit" class="queue-button activate">Start missie</button>
                                     </form>
-                                    <a href="?action=edit&id=<?= $queuedMission['id'] ?>" class="queue-button edit">Aanpassen</a>
-                                    <a href="?action=delete&id=<?= $queuedMission['id'] ?>" class="queue-button delete">Verwijderen</a>
+                                    <a href="?action=edit&id=<?= $queuedMission['id'] ?>"
+                                        class="queue-button edit">Aanpassen</a>
+                                    <a href="?action=delete&id=<?= $queuedMission['id'] ?>"
+                                        class="queue-button delete">Verwijderen</a>
                                 </div>
                             </article>
                         <?php endforeach; ?>
@@ -783,7 +794,8 @@ if (is_array($notification)) {
 
                 <input type="hidden" name="edit_id" value="<?= $formEditId ?>">
                 <input type="hidden" name="claim_id" value="<?= $claimMissionId ?>">
-                <input type="hidden" name="priority" value="<?= htmlspecialchars($formPriority, ENT_QUOTES, 'UTF-8') ?>">
+                <input type="hidden" name="priority"
+                    value="<?= htmlspecialchars($formPriority, ENT_QUOTES, 'UTF-8') ?>">
 
                 <?php if ($claimMissionMessage): ?>
                     <div class="form-message" role="status">
