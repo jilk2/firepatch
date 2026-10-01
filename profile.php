@@ -12,7 +12,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Haal alle claims van deze gebruiker op
         $stmtClaims =$pdo->prepare("SELECT * FROM claims WHERE author_email = ? ORDER BY timestamp DESC");
         $stmtClaims->execute([$data->email]);
-        $claims =$stmtClaims->fetchAll(PDO::FETCH_ASSOC);
+        $claims = array_map('firepatchNormalizeClaimRow', $stmtClaims->fetchAll(PDO::FETCH_ASSOC));
 
         // Haal alle comments/notities van deze gebruiker op (inclusief de titel van de claim)
         $stmtNotes =$pdo->prepare("
@@ -145,8 +145,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         let html = '<table class="verifinet-table" style="margin-top: 0;"><tbody>';
         claims.forEach(claim => {
             let statusColor = '#ff9f0a'; // Oranje standaard
-            if (claim.Status === 'true') statusColor = '#22f693'; // Groen
-            if (claim.Status === 'false') statusColor = '#96031A'; // Rood
+            if (claim.status === 'true') statusColor = '#22f693'; // Groen
+            if (claim.status === 'false') statusColor = '#96031A'; // Rood
+            const title = claim.title || 'Claim zonder titel';
 
             // Knip tijd uit de timestamp
             const time = claim.timestamp ? claim.timestamp.substring(11, 16) : '??:??';
@@ -157,7 +158,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             html += `
                 <tr style="--row-color: ${statusColor};" onclick="window.location.href='article.php?id=${claim.id}'">
                     <td class="tijd-col" style="width: 80px;">${time}</td>
-                    <td>${claim.Title}</td>
+                    <td>${title}</td>
                 </tr>
             `;
         });

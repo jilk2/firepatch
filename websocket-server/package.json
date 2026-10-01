@@ -1,0 +1,13 @@
+{
+  "name": "firepatch-websocket",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Simple WebSocket relay between the Firepatch website and Unreal Engine",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "ws": "8.22.0"
+  }
+}

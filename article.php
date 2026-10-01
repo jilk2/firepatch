@@ -10,6 +10,10 @@ mysqli_stmt_execute($stmt);
 $result = mysqli_stmt_get_result($stmt);
 $claim = mysqli_fetch_assoc($result);
 
+if (is_array($claim)) {
+    $claim = firepatchNormalizeClaimRow($claim);
+}
+
 if (!$claim) {
     die("Claim niet gevonden.");
 }

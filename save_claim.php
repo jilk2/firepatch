@@ -1,7 +1,5 @@
 <?php
-require "database.php";
-
-require "database.php";
+require_once __DIR__ . '/database.php';
 $sectors = [];
 
 try {

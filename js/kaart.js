@@ -135,38 +135,29 @@ if (sectorGrid) {
 }
 
 function renderClaim(claim, claimX, claimY) {
-  const anchor = document.createElement("a");
+  const pin = document.createElement(sectorGrid ? "a" : "span");
   const image = document.createElement("img");
-  const isSectorAlert = Boolean(sectorGrid);
+  const sectorNumber = sectorNumberForCoordinates(claimX, claimY);
+  const column = (sectorNumber - 1) % 6;
+  const row = Math.floor((sectorNumber - 1) / 6);
 
-  anchor.className = isSectorAlert ? "claim-pin claim-alert" : "claim-pin";
-  anchor.href = `article.php?id=${encodeURIComponent(claim.id)}`;
-  anchor.setAttribute(
-    "aria-label",
-    isSectorAlert
-      ? `Openstaande claim ${claim.id}`
-      : `Bekijk claim ${claim.id}`,
-  );
+  pin.className = "claim-pin claim-alert";
+  pin.setAttribute("aria-label", `Openstaande claim ${claim.id} in sector ${sectorNumber}`);
+  pin.style.left = `${((column + 0.5) / 6) * 100}%`;
+  pin.style.top = `${((row + 0.5) / 6) * 100}%`;
 
-  if (isSectorAlert) {
-    const sectorNumber = sectorNumberForCoordinates(claimX, claimY);
-    const column = (sectorNumber - 1) % 6;
-    const row = Math.floor((sectorNumber - 1) / 6);
-
-    anchor.style.left = `${((column + 0.5) / 6) * 100}%`;
-    anchor.style.top = `${((row + 0.5) / 6) * 100}%`;
-    image.src = "./images/fire_alert.png";
-    image.alt = "Openstaande claim";
+  if (sectorGrid) {
+    pin.href = `article.php?id=${encodeURIComponent(claim.id)}`;
   } else {
-    anchor.style.left = `${claimX * 100}%`;
-    anchor.style.top = `${claimY * 100}%`;
-    image.src = "./images/pin.png";
-    image.alt = "";
-    image.setAttribute("aria-hidden", "true");
+    pin.style.pointerEvents = "none";
+    pin.setAttribute("aria-hidden", "true");
   }
 
-  anchor.appendChild(image);
-  claimPins.appendChild(anchor);
+  image.src = "./images/fire_alert.png";
+  image.alt = "Openstaande claim";
+
+  pin.appendChild(image);
+  claimPins.appendChild(pin);
 }
 
 function renderClaims(claims) {
@@ -189,17 +180,14 @@ function renderClaims(claims) {
     const claimY = hasLocation ? y : 0;
     const sectorNumber = sectorNumberForCoordinates(claimX, claimY);
 
-    sectorCounts.set(
-      sectorNumber,
-      (sectorCounts.get(sectorNumber) || 0) + 1,
-    );
-
     const status = String(claim.status ?? claim.Status ?? "").toLowerCase();
     const isResolved = ["true", "false", "resolved"].includes(status);
 
-    if (sectorGrid && !isResolved) {
-      renderClaim(claim, claimX, claimY);
-    } else if (!sectorGrid) {
+    if (!isResolved) {
+      sectorCounts.set(
+        sectorNumber,
+        (sectorCounts.get(sectorNumber) || 0) + 1,
+      );
       renderClaim(claim, claimX, claimY);
     }
   });

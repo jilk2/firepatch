@@ -14,11 +14,13 @@ function handleClaimLocation(claim) {
 function showLatestClaim(claim) {
     if (!claimAlert || !claimAlertImage || !claimAlertMessage || !claimAlertLink || !claim) return;
 
-    claimAlertMessage.textContent = `${claim.Title}`;
+    const title = claim.title || 'Claim zonder titel';
+
+    claimAlertMessage.textContent = title;
     claimAlertLink.href = `article.php?id=${encodeURIComponent(claim.id)}`;
     claimAlertImage.hidden = !claim.image_path;
     claimAlertImage.src = claim.image_path || '';
-    claimAlertImage.alt = claim.image_path ? `Bewijsafbeelding voor ${claim.Title}` : '';
+    claimAlertImage.alt = claim.image_path ? `Bewijsafbeelding voor ${title}` : '';
     claimAlert.hidden = false;
     handleClaimLocation(claim);
 }

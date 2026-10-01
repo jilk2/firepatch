@@ -6,6 +6,10 @@
 -- Gegenereerd op: 30 sep 2026 om 12:36
 -- Serverversie: 8.4.2
 -- PHP-versie: 8.4.14
+--
+-- MariaDB-compatibele snapshot voor een LEGE database.
+-- NIET uitvoeren op de bestaande NAS-database. Gebruik daarvoor
+-- DB/migrate-nas-20260930.sql; die behoudt bestaande tabellen en gegevens.
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -32,7 +36,7 @@ CREATE TABLE `accounts` (
   `Password` varchar(255) NOT NULL,
   `Claims` varchar(255) DEFAULT NULL,
   `Comments` varchar(255) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Gegevens worden geëxporteerd voor tabel `accounts`
@@ -52,16 +56,16 @@ INSERT INTO `accounts` (`Email`, `Password`, `Claims`, `Comments`) VALUES
 
 CREATE TABLE `claims` (
   `id` int NOT NULL,
-  `title` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `title` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `description` text,
   `image_path` varchar(255) DEFAULT NULL,
   `source` varchar(255) DEFAULT NULL,
-  `status` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `status` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `author_email` varchar(255) NOT NULL,
   `timestamp` datetime DEFAULT CURRENT_TIMESTAMP,
-  `x_value` float NOT NULL,
-  `y_value` float NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  `x_value` double DEFAULT NULL,
+  `y_value` double DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -76,7 +80,7 @@ CREATE TABLE `community_notes` (
   `text` text NOT NULL,
   `source` varchar(255) DEFAULT NULL,
   `timestamp` datetime DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -89,7 +93,7 @@ CREATE TABLE `favorites` (
   `user_email` varchar(255) NOT NULL,
   `claim_id` int NOT NULL,
   `created_at` datetime DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -130,7 +134,7 @@ CREATE TABLE `map_sectors` (
   `x_value` decimal(8,6) UNSIGNED NOT NULL,
   `y_value` decimal(8,6) UNSIGNED NOT NULL,
   `state` varchar(32) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Gegevens worden geëxporteerd voor tabel `map_sectors`
@@ -182,15 +186,15 @@ INSERT INTO `map_sectors` (`sector_number`, `sector_name`, `x_value`, `y_value`,
 
 CREATE TABLE `missions` (
   `id` int NOT NULL,
-  `area` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT 'Kralingse Bos',
-  `purpose` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
-  `interventions` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `area` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'Kralingse Bos',
+  `purpose` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `interventions` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `start-time` datetime NOT NULL,
   `end-time` datetime NOT NULL,
-  `purpose_state` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT 'Gepland',
+  `purpose_state` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'Gepland',
   `mission_state` varchar(15) NOT NULL DEFAULT 'queued',
   `priority` varchar(15) NOT NULL DEFAULT 'normal'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Gegevens worden geëxporteerd voor tabel `missions`

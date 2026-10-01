@@ -13,7 +13,7 @@ $stmt = $pdo->query("
     ORDER BY c.timestamp DESC
 ");
 
-$claims = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$claims = array_map('firepatchNormalizeClaimRow', $stmt->fetchAll(PDO::FETCH_ASSOC));
 
 echo json_encode(["success" => true, "data" => $claims]);
 ?>

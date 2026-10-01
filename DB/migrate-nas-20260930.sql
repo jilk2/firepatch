@@ -1,14 +1,21 @@
--- MariaDB-compatibele, niet-destructieve versie van map_sectors.sql.
+-- Firepatch NAS-migratie voor MariaDB 10.
+-- Niet-destructief en herhaalbaar: geen DROP, DELETE of TRUNCATE.
+-- Maak voor de zekerheid eerst een export van database TLE-1.
 
-CREATE TABLE IF NOT EXISTS `map_sectors` (
-  `sector_number` TINYINT UNSIGNED NOT NULL,
-  `sector_name` VARCHAR(50) NOT NULL DEFAULT '',
-  `x_value` DECIMAL(8,6) UNSIGNED NOT NULL,
-  `y_value` DECIMAL(8,6) UNSIGNED NOT NULL,
-  `state` VARCHAR(32) NOT NULL,
-  PRIMARY KEY (`sector_number`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+SET NAMES utf8mb4;
 
+-- Claims: behoud alle bestaande meldingen en voeg alleen de nieuwe velden toe.
+ALTER TABLE `claims`
+  ADD COLUMN IF NOT EXISTS `image_path` VARCHAR(2048) NULL AFTER `author_email`,
+  ADD COLUMN IF NOT EXISTS `x_value` DOUBLE NULL AFTER `timestamp`,
+  ADD COLUMN IF NOT EXISTS `y_value` DOUBLE NULL AFTER `x_value`;
+
+-- Ook databases uit de recente teamdump moeten claims zonder sector accepteren.
+ALTER TABLE `claims`
+  MODIFY COLUMN `x_value` DOUBLE NULL,
+  MODIFY COLUMN `y_value` DOUBLE NULL;
+
+-- Sectornamen en coördinaten. Een bestaande state wordt bewust niet overschreven.
 ALTER TABLE `map_sectors`
   ADD COLUMN IF NOT EXISTS `sector_name` VARCHAR(50) NOT NULL DEFAULT '' AFTER `sector_number`,
   ADD COLUMN IF NOT EXISTS `x_value` DECIMAL(8,6) UNSIGNED NOT NULL DEFAULT 0 AFTER `sector_name`,
@@ -56,3 +63,31 @@ ON DUPLICATE KEY UPDATE
   `sector_name` = VALUES(`sector_name`),
   `x_value` = VALUES(`x_value`),
   `y_value` = VALUES(`y_value`);
+
+-- Missievelden die de huidige teamcode gebruikt.
+ALTER TABLE `missions`
+  ADD COLUMN IF NOT EXISTS `purpose_state` VARCHAR(255) NOT NULL DEFAULT '[]' AFTER `end-time`,
+  ADD COLUMN IF NOT EXISTS `mission_state` VARCHAR(32) NOT NULL DEFAULT 'queued' AFTER `purpose_state`,
+  ADD COLUMN IF NOT EXISTS `priority` VARCHAR(32) NOT NULL DEFAULT 'normal' AFTER `mission_state`,
+  ADD COLUMN IF NOT EXISTS `state` VARCHAR(255) NULL AFTER `priority`;
+
+-- Oude installaties hadden purpose_state onder de naam state. De kolom wordt
+-- hierboven zo nodig toegevoegd, zodat deze kopie geen information_schema-
+-- rechten nodig heeft en bestaande waarden behouden blijven.
+UPDATE `missions`
+SET `purpose_state` = `state`
+WHERE `state` IS NOT NULL
+  AND `state` <> ''
+  AND (`purpose_state` IS NULL OR `purpose_state` = '' OR `purpose_state` = '[]');
+
+-- Nieuwe logboekregels koppelen aan een missie; oude regels blijven intact.
+ALTER TABLE `logboek`
+  ADD COLUMN IF NOT EXISTS `mission_id` INT NULL AFTER `created_at`;
+
+-- Controles zonder toegang tot information_schema. Iedere SHOW-opdracht hoort
+-- exact één kolomregel terug te geven.
+SHOW COLUMNS FROM `claims` LIKE 'x_value';
+SHOW COLUMNS FROM `claims` LIKE 'y_value';
+SHOW COLUMNS FROM `map_sectors` LIKE 'sector_name';
+SHOW COLUMNS FROM `missions` LIKE 'mission_state';
+SHOW COLUMNS FROM `logboek` LIKE 'mission_id';

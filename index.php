@@ -35,8 +35,8 @@ while ($row = mysqli_fetch_assoc($result)) {
     <link rel="stylesheet" href="./css/main.css" />
     <link rel="stylesheet" href="./css/kaart.css" />
     <link rel="stylesheet" href="./css/mission.css" />
-    <script src="./js/kaart.js" defer></script>
-    <script src="js/map.js" defer></script>
+    <script src="./js/kaart.js?v=20261001-resolve-sector" defer></script>
+    <script src="js/map.js?v=20261001-unreal-json" defer></script>
 </head>
 
 <body>

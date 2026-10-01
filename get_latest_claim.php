@@ -8,8 +8,9 @@ require_once __DIR__ . '/database.php';
 
 try {
     $statement = $pdo->query(
-        'SELECT id, Title, source, image_path, timestamp
+        'SELECT id, title AS title, source, image_path, timestamp
          FROM claims
+         WHERE LOWER(status) NOT IN ('resolved', 'true', 'false')
          ORDER BY id DESC
          LIMIT 1'
     );

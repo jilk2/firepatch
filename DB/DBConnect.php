@@ -57,6 +57,81 @@ function firepatchDatabaseConfig(): array
     return $config;
 }
 
+/**
+ * Synology gebruikt voor MariaDB 10 meestal poort 3307, terwijl lokale
+ * installaties vaak 3306 gebruiken. Probeer voor een lokale database beide
+ * adressen en poorten, met de ingestelde combinatie altijd als eerste.
+ */
+function firepatchConnectionCandidates(array $config): array
+{
+    $configuredHost = (string) $config['host'];
+    $configuredPort = (int) $config['port'];
+    $candidates = [[$configuredHost, $configuredPort]];
+
+    if (in_array($configuredHost, ['127.0.0.1', 'localhost'], true)) {
+        $candidates = array_merge($candidates, [
+            ['127.0.0.1', 3307],
+            ['localhost', 3307],
+            ['127.0.0.1', 3306],
+            ['localhost', 3306],
+        ]);
+    }
+
+    $unique = [];
+    foreach ($candidates as [$host, $port]) {
+        $unique[$host . ':' . $port] = [$host, $port];
+    }
+
+    return array_values($unique);
+}
+
+/**
+ * De eerste Firepatch-database gebruikte Title en Status met hoofdletters.
+ * Nieuwe code gebruikt title en status. Houd beide databases zonder migratie
+ * compatibel door claimresultaten direct na het ophalen te normaliseren.
+ */
+function firepatchNormalizeClaimRow(array $claim): array
+{
+    if (!array_key_exists('title', $claim) && array_key_exists('Title', $claim)) {
+        $claim['title'] = $claim['Title'];
+    }
+
+    if (!array_key_exists('status', $claim) && array_key_exists('Status', $claim)) {
+        $claim['status'] = $claim['Status'];
+    }
+
+    return $claim;
+}
+
+/**
+ * Bepaal de sector uit genormaliseerde kaartcoordinaten. Oude claims hadden
+ * nog geen coordinaten; probeer daarbij "Sector 8" uit source te herkennen.
+ */
+function firepatchClaimSectorNumber(array $claim): ?int
+{
+    $x = $claim['x_value'] ?? null;
+    $y = $claim['y_value'] ?? null;
+
+    if (is_numeric($x) && is_numeric($y)) {
+        $x = (float) $x;
+        $y = (float) $y;
+
+        if ($x >= 0.0 && $x <= 1.0 && $y >= 0.0 && $y <= 1.0) {
+            $column = min(5, max(0, (int) floor($x * 6)));
+            $row = min(5, max(0, (int) floor($y * 6)));
+
+            return ($row * 6) + $column + 1;
+        }
+    }
+
+    $source = (string) ($claim['source'] ?? '');
+    if (preg_match('/\bsector\s*([1-9]|[12][0-9]|3[0-6])\b/i', $source, $matches) === 1) {
+        return (int) $matches[1];
+    }
+
+    return null;
+}
+
 function firepatchPdo(): PDO
 {
     static $connection = null;
@@ -70,21 +145,32 @@ function firepatchPdo(): PDO
     }
 
     $config = firepatchDatabaseConfig();
-    $dsn = sprintf(
-        'mysql:host=%s;port=%d;dbname=%s;charset=%s',
-        $config['host'],
-        $config['port'],
-        $config['name'],
-        $config['charset']
-    );
+    $lastException = null;
 
-    $connection = new PDO($dsn, $config['user'], $config['password'], [
-        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-        PDO::ATTR_EMULATE_PREPARES => false,
-    ]);
+    foreach (firepatchConnectionCandidates($config) as [$host, $port]) {
+        $dsn = sprintf(
+            'mysql:host=%s;port=%d;dbname=%s;charset=%s',
+            $host,
+            $port,
+            $config['name'],
+            $config['charset']
+        );
 
-    return $connection;
+        try {
+            $connection = new PDO($dsn, $config['user'], $config['password'], [
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                PDO::ATTR_EMULATE_PREPARES => false,
+                PDO::ATTR_TIMEOUT => 3,
+            ]);
+
+            return $connection;
+        } catch (PDOException $exception) {
+            $lastException = $exception;
+        }
+    }
+
+    throw $lastException ?? new RuntimeException('Kon geen databaseverbinding maken.');
 }
 
 function firepatchMysqli(): mysqli
@@ -102,14 +188,29 @@ function firepatchMysqli(): mysqli
     $config = firepatchDatabaseConfig();
     mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
-    $connection = mysqli_connect(
-        $config['host'],
-        $config['user'],
-        $config['password'],
-        $config['name'],
-        $config['port']
-    );
-    mysqli_set_charset($connection, $config['charset']);
+    $lastException = null;
 
-    return $connection;
+    foreach (firepatchConnectionCandidates($config) as [$host, $port]) {
+        $candidate = mysqli_init();
+        $candidate->options(MYSQLI_OPT_CONNECT_TIMEOUT, 3);
+
+        try {
+            $candidate->real_connect(
+                $host,
+                $config['user'],
+                $config['password'],
+                $config['name'],
+                $port
+            );
+            $candidate->set_charset($config['charset']);
+            $connection = $candidate;
+
+            return $connection;
+        } catch (mysqli_sql_exception $exception) {
+            $lastException = $exception;
+            $candidate->close();
+        }
+    }
+
+    throw $lastException ?? new RuntimeException('Kon geen databaseverbinding maken.');
 }

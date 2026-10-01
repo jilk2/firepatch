@@ -11,7 +11,7 @@
     <title>Firepatch - Kaart</title>
     <link rel="stylesheet" href="./css/main.css"/>
     <link rel="stylesheet" href="./css/kaart.css"/>
-    <script src="./js/kaart.js" defer></script>
+    <script src="./js/kaart.js?v=20261001-resolve-sector" defer></script>
 </head>
 
 <body>

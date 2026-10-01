@@ -84,7 +84,7 @@ if (isset($_POST['action']) && $_POST['action'] === 'activate_mission') {
     } else {
         try {
             activateMission($db, $missionId);
-            header('Location: mission.php');
+            header('Location: index.php');
             exit();
         } catch (Throwable $exception) {
             $errors[] = $exception->getMessage();
@@ -154,6 +154,10 @@ if (isset($_POST['action']) && $_POST['action'] === 'prepare_mission') {
         $claimStatement->execute();
         $claim = $claimStatement->get_result()->fetch_assoc();
         $claimStatement->close();
+
+        if (is_array($claim)) {
+            $claim = firepatchNormalizeClaimRow($claim);
+        }
 
         if (!$claim) {
             $errors[] = 'Alleen bevestigde meldingen kunnen een missievoorstel maken.';
@@ -428,6 +432,8 @@ if (isset($_POST['submit'])) {
         if (empty($errors) && !$editMissionId && $priority === 'high') {
             try {
                 activateMission($db, $missionId);
+                header('Location: index.php');
+                exit();
             } catch (Throwable $exception) {
                 $errors[] = 'De high-priority missie kon niet worden geactiveerd.';
             }
@@ -580,6 +586,10 @@ require_once('./partials/currentmission.php');
 $notificationQuery = "SELECT * FROM claims WHERE `status` = 'true' ORDER BY `timestamp` DESC LIMIT 1";
 $notification = mysqli_query($db, $notificationQuery);
 $notification = mysqli_fetch_assoc($notification);
+
+if (is_array($notification)) {
+    $notification = firepatchNormalizeClaimRow($notification);
+}
 
 ?>
 
@@ -751,7 +761,7 @@ $notification = mysqli_fetch_assoc($notification);
                                     <form method="POST" class="queue-activation-form">
                                         <input type="hidden" name="action" value="activate_mission">
                                         <input type="hidden" name="mission_id" value="<?= (int) $queuedMission['id'] ?>">
-                                        <button type="submit" class="queue-button activate">Activeren</button>
+                                        <button type="submit" class="queue-button activate">Start missie</button>
                                     </form>
                                     <a href="?action=edit&id=<?= $queuedMission['id'] ?>" class="queue-button edit">Aanpassen</a>
                                     <a href="?action=delete&id=<?= $queuedMission['id'] ?>" class="queue-button delete">Verwijderen</a>

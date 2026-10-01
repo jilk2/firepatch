@@ -6,7 +6,7 @@ $result = mysqli_query($db, $sql);
 
 $claims = [];
 while ($row = mysqli_fetch_assoc($result)) {
-    $claims[] = $row;
+    $claims[] = firepatchNormalizeClaimRow($row);
 }
 mysqli_close($db);
 ?>
@@ -53,7 +53,8 @@ mysqli_close($db);
                                 </tr>
                             <?php else: ?>
                                 <?php foreach ($claims as $claim):
-                                        $tijd = isset($claim['timestamp']) ? date('H:i', strtotime($claim['timestamp'])) : 'N.v.t.';
+                                    $tijd = isset($claim['timestamp']) ? date('H:i', strtotime($claim['timestamp'])) : 'N.v.t.';
+                                    $sectorNumber = firepatchClaimSectorNumber($claim);
 
                                     $statusKleur = '#ff9f0a'; // Oranje (In onderzoek / Pending) als standaard
                                     if (isset($claim['status'])) {
@@ -66,7 +67,7 @@ mysqli_close($db);
 
                                         <td class="tijd-col"><?= $tijd; ?></td>
                                         <td><?= htmlspecialchars($claim['title'] ?? 'Geen titel'); ?></td>
-                                        <td><?= htmlspecialchars($claim['source'] ?? 'Onbekend'); ?></td>
+                                        <td><?= $sectorNumber !== null ? 'Sector ' . $sectorNumber : 'Onbekend'; ?></td>
                                         <td>
                                             <?php if (!empty($claim['image_path'])): ?>
                                                 <div style="width: 80px; height: 40px; background: url('<?= htmlspecialchars($claim['image_path']); ?>') center/cover; border-radius: 4px; border: 1px solid #6D676E;"></div>
