@@ -449,7 +449,7 @@ if (isset($_POST['submit'])) {
         }
 
         if (empty($errors)) {
-            header('Location: mission.php');
+            header('Location: index.php');
             exit();
         }
     }
